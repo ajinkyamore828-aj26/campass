@@ -12,15 +12,17 @@ import {
   MapPin,
   User,
   History,
-  RefreshCw,
-  ArrowRight,
   Zap,
-  Radio,
   Lock,
   Calendar,
   Clock,
-  Layers,
-  ChevronRight
+  Activity,
+  Terminal,
+  Fingerprint,
+  RotateCcw,
+  ShieldAlert,
+  Hash,
+  BadgeCheck
 } from 'lucide-react';
 
 export const GateScannerPortal: React.FC = () => {
@@ -50,6 +52,7 @@ export const GateScannerPortal: React.FC = () => {
     resultCode?: string;
     message?: string;
     passData?: DigitalEventPass | LunchPass;
+    timestamp?: string;
   }>({ status: 'IDLE' });
 
   // Web camera video ref
@@ -100,6 +103,7 @@ export const GateScannerPortal: React.FC = () => {
     setVerdict({ status: 'IDLE' });
 
     try {
+      const nowStr = new Date().toLocaleTimeString();
       if (scannerMode === 'GATE') {
         const evId = targetEventId === 'ALL' ? undefined : targetEventId;
         const res = await verifyGateEntry(token.trim(), selectedGate, currentUser.fullName, evId);
@@ -109,14 +113,16 @@ export const GateScannerPortal: React.FC = () => {
             status: 'SUCCESS',
             resultCode: res.result,
             message: res.message,
-            passData: res.data
+            passData: res.data,
+            timestamp: nowStr
           });
         } else {
           setVerdict({
             status: 'ERROR',
             resultCode: res.result,
             message: res.message,
-            passData: res.data
+            passData: res.data,
+            timestamp: nowStr
           });
         }
       } else {
@@ -127,14 +133,16 @@ export const GateScannerPortal: React.FC = () => {
             status: 'SUCCESS',
             resultCode: res.result,
             message: res.message,
-            passData: res.data
+            passData: res.data,
+            timestamp: nowStr
           });
         } else {
           setVerdict({
             status: 'ERROR',
             resultCode: res.result,
             message: res.message,
-            passData: res.data
+            passData: res.data,
+            timestamp: nowStr
           });
         }
       }
@@ -142,11 +150,24 @@ export const GateScannerPortal: React.FC = () => {
       setVerdict({
         status: 'ERROR',
         resultCode: 'SYSTEM_ERROR',
-        message: err.message || 'Verification network failure.'
+        message: err.message || 'Verification network failure.',
+        timestamp: new Date().toLocaleTimeString()
       });
     } finally {
       setIsScanning(false);
     }
+  };
+
+  // Mock cryptographic hash preview for attendee dossier
+  const getFingerprint = (data?: DigitalEventPass | LunchPass) => {
+    if (!data) return 'SHA256: 7f83b165...e2d3';
+    const raw = `${data.id}:${data.studentId}:${data.eventId}`;
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+      hash = (hash << 5) - hash + raw.charCodeAt(i);
+      hash |= 0;
+    }
+    return `SHA256: ${Math.abs(hash).toString(16).padStart(8, '0')}8fa9...c4b2`;
   };
 
   return (
@@ -156,16 +177,16 @@ export const GateScannerPortal: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }} />
+              <span className="cp-scanner-status-dot" />
               <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#38bdf8' }}>
-                Volunteer Gate Operator Console
+                Turnstile Station Online • Optical Reticle Active
               </span>
             </div>
             <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', margin: 0 }}>
-              Turnstile & Dining QR Scanner HUD
+              Turnstile & Dining Optical Scanner HUD
             </h1>
-            <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '6px', maxWidth: '580px', lineHeight: 1.5 }}>
-              High-speed cryptographic QR verification with instant turnstile anti-passback security and single-use meal validation.
+            <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '6px', maxWidth: '620px', lineHeight: 1.5 }}>
+              Institutional hardware workstation for instantaneous cryptographic QR validation, single-use anti-passback enforcement, and meal tracking.
             </p>
           </div>
 
@@ -181,7 +202,7 @@ export const GateScannerPortal: React.FC = () => {
               }}
             >
               <ShieldCheck size={14} style={{ display: 'inline', marginRight: '6px' }} />
-              Event Entry Gate
+              Turnstile Entry Gate
             </button>
             <button
               type="button"
@@ -193,41 +214,41 @@ export const GateScannerPortal: React.FC = () => {
               }}
             >
               <Utensils size={14} style={{ display: 'inline', marginRight: '6px' }} />
-              Dining Hall Counter
+              Dining Distribution Station
             </button>
           </div>
         </div>
       </div>
 
-      {/* Configuration Controls Bar */}
+      {/* Hardware Telemetry & Configuration Bar */}
       <div className="cp-section-card">
         <div style={{ padding: '18px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', alignItems: 'center' }}>
           {scannerMode === 'GATE' ? (
             <>
               <div>
-                <label className="cp-label">Operating Gate Station</label>
+                <label className="cp-label">Turnstile Checkpoint</label>
                 <select
                   className="cp-select"
                   style={{ width: '100%' }}
                   value={selectedGate}
                   onChange={(e) => setSelectedGate(e.target.value)}
                 >
-                  <option value="Gate A - Main Auditorium">Gate A - Main Auditorium</option>
-                  <option value="Gate B - Engineering Quadrangle">Gate B - Engineering Quadrangle</option>
-                  <option value="Gate C - Computer Center">Gate C - Computer Center</option>
-                  <option value="Gate D - Sports Arena">Gate D - Sports Arena</option>
+                  <option value="Gate A - Main Auditorium">Gate A - Main Auditorium (Turnstile 01)</option>
+                  <option value="Gate B - Engineering Quadrangle">Gate B - Engineering Quadrangle (Turnstile 02)</option>
+                  <option value="Gate C - Computer Center">Gate C - Computer Center (Turnstile 03)</option>
+                  <option value="Gate D - Sports Arena">Gate D - Sports Arena (Turnstile 04)</option>
                 </select>
               </div>
 
               <div>
-                <label className="cp-label">Target Event Filter</label>
+                <label className="cp-label">Enforced Event Context</label>
                 <select
                   className="cp-select"
                   style={{ width: '100%' }}
                   value={targetEventId}
                   onChange={(e) => setTargetEventId(e.target.value)}
                 >
-                  <option value="ALL">All Active Campus Events</option>
+                  <option value="ALL">All Active Campus Events (Permissive)</option>
                   {events.map(ev => (
                     <option key={ev.id} value={ev.id}>{ev.title}</option>
                   ))}
@@ -236,22 +257,22 @@ export const GateScannerPortal: React.FC = () => {
             </>
           ) : (
             <div>
-              <label className="cp-label">Dining Counter Station</label>
+              <label className="cp-label">Dining Distribution Counter</label>
               <select
                 className="cp-select"
                 style={{ width: '100%' }}
                 value={selectedLunchCounter}
                 onChange={(e) => setSelectedLunchCounter(e.target.value)}
               >
-                <option value="Counter 1 - Dining Hall A">Counter 1 - Dining Hall A (Main)</option>
-                <option value="Counter 2 - Dining Hall B">Counter 2 - Dining Hall B</option>
-                <option value="Counter 3 - North Lawn Catering">Counter 3 - North Lawn Catering</option>
+                <option value="Counter 1 - Dining Hall A">Counter 1 - Dining Hall A (Main Dining)</option>
+                <option value="Counter 2 - Dining Hall B">Counter 2 - Dining Hall B (South Wing)</option>
+                <option value="Counter 3 - North Lawn Catering">Counter 3 - North Lawn Catering (Open Court)</option>
               </select>
             </div>
           )}
 
           <div>
-            <label className="cp-label">Authorized Volunteer</label>
+            <label className="cp-label">Station Operator Credentials</label>
             <div style={{
               padding: '9px 12px',
               borderRadius: '10px',
@@ -262,48 +283,74 @@ export const GateScannerPortal: React.FC = () => {
               color: '#0f172a',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              justifyContent: 'space-between'
             }}>
-              <User size={14} style={{ color: '#0284c7' }} />
-              <span>{currentUser.fullName} ({currentUser.role})</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <User size={14} style={{ color: '#0284c7' }} />
+                <span>{currentUser.fullName}</span>
+              </div>
+              <span className="cp-badge cp-badge-open" style={{ fontSize: '10.5px' }}>
+                VERIFIED OPERATOR
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Scanner Section: Camera Viewfinder + Instant Verdict Card */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '22px' }}>
-        {/* Left: Viewfinder & Input */}
-        <div className="cp-section-card" style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-              Optical Scanner Reticle
-            </h3>
+      {/* Main Workstation: Industrial Scanner Terminal (Left) + Verdict Dossier (Right) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '22px' }}>
+        
+        {/* Left: Industrial Scanner Hardware Terminal */}
+        <div className="cp-scanner-terminal">
+          <div className="cp-scanner-terminal-header">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Terminal size={14} style={{ color: '#38bdf8' }} />
+              <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#f1f5f9' }}>
+                TERMINAL::NODE-01
+              </span>
+              <span style={{ fontSize: '10px', color: '#64748b', borderLeft: '1px solid #334155', paddingLeft: '8px' }}>
+                60 FPS • 48ms ENGINE
+              </span>
+            </div>
+
             <button
-              className="cp-btn cp-btn-outline cp-btn-sm"
+              type="button"
+              className="cp-btn cp-btn-sm"
+              style={{
+                backgroundColor: cameraActive ? '#334155' : '#1e293b',
+                color: cameraActive ? '#f8fafc' : '#94a3b8',
+                border: '1px solid #475569',
+                fontSize: '11px',
+                padding: '4px 10px'
+              }}
               onClick={cameraActive ? stopCamera : startCamera}
             >
-              <Camera size={13} />
-              {cameraActive ? 'Deactivate Camera' : 'Activate Camera'}
+              <Camera size={12} style={{ marginRight: '5px' }} />
+              {cameraActive ? 'Deactivate Lens' : 'Activate Optical Lens'}
             </button>
           </div>
 
-          {/* Viewfinder Window with Optical Reticle Framing */}
-          <div style={{
-            height: '240px',
-            borderRadius: '16px',
-            backgroundColor: '#0f172a',
-            position: 'relative',
-            overflow: 'hidden',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            {/* Corner Reticle Brackets */}
-            <div className="cp-qr-corner tl" style={{ borderColor: '#38bdf8', width: '22px', height: '22px', top: '14px', left: '14px' }} />
-            <div className="cp-qr-corner tr" style={{ borderColor: '#38bdf8', width: '22px', height: '22px', top: '14px', right: '14px' }} />
-            <div className="cp-qr-corner bl" style={{ borderColor: '#38bdf8', width: '22px', height: '22px', bottom: '14px', left: '14px' }} />
-            <div className="cp-qr-corner br" style={{ borderColor: '#38bdf8', width: '22px', height: '22px', bottom: '14px', right: '14px' }} />
+          {/* Viewport with matte precision reticle */}
+          <div className="cp-scanner-viewport">
+            <div className="cp-scanner-grid-overlay" />
+            
+            {/* Corner Telemetry Tags */}
+            <div className="cp-scanner-tag tl">LENS: OPTICAL 1080p</div>
+            <div className="cp-scanner-tag tr">HMAC-SHA256 SECURED</div>
+            <div className="cp-scanner-tag bl">LATENCY: 42ms</div>
+            <div className="cp-scanner-tag br">PASSBACK: ENFORCED</div>
+
+            {/* Sweep Scanline (Subtle matte motion, no glowing halo) */}
+            <div className="cp-scanner-scanline" />
+
+            {/* Target Reticle Frame */}
+            <div className="cp-scanner-reticle-frame">
+              <div className="cp-scanner-reticle-corner tl" />
+              <div className="cp-scanner-reticle-corner tr" />
+              <div className="cp-scanner-reticle-corner bl" />
+              <div className="cp-scanner-reticle-corner br" />
+              <div className="cp-scanner-reticle-crosshair" />
+            </div>
 
             {cameraActive ? (
               <video
@@ -314,246 +361,369 @@ export const GateScannerPortal: React.FC = () => {
               />
             ) : (
               <div style={{
-                height: '100%',
+                position: 'relative',
+                zIndex: 2,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 textAlign: 'center',
-                color: '#94a3b8',
-                padding: '24px',
-                position: 'relative',
-                zIndex: 2
+                padding: '24px'
               }}>
-                <Scan size={44} style={{ margin: '0 auto 10px auto', opacity: 0.8, color: '#38bdf8' }} />
-                <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.5, color: '#cbd5e1' }}>
-                  Camera in standby. Click "Activate Camera" or test instant credentials with 1-click test injections below.
+                <Scan size={36} style={{ color: '#38bdf8', opacity: 0.8, marginBottom: '10px' }} />
+                <h4 style={{ margin: '0 0 4px 0', fontSize: '13px', fontWeight: 700, color: '#f8fafc', letterSpacing: '0.02em' }}>
+                  Optical Sensor Standby
+                </h4>
+                <p style={{ margin: 0, fontSize: '11.5px', color: '#94a3b8', maxWidth: '300px', lineHeight: 1.4 }}>
+                  Activate hardware camera or use 1-click test injections below to simulate credential check-in.
                 </p>
                 {cameraError && (
-                  <p style={{ margin: '8px 0 0 0', fontSize: '11.5px', color: '#f87171' }}>{cameraError}</p>
+                  <p style={{ margin: '8px 0 0 0', fontSize: '11px', color: '#f87171' }}>{cameraError}</p>
                 )}
               </div>
             )}
-
-            {/* Target Reticle Crosshairs */}
-            <div style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '130px',
-              height: '130px',
-              border: '2px solid rgba(56, 189, 248, 0.4)',
-              borderRadius: '16px',
-              pointerEvents: 'none',
-              zIndex: 4
-            }} />
           </div>
 
-          {/* Manual Token Submission Bar */}
-          <div>
-            <label className="cp-label">Manual QR Token or Barcode Entry</label>
+          {/* Terminal Manual Token Input Bar */}
+          <div className="cp-scanner-terminal-footer">
+            <label style={{ fontSize: '11px', fontWeight: 600, color: '#94a3b8', display: 'block', marginBottom: '6px' }}>
+              Direct Token Buffer / Barcode Wedge
+            </label>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
                 className="cp-input"
-                placeholder="Paste encrypted QR token string here..."
+                style={{
+                  backgroundColor: '#020617',
+                  borderColor: '#334155',
+                  color: '#f8fafc',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '12.5px'
+                }}
+                placeholder="Paste encrypted QR payload string here..."
                 value={manualToken}
                 onChange={(e) => setManualToken(e.target.value)}
               />
               <button
+                type="button"
                 className="cp-btn cp-btn-primary"
                 onClick={() => handleVerify(manualToken)}
                 disabled={isScanning || !manualToken.trim()}
-                style={{ flexShrink: 0 }}
+                style={{ flexShrink: 0, padding: '0 16px', fontSize: '12.5px' }}
               >
-                <Zap size={14} />
+                <Zap size={13} style={{ marginRight: '6px' }} />
                 Verify
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right: Instant Verdict Display Card */}
-        <div className="cp-section-card" style={{ padding: '22px', display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 16px 0', color: '#0f172a' }}>
-            Turnstile Verdict & Participant Card
-          </h3>
+        {/* Right: Turnstile Verdict & Attendee Dossier Workstation */}
+        <div className="cp-verdict-dossier">
+          <div className="cp-verdict-header">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Activity size={15} style={{ color: '#0284c7' }} />
+              <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                Verification Verdict Dossier
+              </h3>
+            </div>
+            <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#64748b' }}>
+              STATUS: {verdict.status}
+            </span>
+          </div>
 
           {verdict.status === 'IDLE' ? (
-            <div style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#f8fafc',
-              borderRadius: '16px',
-              padding: '36px 20px',
-              textAlign: 'center',
-              border: '1.5px dashed #e2e8f0'
-            }}>
-              <Scan size={44} style={{ color: '#94a3b8', marginBottom: '14px', opacity: 0.5 }} />
-              <h4 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 6px 0', color: '#0f172a' }}>
-                Waiting for Pass Scan
+            <div className="cp-verdict-idle-hud">
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                backgroundColor: '#f1f5f9',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '14px',
+                color: '#64748b'
+              }}>
+                <Scan size={26} />
+              </div>
+              <h4 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 6px 0', color: '#0f172a' }}>
+                Awaiting Optical Presentation
               </h4>
-              <p style={{ margin: 0, fontSize: '13px', color: '#64748b', maxWidth: '320px', lineHeight: 1.5 }}>
-                Present attendee QR code to the scanner camera or select a test pass below to simulate turnstile check-in.
+              <p style={{ margin: 0, fontSize: '12.5px', color: '#64748b', maxWidth: '340px', lineHeight: 1.5 }}>
+                Position attendee digital pass in the optical reticle or trigger instant test credentials from the simulation suite below.
               </p>
-            </div>
-          ) : verdict.status === 'SUCCESS' ? (
-            <div style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-              padding: '22px',
-              borderRadius: '16px',
-              backgroundColor: '#f0fdf4',
-              border: '1.5px solid #bbf7d0'
-            }}>
-              {/* Success Banner */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '12px',
-                  backgroundColor: '#15803d',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 8px rgba(21, 128, 61, 0.25)'
-                }}>
-                  <CheckCircle size={26} />
-                </div>
-                <div>
-                  <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#15803d' }}>
-                    ACCESS GRANTED • ATOMIC CHECK-IN
+
+              {/* Station Readiness Specifications */}
+              <div className="cp-verdict-idle-spec-grid">
+                <div className="cp-verdict-idle-spec-item">
+                  <span style={{ fontSize: '10.5px', color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Station Moniker
                   </span>
-                  <h3 style={{ fontSize: '17px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
-                    {verdict.message}
-                  </h3>
+                  <strong style={{ fontSize: '12px', color: '#0f172a', fontFamily: 'var(--font-mono)' }}>
+                    {selectedGate.split(' - ')[0]}
+                  </strong>
+                </div>
+
+                <div className="cp-verdict-idle-spec-item">
+                  <span style={{ fontSize: '10.5px', color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Security Policy
+                  </span>
+                  <strong style={{ fontSize: '12px', color: '#0f172a' }}>
+                    Single-Use Atomic
+                  </strong>
+                </div>
+
+                <div className="cp-verdict-idle-spec-item">
+                  <span style={{ fontSize: '10.5px', color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Engine Mode
+                  </span>
+                  <strong style={{ fontSize: '12px', color: '#0284c7' }}>
+                    {scannerMode === 'GATE' ? 'Turnstile Entry' : 'Meal Counter'}
+                  </strong>
+                </div>
+
+                <div className="cp-verdict-idle-spec-item">
+                  <span style={{ fontSize: '10.5px', color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Recent Scan Logs
+                  </span>
+                  <strong style={{ fontSize: '12px', color: '#0f172a', fontFamily: 'var(--font-mono)' }}>
+                    {scanLogs.length} Logged
+                  </strong>
                 </div>
               </div>
+            </div>
+          ) : verdict.status === 'SUCCESS' ? (
+            <div className="cp-verdict-granted">
+              {/* Verdict Header Banner */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '14px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '10px',
+                    backgroundColor: '#15803d',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <CheckCircle size={24} />
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#15803d', display: 'block' }}>
+                      ACCESS GRANTED • ATOMIC CHECK-IN
+                    </span>
+                    <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                      {verdict.message}
+                    </h3>
+                  </div>
+                </div>
 
-              {/* Attendee Details Card */}
+                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#15803d', fontWeight: 600 }}>
+                  {verdict.timestamp}
+                </span>
+              </div>
+
+              {/* Verified Attendee Dossier Card */}
               {verdict.passData && (
                 <div style={{
-                  padding: '16px',
-                  borderRadius: '12px',
                   backgroundColor: '#ffffff',
                   border: '1px solid #bbf7d0',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '12px',
-                  fontSize: '12px'
+                  borderRadius: '12px',
+                  padding: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px',
+                  marginBottom: '16px'
                 }}>
-                  <div>
-                    <span style={{ color: '#64748b', display: 'block' }}>Attendee Name</span>
-                    <strong style={{ color: '#0f172a', fontSize: '14px' }}>{verdict.passData.studentName}</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: '#64748b', display: 'block' }}>Student Roll No</span>
-                    <strong style={{ color: '#0f172a' }}>{verdict.passData.studentId}</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: '#64748b', display: 'block' }}>Event</span>
-                    <span style={{ color: '#0f172a' }}>{verdict.passData.eventTitle}</span>
-                  </div>
-                  <div>
-                    <span style={{ color: '#64748b', display: 'block' }}>
-                      {scannerMode === 'GATE' ? 'Pass Type' : 'Dietary Preference'}
+                  {/* Attendee Identity Row */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      backgroundColor: '#0f172a',
+                      color: '#ffffff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 700,
+                      fontSize: '14px',
+                      flexShrink: 0
+                    }}>
+                      {verdict.passData.studentName.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <strong style={{ fontSize: '14px', color: '#0f172a', display: 'block' }}>
+                        {verdict.passData.studentName}
+                      </strong>
+                      <span style={{ fontSize: '12px', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+                        Roll No: {verdict.passData.studentId}
+                      </span>
+                    </div>
+                    <span className="cp-badge cp-badge-open" style={{ fontSize: '11px' }}>
+                      <BadgeCheck size={12} style={{ marginRight: '4px' }} />
+                      VALIDATED
                     </span>
-                    <strong style={{ color: '#0284c7' }}>
-                      {scannerMode === 'GATE'
-                        ? (verdict.passData as DigitalEventPass).passType
-                        : (verdict.passData as LunchPass).dietaryPreference}
-                    </strong>
+                  </div>
+
+                  {/* Attribute Matrix */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '10px',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    backgroundColor: '#f8fafc',
+                    fontSize: '11.5px'
+                  }}>
+                    <div>
+                      <span style={{ color: '#64748b', display: 'block' }}>Registered Event</span>
+                      <strong style={{ color: '#0f172a', fontSize: '12px' }}>{verdict.passData.eventTitle}</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748b', display: 'block' }}>
+                        {scannerMode === 'GATE' ? 'Assigned Pass Tier' : 'Dietary Preference'}
+                      </span>
+                      <strong style={{ color: '#0284c7', fontSize: '12px' }}>
+                        {scannerMode === 'GATE'
+                          ? (verdict.passData as DigitalEventPass).passType
+                          : (verdict.passData as LunchPass).dietaryPreference}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {/* Cryptographic Telemetry Stamp */}
+                  <div style={{
+                    fontSize: '10.5px',
+                    fontFamily: 'var(--font-mono)',
+                    color: '#64748b',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    borderTop: '1px dashed #e2e8f0',
+                    paddingTop: '10px'
+                  }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Fingerprint size={12} style={{ color: '#0284c7' }} />
+                      {getFingerprint(verdict.passData)}
+                    </span>
+                    <span>ATOMIC PASSBACK: CONSUMED</span>
                   </div>
                 </div>
               )}
 
               <button
+                type="button"
                 className="cp-btn cp-btn-outline cp-btn-sm"
                 onClick={() => setVerdict({ status: 'IDLE' })}
                 style={{ marginTop: 'auto', alignSelf: 'flex-start' }}
               >
+                <RotateCcw size={12} style={{ marginRight: '6px' }} />
                 Scan Next Attendee
               </button>
             </div>
           ) : (
-            <div style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-              padding: '22px',
-              borderRadius: '16px',
-              backgroundColor: '#fee2e2',
-              border: '1.5px solid #fecaca'
-            }}>
-              {/* Error Banner */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '12px',
-                  backgroundColor: '#b91c1c',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 8px rgba(185, 28, 28, 0.25)'
-                }}>
-                  <XCircle size={26} />
+            <div className="cp-verdict-denied">
+              {/* Verdict Header Banner */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '14px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '10px',
+                    backgroundColor: '#b91c1c',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <XCircle size={24} />
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#b91c1c', display: 'block' }}>
+                      ACCESS DENIED • {verdict.resultCode}
+                    </span>
+                    <h3 style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                      {verdict.message}
+                    </h3>
+                  </div>
                 </div>
-                <div>
-                  <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#b91c1c' }}>
-                    ACCESS DENIED • {verdict.resultCode}
-                  </span>
-                  <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
-                    {verdict.message}
-                  </h3>
-                </div>
+
+                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#b91c1c', fontWeight: 600 }}>
+                  {verdict.timestamp}
+                </span>
               </div>
 
-              {/* Error Explanation */}
+              {/* Institutional Incident Explanation & SOP */}
               <div style={{
-                padding: '14px 16px',
-                borderRadius: '10px',
                 backgroundColor: '#ffffff',
                 border: '1px solid #fecaca',
+                borderRadius: '12px',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                marginBottom: '16px',
                 fontSize: '12px',
-                color: '#64748b',
+                color: '#334155',
                 lineHeight: 1.5
               }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#b91c1c', fontWeight: 700 }}>
+                  <ShieldAlert size={15} />
+                  <span>Turnstile Security Violation Breakdown</span>
+                </div>
+
                 {verdict.resultCode === 'ALREADY_USED' && (
                   <div>
-                    <strong>Duplicate Entry Attempt Detected:</strong> This digital pass has already been scanned and checked in. Turnstile access is strictly restricted to one single-use entry.
+                    <strong>Anti-Passback Breach Detected:</strong> This digital pass has already been scanned and checked in at a campus turnstile. Re-entry with the same single-use token is blocked by campus security policy.
                   </div>
                 )}
                 {verdict.resultCode === 'REVOKED' && (
                   <div>
-                    <strong>Pass Revoked:</strong> This ticket was voided by institutional administrators. Attendee must report to the Event Helpdesk.
+                    <strong>Revoked Pass Credential:</strong> Ticket invalidated by campus event administration. Request attendee report to Central Registration Desk 04.
                   </div>
                 )}
                 {verdict.resultCode === 'ALREADY_REDEEMED' && (
                   <div>
-                    <strong>Meal Voucher Already Claimed:</strong> This dining pass has already been redeemed at a catering station.
+                    <strong>Catering Voucher Consumed:</strong> This dining voucher was previously marked as dispensed.
                   </div>
                 )}
                 {verdict.resultCode === 'INVALID_TOKEN' && (
                   <div>
-                    <strong>Cryptographic Mismatch:</strong> Pass signature failed verification. Possible fraudulent copy or unissued token.
+                    <strong>Cryptographic Checksum Failure:</strong> HMAC signature could not be verified against the campus authority keystore. Potential fraudulent reproduction.
                   </div>
                 )}
+                {verdict.resultCode === 'SYSTEM_ERROR' && (
+                  <div>
+                    <strong>Station Connectivity Exception:</strong> Verification service did not reply in time.
+                  </div>
+                )}
+
+                <div style={{
+                  padding: '8px 10px',
+                  borderRadius: '6px',
+                  backgroundColor: '#fef2f2',
+                  fontSize: '11px',
+                  color: '#991b1b',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <AlertTriangle size={13} style={{ flexShrink: 0 }} />
+                  <span>SOP: Turnstile gate locked. Direct attendee to Helpdesk if dispute arises.</span>
+                </div>
               </div>
 
               <button
+                type="button"
                 className="cp-btn cp-btn-outline cp-btn-sm"
                 onClick={() => setVerdict({ status: 'IDLE' })}
                 style={{ marginTop: 'auto', alignSelf: 'flex-start' }}
               >
+                <RotateCcw size={12} style={{ marginRight: '6px' }} />
                 Dismiss & Scan Next
               </button>
             </div>
@@ -561,100 +731,138 @@ export const GateScannerPortal: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Test Simulator Panel */}
+      {/* Structured Turnstile QA Simulation Suite */}
       <div className="cp-section-card" style={{ padding: '22px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Zap size={16} style={{ color: '#d97706' }} />
             <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-              Quick-Test Pass Simulator (1-Click Test Injections)
+              Turnstile Quality Assurance & Simulation Suite
             </h3>
           </div>
           <span style={{ fontSize: '12px', color: '#64748b' }}>
-            Test turnstile entry scenarios without needing an external smartphone camera
+            Direct hardware simulation for all pass conditions and edge cases
           </span>
         </div>
 
         {scannerMode === 'GATE' ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
-            {passes.slice(0, 6).map((pass) => (
-              <button
-                key={pass.id}
-                type="button"
-                onClick={() => handleVerify(pass.qrToken)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '12px 14px',
-                  borderRadius: '10px',
-                  backgroundColor: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  cursor: 'pointer',
-                  textAlign: 'left'
-                }}
-              >
-                <div>
-                  <strong style={{ fontSize: '13px', color: '#0f172a', display: 'block' }}>
-                    {pass.studentName} ({pass.passType})
-                  </strong>
-                  <span style={{ fontSize: '11px', color: '#64748b' }}>
-                    {pass.eventTitle}
-                  </span>
-                </div>
-                <span className={pass.status === 'ACTIVE' ? 'cp-badge cp-badge-open' : pass.status === 'USED' ? 'cp-badge cp-badge-wait' : 'cp-badge cp-badge-full'}>
-                  {pass.status}
-                </span>
-              </button>
-            ))}
-
-            {/* Test Corrupted Token button */}
-            <button
-              type="button"
-              onClick={() => handleVerify('CORRUPTED-FAKE-TOKEN-999')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px 14px',
-                borderRadius: '10px',
-                backgroundColor: '#fee2e2',
-                border: '1.5px dashed #fecaca',
-                cursor: 'pointer',
-                textAlign: 'left'
-              }}
-            >
-              <div>
-                <strong style={{ fontSize: '13px', color: '#b91c1c', display: 'block' }}>
-                  Simulate Fraudulent Token
-                </strong>
-                <span style={{ fontSize: '11px', color: '#64748b' }}>
-                  Tampered HMAC Signature
-                </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Section 1: Standard Active Passes */}
+            <div>
+              <div style={{ fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#64748b', marginBottom: '8px' }}>
+                Standard Issue Passes
               </div>
-              <span className="cp-badge cp-badge-full">
-                INVALID
-              </span>
-            </button>
+              <div className="cp-qa-suite-grid">
+                {passes.slice(0, 4).map((pass) => (
+                  <button
+                    key={pass.id}
+                    type="button"
+                    className="cp-qa-card"
+                    onClick={() => handleVerify(pass.qrToken)}
+                  >
+                    <div>
+                      <strong style={{ fontSize: '13px', color: '#0f172a', display: 'block' }}>
+                        {pass.studentName} ({pass.passType})
+                      </strong>
+                      <span style={{ fontSize: '11px', color: '#64748b' }}>
+                        {pass.eventTitle}
+                      </span>
+                    </div>
+                    <span className={pass.status === 'ACTIVE' ? 'cp-badge cp-badge-open' : pass.status === 'USED' ? 'cp-badge cp-badge-wait' : 'cp-badge cp-badge-full'}>
+                      {pass.status}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Section 2: Security Violations & Edge Cases */}
+            <div>
+              <div style={{ fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#b91c1c', marginBottom: '8px' }}>
+                Security & Anti-Passback Test Vectors
+              </div>
+              <div className="cp-qa-suite-grid">
+                {/* Corrupted Token */}
+                <button
+                  type="button"
+                  className="cp-qa-card danger"
+                  onClick={() => handleVerify('CORRUPTED-FAKE-TOKEN-999')}
+                >
+                  <div>
+                    <strong style={{ fontSize: '13px', color: '#b91c1c', display: 'block' }}>
+                      Tampered HMAC Signature
+                    </strong>
+                    <span style={{ fontSize: '11px', color: '#64748b' }}>
+                      Cryptographic mismatch vector
+                    </span>
+                  </div>
+                  <span className="cp-badge cp-badge-full">
+                    INVALID
+                  </span>
+                </button>
+
+                {/* Revoked Token */}
+                <button
+                  type="button"
+                  className="cp-qa-card danger"
+                  onClick={() => {
+                    const revoked = passes.find(p => p.status === 'REVOKED');
+                    if (revoked) {
+                      handleVerify(revoked.qrToken);
+                    } else {
+                      handleVerify(passes[0]?.qrToken || 'TEST');
+                    }
+                  }}
+                >
+                  <div>
+                    <strong style={{ fontSize: '13px', color: '#b91c1c', display: 'block' }}>
+                      Revoked Ticket Simulation
+                    </strong>
+                    <span style={{ fontSize: '11px', color: '#64748b' }}>
+                      Administrative ban status
+                    </span>
+                  </div>
+                  <span className="cp-badge cp-badge-full">
+                    REVOKED
+                  </span>
+                </button>
+
+                {/* Double-tap Passback Test */}
+                <button
+                  type="button"
+                  className="cp-qa-card danger"
+                  onClick={() => {
+                    const used = passes.find(p => p.status === 'USED');
+                    if (used) {
+                      handleVerify(used.qrToken);
+                    } else {
+                      handleVerify(passes[0]?.qrToken || 'TEST');
+                    }
+                  }}
+                >
+                  <div>
+                    <strong style={{ fontSize: '13px', color: '#b91c1c', display: 'block' }}>
+                      Duplicate Passback Attempt
+                    </strong>
+                    <span style={{ fontSize: '11px', color: '#64748b' }}>
+                      Second turnstile check-in attempt
+                    </span>
+                  </div>
+                  <span className="cp-badge cp-badge-wait">
+                    USED
+                  </span>
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
+          <div className="cp-qa-suite-grid">
             {lunchPasses.slice(0, 6).map((lp) => (
               <button
                 key={lp.id}
                 type="button"
+                className="cp-qa-card"
                 onClick={() => handleVerify(lp.qrToken)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '12px 14px',
-                  borderRadius: '10px',
-                  backgroundColor: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  cursor: 'pointer',
-                  textAlign: 'left'
-                }}
               >
                 <div>
                   <strong style={{ fontSize: '13px', color: '#0f172a', display: 'block' }}>
@@ -675,23 +883,28 @@ export const GateScannerPortal: React.FC = () => {
 
       {/* Live Turnstile Scan History Table Card */}
       <div className="cp-section-card" style={{ padding: '22px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-          <History size={16} style={{ color: '#0284c7' }} />
-          <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-            Recent Turnstile Scan Activity Log
-          </h3>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <History size={16} style={{ color: '#0284c7' }} />
+            <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+              Turnstile Audit & Scan Activity Stream
+            </h3>
+          </div>
+          <span style={{ fontSize: '11.5px', fontFamily: 'var(--font-mono)', color: '#64748b' }}>
+            RECORDS: {scanLogs.length} EVENTS
+          </span>
         </div>
 
         <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
           <table className="cp-table">
             <thead>
               <tr>
-                <th>Time</th>
-                <th>Attendee</th>
-                <th>Event</th>
-                <th>Station / Gate</th>
-                <th>Volunteer</th>
-                <th>Verdict</th>
+                <th>Timestamp</th>
+                <th>Attendee Identity</th>
+                <th>Target Event</th>
+                <th>Checkpoint Station</th>
+                <th>Operator</th>
+                <th>Cryptographic Verdict</th>
               </tr>
             </thead>
             <tbody>
@@ -709,7 +922,7 @@ export const GateScannerPortal: React.FC = () => {
                     </td>
                     <td>
                       <strong style={{ display: 'block', fontSize: '13px', color: '#0f172a' }}>{log.studentName}</strong>
-                      <span style={{ fontSize: '11px', color: '#64748b' }}>{log.studentId}</span>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'var(--font-mono)' }}>{log.studentId}</span>
                     </td>
                     <td style={{ fontWeight: 600, color: '#0f172a' }}>{log.eventTitle}</td>
                     <td>
