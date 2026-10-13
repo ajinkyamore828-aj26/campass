@@ -1,0 +1,350 @@
+import React, { useState } from 'react';
+import { useCampusPass } from '../../context/CampusPassContext';
+import {
+  GraduationCap,
+  Compass,
+  Ticket,
+  Utensils,
+  FileText,
+  Calendar,
+  Scan,
+  ShieldAlert,
+  ChevronDown,
+  Server,
+  Activity,
+  Users,
+  Settings,
+  LogOut,
+  User,
+  Building,
+  Bell,
+  BarChart3,
+} from 'lucide-react';
+
+interface DemostackSidebarProps {
+  currentView: string;
+  onNavigate: (view: string) => void;
+}
+
+const ROLES = [
+  { value: 'STUDENT' as const, label: 'Student Portal', desc: 'Event discovery & passes' },
+  { value: 'ORGANIZER' as const, label: 'Event Organizer', desc: 'Manage your events' },
+  { value: 'VOLUNTEER' as const, label: 'Gate Volunteer', desc: 'Entry & scanning' },
+  { value: 'ADMIN' as const, label: 'Administrator', desc: 'Full system control' },
+];
+
+export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView, onNavigate }) => {
+  const {
+    activePortal,
+    switchUserRole,
+    currentUser,
+    institutionProfile,
+    events,
+    passes,
+    lunchPasses,
+    registrations,
+  } = useCampusPass();
+
+  const [orgOpen, setOrgOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
+
+  const studentPasses = passes.filter(p => p.studentId === currentUser.studentId);
+  const studentLunchPasses = lunchPasses.filter(lp => lp.studentId === currentUser.studentId);
+  const pendingApprovals = registrations.filter(r => r.status === 'PENDING').length;
+  const openEvents = events.filter(e => e.status === 'OPEN').length;
+
+  const handleRoleSwitch = (role: 'STUDENT' | 'ORGANIZER' | 'VOLUNTEER' | 'ADMIN') => {
+    switchUserRole(role);
+    setOrgOpen(false);
+    if (role === 'STUDENT') onNavigate('DISCOVER');
+    if (role === 'ORGANIZER') onNavigate('ORGANIZER');
+    if (role === 'VOLUNTEER') onNavigate('SCANNER');
+    if (role === 'ADMIN') onNavigate('ADMIN');
+  };
+
+  const studentNav = [
+    { id: 'DISCOVER', icon: Compass, label: 'Event Discovery', badge: openEvents > 0 ? String(openEvents) : undefined, badgeColor: 'cyan' },
+    { id: 'PASSES', icon: Ticket, label: 'Pass Wallet', badge: studentPasses.length > 0 ? String(studentPasses.length) : undefined },
+    { id: 'LUNCH', icon: Utensils, label: 'Meal Vouchers', badge: studentLunchPasses.length > 0 ? String(studentLunchPasses.length) : undefined, badgeColor: 'amber' },
+    { id: 'APPLICATIONS', icon: FileText, label: 'My Applications' },
+  ];
+
+  const adminNav = [
+    { id: 'ORGANIZER', icon: Calendar, label: 'Organizer Studio', badge: pendingApprovals > 0 ? String(pendingApprovals) : undefined, badgeColor: 'amber' },
+    { id: 'SCANNER', icon: Scan, label: 'Gate Scanner HUD' },
+    { id: 'ADMIN', icon: ShieldAlert, label: 'Admin Control' },
+  ];
+
+  const currentRole = ROLES.find(r => r.value === activePortal) ?? ROLES[0];
+  const currentNavItems = activePortal === 'STUDENT' ? studentNav : adminNav;
+
+  return (
+    <aside className="ds-sidebar">
+      <div className="ds-sidebar-inner">
+        {/* Header: Brand + Org Switcher */}
+        <div className="ds-sidebar-header">
+          {/* Institution Brand */}
+          <div className="flex-center gap-2 mb-3">
+            <div
+              className="cp-icon-box"
+              style={{ background: 'linear-gradient(135deg, #0284c7, #0f766e)', color: '#fff' }}
+            >
+              <GraduationCap size={18} />
+            </div>
+            <div>
+              <p style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>
+                {institutionProfile.collegeName}
+              </p>
+              <p style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
+                CampusPass Platform
+              </p>
+            </div>
+          </div>
+
+          {/* Role/Org Switcher — Demostack style dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button
+              className="ds-org-switcher"
+              onClick={() => setOrgOpen(!orgOpen)}
+            >
+              <div
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '8px',
+                  background: '#0f172a',
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Building size={14} />
+              </div>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>
+                  {currentRole.label}
+                </p>
+                <p style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
+                  {currentRole.desc}
+                </p>
+              </div>
+              <ChevronDown
+                size={14}
+                style={{
+                  color: '#94a3b8',
+                  transform: orgOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.15s',
+                }}
+              />
+            </button>
+
+            {orgOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 6px)',
+                  left: 0,
+                  right: 0,
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '12px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                  zIndex: 100,
+                  padding: '4px',
+                  overflow: 'hidden',
+                }}
+              >
+                <p style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '6px 10px 4px 10px' }}>
+                  Switch Portal
+                </p>
+                {ROLES.map(role => (
+                  <button
+                    key={role.value}
+                    onClick={() => handleRoleSwitch(role.value)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '1px',
+                      padding: '7px 10px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: activePortal === role.value ? '#f1f5f9' : 'transparent',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'background-color 0.1s',
+                    }}
+                    onMouseEnter={e => { if (activePortal !== role.value) (e.currentTarget as HTMLButtonElement).style.background = '#f8fafc'; }}
+                    onMouseLeave={e => { if (activePortal !== role.value) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                  >
+                    <span style={{ fontSize: '12.5px', fontWeight: 600, color: activePortal === role.value ? '#0284c7' : '#0f172a' }}>
+                      {role.label}
+                    </span>
+                    <span style={{ fontSize: '10.5px', color: '#94a3b8' }}>{role.desc}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Navigation Links */}
+        <nav style={{ flex: 1, padding: '10px 10px', overflowY: 'auto' }}>
+          {/* Main Section */}
+          <p style={{ fontSize: '10.5px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '4px 2px 8px 2px' }}>
+            {activePortal === 'STUDENT' ? 'Student Workspace' : 'Management'}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '16px' }}>
+            {currentNavItems.map(item => (
+              <button
+                key={item.id}
+                className={`ds-nav-item${currentView === item.id ? ' active' : ''}`}
+                onClick={() => onNavigate(item.id)}
+                style={{ width: '100%' }}
+              >
+                <item.icon size={16} />
+                <span style={{ flex: 1 }}>{item.label}</span>
+                {item.badge && (
+                  <span className={`ds-nav-badge${item.badgeColor ? ` ${item.badgeColor}` : ''}`}>
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* System Links — visible to everyone */}
+          <div className="cp-divider" />
+          <p style={{ fontSize: '10.5px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '4px 2px 8px 2px' }}>
+            System
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <div className="ds-nav-item">
+              <Server size={15} />
+              <span style={{ flex: 1, fontSize: '12.5px' }}>API Backend</span>
+              <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#22c55e' }} />
+            </div>
+            <div className="ds-nav-item">
+              <Activity size={15} />
+              <span style={{ flex: 1, fontSize: '12.5px' }}>Gate Telemetry</span>
+              <span style={{ fontSize: '10px', color: '#22c55e', fontWeight: 700 }}>LIVE</span>
+            </div>
+            <div className="ds-nav-item">
+              <BarChart3 size={15} />
+              <span style={{ flex: 1, fontSize: '12.5px' }}>Analytics</span>
+            </div>
+          </div>
+        </nav>
+
+        {/* Footer: User Profile */}
+        <div style={{ padding: '10px 12px 12px 12px', borderTop: '1px solid #f1f5f9', position: 'relative' }}>
+          <button
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              borderRadius: '10px',
+              padding: '6px 8px',
+              transition: 'background-color 0.12s',
+            }}
+            onClick={() => setUserOpen(!userOpen)}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#f8fafc'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+          >
+            <div
+              className="cp-avatar"
+              style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #0284c7, #0f766e)', color: '#fff', fontSize: '12px', fontWeight: 800 }}
+            >
+              {currentUser.fullName.charAt(0).toUpperCase()}
+            </div>
+            <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+              <p className="truncate" style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a' }}>
+                {currentUser.fullName}
+              </p>
+              <p className="truncate" style={{ fontSize: '11px', color: '#64748b' }}>
+                {currentUser.email || `${currentUser.studentId}@campus.edu`}
+              </p>
+            </div>
+            <ChevronDown size={13} style={{ color: '#94a3b8', flexShrink: 0, transform: userOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.15s' }} />
+          </button>
+
+          {userOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 'calc(100% + 4px)',
+                left: '10px',
+                right: '10px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                zIndex: 100,
+                padding: '4px',
+              }}
+            >
+              {[
+                { icon: User, label: 'Profile Settings' },
+                { icon: Bell, label: 'Notifications' },
+                { icon: Settings, label: 'Account Settings' },
+              ].map(item => (
+                <button
+                  key={item.label}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 10px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    fontSize: '12.5px',
+                    fontWeight: 500,
+                    color: '#374151',
+                    transition: 'background-color 0.1s',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#f8fafc'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                >
+                  <item.icon size={14} style={{ color: '#64748b' }} />
+                  {item.label}
+                </button>
+              ))}
+              <div className="cp-divider" style={{ margin: '4px 0' }} />
+              <button
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 10px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  color: '#b91c1c',
+                  transition: 'background-color 0.1s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#fee2e2'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+              >
+                <LogOut size={14} />
+                Sign Out
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </aside>
+  );
+};
