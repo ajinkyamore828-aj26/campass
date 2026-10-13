@@ -159,7 +159,8 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-          gap: '24px'
+          gap: '24px',
+          alignItems: 'stretch'
         }}>
           {studentPasses.map(pass => {
             const isCheckedIn = pass.status === 'USED';
@@ -170,13 +171,17 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
               <div key={pass.id} className="cp-credential">
                 {/* Holographic Header Bar */}
                 <div className="cp-credential-header">
-                  <div>
+                  <div style={{ flex: 1, minWidth: 0, paddingRight: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 700 }}>
                         {institutionProfile.collegeCode} • SMART ADMIT PASS
                       </span>
                     </div>
-                    <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#ffffff', margin: '4px 0 0 0', letterSpacing: '-0.01em' }}>
+                    <h3 style={{
+                      fontSize: '15.5px', fontWeight: 800, color: '#ffffff', margin: '3px 0 0 0',
+                      letterSpacing: '-0.01em', lineHeight: 1.3,
+                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
+                    }}>
                       {pass.eventTitle}
                     </h3>
                   </div>
@@ -191,7 +196,8 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                     border: '1px solid rgba(255, 255, 255, 0.15)',
                     fontSize: '10px',
                     fontWeight: 700,
-                    color: '#38bdf8'
+                    color: '#38bdf8',
+                    flexShrink: 0
                   }}>
                     <Lock size={10} />
                     <span>HMAC SECURED</span>
@@ -199,7 +205,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                 </div>
 
                 {/* Credential Interior */}
-                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
                   {/* Status Banner */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -419,7 +425,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                   {/* Download Official PDF Action */}
                   <button
                     className="cp-btn cp-btn-primary"
-                    style={{ width: '100%', justifyContent: 'center' }}
+                    style={{ width: '100%', justifyContent: 'center', marginTop: 'auto', height: '40px' }}
                     onClick={() => handleDownloadPdf(pass)}
                     disabled={downloadingId === pass.id}
                   >

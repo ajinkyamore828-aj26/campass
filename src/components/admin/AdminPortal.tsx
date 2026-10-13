@@ -285,7 +285,7 @@ export const AdminPortal: React.FC = () => {
       </div>
 
       {/* KPI Stats Row */}
-      <div className="cp-stats-grid">
+      <div className="cp-stats-grid six-cols">
         <div className="cp-stat-card">
           <div className="cp-stat-icon" style={{ background: '#e0f2fe', color: '#0284c7' }}>
             <Calendar size={15} />

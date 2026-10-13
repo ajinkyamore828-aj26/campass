@@ -150,7 +150,8 @@ export const LunchPassView: React.FC = () => {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-          gap: '24px'
+          gap: '24px',
+          alignItems: 'stretch'
         }}>
           {studentLunchPasses.map(pass => {
             const isRedeemed = pass.status === 'REDEEMED';
@@ -173,27 +174,33 @@ export const LunchPassView: React.FC = () => {
                   color: '#ffffff',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between'
+                  justifyContent: 'space-between',
+                  minHeight: '74px',
+                  gap: '12px'
                 }}>
-                  <div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#99f6e4', fontWeight: 700 }}>
                       COLLEGE DINING VOUCHER
                     </span>
-                    <h3 style={{ fontSize: '15px', fontWeight: 800, margin: '2px 0 0 0', color: '#ffffff' }}>
+                    <h3 style={{
+                      fontSize: '15px', fontWeight: 800, margin: '2px 0 0 0', color: '#ffffff',
+                      lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
+                    }}>
                       {pass.eventTitle}
                     </h3>
                   </div>
 
                   <span className={isRedeemed ? 'cp-badge cp-badge-open' : 'cp-badge cp-badge-wait'} style={{
                     background: isRedeemed ? '#dcfce7' : '#e0f2fe',
-                    color: isRedeemed ? '#15803d' : '#0284c7'
+                    color: isRedeemed ? '#15803d' : '#0284c7',
+                    flexShrink: 0
                   }}>
                     {isRedeemed ? 'Redeemed' : 'Active'}
                   </span>
                 </div>
 
                 {/* Body */}
-                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
                   {/* Meal info box */}
                   <div style={{
                     display: 'flex',
