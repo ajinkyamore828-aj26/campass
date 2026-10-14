@@ -116,8 +116,7 @@ export const AnalyticsDashboard: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
               onClick={handleExportCSV}
-              className="cp-btn cp-btn-primary"
-              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              className="cp-hero-pill-btn cp-hero-pill-btn-solid"
             >
               <Download size={14} />
               <span>Export CSV Report</span>

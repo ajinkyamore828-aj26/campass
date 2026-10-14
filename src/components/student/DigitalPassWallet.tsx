@@ -80,32 +80,32 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Wallet Hero Header */}
-      <div className="cp-page-hero" style={{ padding: '24px 28px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="cp-page-hero">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }} />
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#86efac' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#86efac' }} />
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#86efac' }}>
                 Secure Smart Credentials
               </span>
             </div>
-            <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', margin: 0 }}>
+            <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', margin: '0 0 8px 0' }}>
               Digital Event Pass Wallet
             </h1>
-            <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '6px', maxWidth: '580px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.88)', margin: 0, maxWidth: '580px', lineHeight: 1.55 }}>
               HMAC-SHA256 cryptographically authenticated entry tokens. Present your pass at venue gates for instant verification.
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{
-              fontSize: '12px',
-              fontWeight: 700,
-              padding: '6px 14px',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              fontSize: '12.5px',
+              fontWeight: 600,
+              padding: '8px 18px',
+              borderRadius: '9999px',
+              backgroundColor: 'rgba(255, 255, 255, 0.12)',
               color: '#ffffff',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.22)',
               display: 'flex',
               alignItems: 'center',
               gap: '6px'
@@ -114,10 +114,10 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
               {studentPasses.length} {studentPasses.length === 1 ? 'Pass Issued' : 'Passes Issued'}
             </span>
             <button
-              className="cp-btn cp-btn-primary cp-btn-sm"
+              className="cp-hero-pill-btn"
               onClick={onBrowseEvents}
             >
-              Browse Events
+              <span>Browse Events</span>
               <ChevronRight size={14} />
             </button>
           </div>

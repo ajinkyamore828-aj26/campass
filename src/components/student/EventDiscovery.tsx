@@ -216,61 +216,60 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
 
       {/* ── Watermelon: Hero Block — Platform Overview ── */}
       <div className="cp-page-hero">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '24px', alignItems: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '32px', alignItems: 'center' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }} />
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#86efac' }} />
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 Campus Festival 2026 — Live Registration
               </span>
             </div>
-            <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.15, marginBottom: '10px' }}>
+            <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.025em', lineHeight: 1.15, marginBottom: '12px' }}>
               Discover & Register for<br />
               <span style={{ color: '#86efac' }}>College Events</span>
             </h1>
-            <p style={{ fontSize: '13.5px', color: '#94a3b8', lineHeight: 1.55, maxWidth: '480px' }}>
+            <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.88)', lineHeight: 1.6, maxWidth: '520px', margin: '0 0 20px 0' }}>
               Apply for hackathons, cultural competitions, technical workshops, and sports events.
               Get your digital gate pass instantly after confirmation.
             </p>
-            {onOpenPassWallet && (
+
+            {/* Pill CTA Buttons matching reference image */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
               <button
-                className="cp-btn cp-btn-primary"
-                style={{ marginTop: '16px', display: 'inline-flex' }}
-                onClick={onOpenPassWallet}
+                className="cp-hero-pill-btn"
+                onClick={() => onOpenRegistrations?.()}
               >
-                <Ticket size={14} />
-                Open Pass Wallet
+                <span>My Registrations</span>
+                <ArrowRight size={14} />
               </button>
-            )}
+              {onOpenPassWallet && (
+                <button
+                  className="cp-hero-pill-btn"
+                  onClick={onOpenPassWallet}
+                >
+                  <Ticket size={14} />
+                  <span>Pass Wallet</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Bento-style mini stats on hero */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-            {[
-              { label: 'Live Events', value: String(openCount), icon: Globe },
-              { label: 'Registrations', value: String(totalRegs), icon: Users },
-              { label: 'Passes Issued', value: String(approvedPasses), icon: Ticket },
-              { label: 'Total Seats', value: String(totalCapacity), icon: Award },
-            ].map(s => (
-              <div
-                key={s.label}
-                style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '12px',
-                  padding: '12px 14px',
-                  minWidth: '100px',
-                }}
-              >
-                <s.icon size={14} style={{ color: '#86efac', marginBottom: '6px' }} />
-                <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>
-                  {s.value}
+          {/* Elevated Floating Glass Stats Panel on the waves */}
+          <div className="cp-hero-stats-panel">
+            <div className="cp-hero-stats-grid">
+              {[
+                { label: 'Live Events', value: String(openCount), icon: Globe },
+                { label: 'Registrations', value: String(totalRegs), icon: Users },
+                { label: 'Passes Issued', value: String(approvedPasses), icon: Ticket },
+                { label: 'Total Seats', value: String(totalCapacity), icon: Award },
+              ].map(s => (
+                <div key={s.label} className="cp-hero-stat-box">
+                  <s.icon size={15} className="cp-hero-stat-icon" />
+                  <div className="cp-hero-stat-value">{s.value}</div>
+                  <div className="cp-hero-stat-label">{s.label}</div>
                 </div>
-                <div style={{ fontSize: '10.5px', fontWeight: 600, color: '#64748b', marginTop: '3px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  {s.label}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -297,54 +296,47 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
       {/* ── Watermelon: Featured Event (Marketing Block) ── */}
       {featuredEvent && (
         <div className="cp-featured-card">
-          <div
-            style={{
-              position: 'absolute', top: '-40px', right: '80px',
-              width: '180px', height: '180px', borderRadius: '50%',
-              background: 'rgba(22, 101, 52, 0.1)', pointerEvents: 'none',
-            }}
-          />
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-              <Star size={12} style={{ color: '#d97706' }} />
-              <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <Star size={13} style={{ color: '#fde047' }} />
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#fde047', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 Featured Event
               </span>
             </div>
-            <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', marginBottom: '8px', lineHeight: 1.25 }}>
+            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', marginBottom: '8px', lineHeight: 1.25 }}>
               {featuredEvent.title}
             </h2>
-            <p style={{ fontSize: '13px', color: '#94a3b8', lineHeight: 1.5, marginBottom: '14px', maxWidth: '520px' }}>
+            <p style={{ fontSize: '13.5px', color: 'rgba(255, 255, 255, 0.88)', lineHeight: 1.55, marginBottom: '16px', maxWidth: '540px' }}>
               {featuredEvent.summary || featuredEvent.description}
             </p>
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', marginBottom: '18px' }}>
               {[
                 { icon: Calendar, text: featuredEvent.date || featuredEvent.startDate },
                 { icon: MapPin, text: featuredEvent.venue },
                 { icon: Users, text: `${featuredEvent.registeredCount}/${featuredEvent.capacity} seats` },
               ].map((item, i) => item.text && (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: '#64748b' }}>
-                  <item.icon size={12} style={{ color: '#166534' }} />
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#d1fae5' }}>
+                  <item.icon size={13} style={{ color: '#86efac' }} />
                   <span>{item.text}</span>
                 </div>
               ))}
             </div>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
-            <button
-              className="cp-btn cp-btn-primary"
-              onClick={() => handleRegisterEvent(featuredEvent)}
-            >
-              Register Now
-              <ArrowUpRight size={14} />
-            </button>
-            <button
-              className="cp-btn cp-btn-outline"
-              style={{ borderColor: 'rgba(255,255,255,0.15)', color: '#94a3b8' }}
-              onClick={() => handleSelectEvent(featuredEvent)}
-            >
-              View Details
-            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <button
+                className="cp-hero-pill-btn cp-hero-pill-btn-solid"
+                onClick={() => handleRegisterEvent(featuredEvent)}
+              >
+                <span>Register Now</span>
+                <ArrowUpRight size={14} />
+              </button>
+              <button
+                className="cp-hero-pill-btn"
+                onClick={() => handleSelectEvent(featuredEvent)}
+              >
+                <span>View Details</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

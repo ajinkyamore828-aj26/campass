@@ -207,28 +207,148 @@ body {
   background-color: #f1f5f9;
 }
 
-/* ── Page Section Headers ─────────────────────────────────── */
-.cp-page-hero {
-  background: linear-gradient(135deg, #0d3822 0%, #166534 50%, #0d3822 100%);
-  border: 1px solid #1a4d2e;
-  border-radius: 16px;
-  padding: 28px 28px;
-  color: #ffffff;
-  margin-bottom: 24px;
+/* ── Page Section Headers & Hero Banners ──────────────────── */
+.cp-page-hero,
+.cp-featured-card {
   position: relative;
   overflow: hidden;
+  background: linear-gradient(118deg, #0d3822 0%, #14532d 38%, #166534 72%, #15803d 100%);
+  border: 1px solid rgba(134, 239, 172, 0.22);
+  border-radius: 24px;
+  padding: 28px 32px;
+  color: #ffffff;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 30px -8px rgba(13, 56, 34, 0.25);
 }
 
-.cp-page-hero::before {
+/* Fluid Wavy Organic Curves Layer matching reference aesthetics */
+.cp-page-hero::before,
+.cp-featured-card::before {
   content: '';
   position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: rgba(34, 197, 94, 0.12);
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 380' preserveAspectRatio='none'%3E%3Cdefs%3E%3CradialGradient id='g1' cx='85%25' cy='15%25' r='70%25'%3E%3Cstop offset='0%25' stop-color='%2386efac' stop-opacity='0.22'/%3E%3Cstop offset='45%25' stop-color='%2322c55e' stop-opacity='0.10'/%3E%3Cstop offset='100%25' stop-color='%2314532d' stop-opacity='0'/%3E%3C/radialGradient%3E%3ClinearGradient id='w1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff' stop-opacity='0.04'/%3E%3Cstop offset='100%25' stop-color='%2386efac' stop-opacity='0.12'/%3E%3C/linearGradient%3E%3ClinearGradient id='w2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff' stop-opacity='0.07'/%3E%3Cstop offset='100%25' stop-color='%2386efac' stop-opacity='0.20'/%3E%3C/linearGradient%3E%3ClinearGradient id='w3' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff' stop-opacity='0.10'/%3E%3Cstop offset='100%25' stop-color='%2386efac' stop-opacity='0.30'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1440' height='380' fill='url(%23g1)'/%3E%3Cpath d='M620,0 C770,90 870,240 1060,380 L1440,380 L1440,0 Z' fill='url(%23w1)'/%3E%3Cpath d='M820,0 C940,100 1030,230 1200,380 L1440,380 L1440,0 Z' fill='url(%23w2)'/%3E%3Cpath d='M1010,0 C1100,100 1190,220 1320,380 L1440,380 L1440,0 Z' fill='url(%23w3)'/%3E%3Cpath d='M0,300 C220,270 420,340 600,380 L0,380 Z' fill='rgba(255,255,255,0.03)'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: right center;
+  background-repeat: no-repeat;
   pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure inner content is elevated above the waves */
+.cp-page-hero > *,
+.cp-featured-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Pill CTA Buttons matching the reference image style [Download ↓] */
+.cp-hero-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 22px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+}
+
+.cp-hero-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: #ffffff;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.cp-hero-pill-btn-solid {
+  background: #ffffff;
+  color: #14532d;
+  border-color: #ffffff;
+  font-weight: 700;
+}
+
+.cp-hero-pill-btn-solid:hover {
+  background: #f0fdf4;
+  color: #0f3d22;
+  border-color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Floating Preview & Stats Panel on the right of the Hero */
+.cp-hero-stats-panel {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.25);
+  min-width: 270px;
+  align-self: center;
+}
+
+.cp-hero-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cp-hero-stat-box {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.15s, transform 0.12s;
+}
+
+.cp-hero-stat-box:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+.cp-hero-stat-icon {
+  color: #86efac;
+  margin-bottom: 6px;
+}
+
+.cp-hero-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.cp-hero-stat-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #d1fae5;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.88;
+}
+
+@media (max-width: 860px) {
+  .cp-page-hero,
+  .cp-featured-card {
+    padding: 22px 20px;
+  }
+  .cp-hero-stats-panel {
+    min-width: 100%;
+    margin-top: 16px;
+  }
 }
 
 /* ── Stats Row ────────────────────────────────────────────── */
@@ -835,25 +955,17 @@ body {
   transform: translateY(-1px);
 }
 
-/* ── Featured Event (Marketing Hero) ─────────────────────── */
+/* ── Featured Event (Marketing Hero Layout) ─────────────── */
 .cp-featured-card {
-  background: linear-gradient(135deg, #0d3822 0%, #166534 60%, #0d3822 100%);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 24px 28px;
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 24px;
   align-items: center;
-  overflow: hidden;
-  position: relative;
-  margin-bottom: 24px;
 }
 
 @media (max-width: 768px) {
   .cp-featured-card {
     grid-template-columns: 1fr;
-    padding: 20px;
     gap: 18px;
   }
 }

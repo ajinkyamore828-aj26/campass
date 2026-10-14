@@ -50,19 +50,19 @@ export const LunchPassView: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Page Hero */}
-      <div className="cp-page-hero" style={{ padding: '24px 28px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="cp-page-hero">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#d97706' }} />
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#fcd34d' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#fde047' }} />
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fde047' }}>
                 Institutional Dining Service
               </span>
             </div>
-            <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', margin: 0 }}>
+            <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', margin: '0 0 8px 0' }}>
               Campus Meal Vouchers & Dining Passes
             </h1>
-            <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '6px', maxWidth: '580px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.88)', margin: 0, maxWidth: '580px', lineHeight: 1.55 }}>
               Single-use institutional dining tokens automatically granted for eligible full-day events, hackathons, and symposiums. Present at dining hall check-in counters.
             </p>
           </div>
@@ -72,13 +72,14 @@ export const LunchPassView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '6px 14px',
-              borderRadius: '10px',
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              fontSize: '12px',
-              fontWeight: 700,
-              color: '#ffffff'
+              padding: '8px 18px',
+              borderRadius: '9999px',
+              background: 'rgba(255, 255, 255, 0.12)',
+              border: '1.5px solid rgba(255, 255, 255, 0.25)',
+              fontSize: '12.5px',
+              fontWeight: 600,
+              color: '#ffffff',
+              backdropFilter: 'blur(8px)'
             }}>
               <ShieldCheck size={14} style={{ color: '#86efac' }} />
               Anti-Fraud Atomic Redemption
