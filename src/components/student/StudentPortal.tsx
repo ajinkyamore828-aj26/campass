@@ -19,20 +19,18 @@ import {
 export const StudentPortal: React.FC = () => {
   const { passes, lunchPasses, registrations, currentUser, announcements } = useCampusPass();
 
-  const [activeSubTab, setActiveSubTab] = useState<'DISCOVER' | 'PASSES' | 'LUNCH' | 'APPLICATIONS'>('DISCOVER');
+  const [activeSubTab, setActiveSubTab] = useState<'DISCOVER' | 'APPLICATIONS'>('DISCOVER');
   const [selectedDetailEvent, setSelectedDetailEvent] = useState<CampusEvent | null>(null);
   const [registeringEvent, setRegisteringEvent] = useState<CampusEvent | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
-  const studentPasses = passes.filter(p => p.studentId === currentUser.studentId);
-  const studentLunchPasses = lunchPasses.filter(lp => lp.studentId === currentUser.studentId);
   const studentRegs = registrations.filter(r => r.studentId === currentUser.studentId);
 
   const handleRegistrationSuccess = (regId: string) => {
     setRegisteringEvent(null);
-    setSuccessToast('Application submitted successfully! Check your pass wallet or applications list.');
-    setActiveSubTab('PASSES');
-    setTimeout(() => setSuccessToast(null), 5000);
+    setSuccessToast('Registration submitted! If this event requires an entry pass, it has been dispatched to your registered college email.');
+    setActiveSubTab('APPLICATIONS');
+    setTimeout(() => setSuccessToast(null), 6000);
   };
 
   return (
@@ -45,9 +43,9 @@ export const StudentPortal: React.FC = () => {
           gap: '10px',
           padding: '12px 18px',
           borderRadius: '10px',
-          backgroundColor: 'rgba(16, 185, 129, 0.12)',
-          border: '1px solid rgba(16, 185, 129, 0.35)',
-          color: 'var(--success)',
+          backgroundColor: '#dcfce7',
+          border: '1px solid #bbf7d0',
+          color: '#15803d',
           fontSize: '13px',
           fontWeight: 600,
           boxShadow: 'var(--shadow-sm)'
@@ -115,76 +113,6 @@ export const StudentPortal: React.FC = () => {
 
         <button
           type="button"
-          onClick={() => setActiveSubTab('PASSES')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 18px',
-            borderRadius: '10px',
-            fontSize: '13px',
-            fontWeight: activeSubTab === 'PASSES' ? 700 : 500,
-            cursor: 'pointer',
-            border: 'none',
-            backgroundColor: activeSubTab === 'PASSES' ? '#166534' : 'transparent',
-            color: activeSubTab === 'PASSES' ? '#ffffff' : 'var(--text-muted)',
-            transition: 'all 0.15s ease',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          <Ticket size={15} />
-          <span>Digital Passes</span>
-          {studentPasses.length > 0 && (
-            <span style={{
-              fontSize: '11px',
-              padding: '2px 7px',
-              borderRadius: '999px',
-              backgroundColor: activeSubTab === 'PASSES' ? 'rgba(255, 255, 255, 0.25)' : '#e2e8f0',
-              color: activeSubTab === 'PASSES' ? '#ffffff' : 'var(--text-main)',
-              fontWeight: 700
-            }}>
-              {studentPasses.length}
-            </span>
-          )}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveSubTab('LUNCH')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 18px',
-            borderRadius: '10px',
-            fontSize: '13px',
-            fontWeight: activeSubTab === 'LUNCH' ? 700 : 500,
-            cursor: 'pointer',
-            border: 'none',
-            backgroundColor: activeSubTab === 'LUNCH' ? '#166534' : 'transparent',
-            color: activeSubTab === 'LUNCH' ? '#ffffff' : 'var(--text-muted)',
-            transition: 'all 0.15s ease',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          <Utensils size={15} />
-          <span>Meal Passes</span>
-          {studentLunchPasses.length > 0 && (
-            <span style={{
-              fontSize: '11px',
-              padding: '2px 7px',
-              borderRadius: '999px',
-              backgroundColor: activeSubTab === 'LUNCH' ? 'rgba(255, 255, 255, 0.25)' : '#e2e8f0',
-              color: activeSubTab === 'LUNCH' ? '#ffffff' : 'var(--text-main)',
-              fontWeight: 700
-            }}>
-              {studentLunchPasses.length}
-            </span>
-          )}
-        </button>
-
-        <button
-          type="button"
           onClick={() => setActiveSubTab('APPLICATIONS')}
           style={{
             display: 'flex',
@@ -203,7 +131,7 @@ export const StudentPortal: React.FC = () => {
           }}
         >
           <FileText size={15} />
-          <span>My Applications</span>
+          <span>My Registrations</span>
           {studentRegs.length > 0 && (
             <span style={{
               fontSize: '11px',
@@ -228,19 +156,8 @@ export const StudentPortal: React.FC = () => {
           />
         )}
 
-        {activeSubTab === 'PASSES' && (
-          <DigitalPassWallet
-            onBrowseEvents={() => setActiveSubTab('DISCOVER')}
-          />
-        )}
-
-        {activeSubTab === 'LUNCH' && (
-          <LunchPassView />
-        )}
-
         {activeSubTab === 'APPLICATIONS' && (
           <MyApplicationsList
-            onOpenPassWallet={() => setActiveSubTab('PASSES')}
             onBrowseEvents={() => setActiveSubTab('DISCOVER')}
           />
         )}

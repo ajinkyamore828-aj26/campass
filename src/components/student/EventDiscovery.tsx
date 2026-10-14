@@ -36,6 +36,10 @@ import {
   Award,
   Zap,
   Globe,
+  Lightbulb,
+  PartyPopper,
+  Mail,
+  GraduationCap
 } from 'lucide-react';
 import { EventDetailModal } from './EventDetailModal';
 import { EventRegistrationModal } from './EventRegistrationModal';
@@ -43,6 +47,7 @@ import { EventRegistrationModal } from './EventRegistrationModal';
 interface EventDiscoveryProps {
   onSelectEvent?: (event: CampusEvent) => void;
   onRegisterEvent?: (event: CampusEvent) => void;
+  onOpenRegistrations?: () => void;
   onOpenPassWallet?: () => void;
   searchOverride?: string;
 }
@@ -51,14 +56,17 @@ type CategoryValue = 'ALL' | EventCategory;
 
 const CATEGORY_CHIPS: { label: string; value: CategoryValue; icon: React.ElementType }[] = [
   { label: 'All Events', value: 'ALL', icon: Layers },
-  { label: 'Technical', value: 'TECHNICAL', icon: Code },
   { label: 'Hackathons', value: 'HACKATHON', icon: Cpu },
-  { label: 'Cultural', value: 'CULTURAL', icon: Palette },
+  { label: 'Ideathons', value: 'IDEATHON', icon: Lightbulb },
+  { label: 'Coding Contests', value: 'CODING_COMPETITION', icon: Code },
+  { label: 'Aptitude Tests', value: 'APTITUDE', icon: Award },
+  { label: 'Cultural Events', value: 'CULTURAL', icon: Palette },
+  { label: 'Fresher Parties', value: 'FRESHER_PARTY', icon: PartyPopper },
+  { label: 'Bootcamps', value: 'BOOTCAMP', icon: BookOpen },
+  { label: 'Campus Drives', value: 'CAMPUS_DRIVE', icon: Briefcase },
+  { label: 'Seminars', value: 'SEMINAR', icon: GraduationCap },
+  { label: 'Technical', value: 'TECHNICAL', icon: Compass },
   { label: 'Sports', value: 'SPORTS', icon: Trophy },
-  { label: 'Workshops', value: 'WORKSHOP', icon: BookOpen },
-  { label: 'Literary', value: 'LITERARY', icon: Feather },
-  { label: 'Management', value: 'MANAGEMENT', icon: Briefcase },
-  { label: 'General', value: 'GENERAL', icon: Compass },
 ];
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
@@ -70,14 +78,21 @@ const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  TECHNICAL:  'linear-gradient(135deg, #0d3822 0%, #166534 100%)',
-  HACKATHON:  'linear-gradient(135deg, #0a2f1c 0%, #14532d 100%)',
-  CULTURAL:   'linear-gradient(135deg, #7c2d12 0%, #92400e 100%)',
-  SPORTS:     'linear-gradient(135deg, #0f3822 0%, #15803d 100%)',
-  WORKSHOP:   'linear-gradient(135deg, #0d3822 0%, #134e35 100%)',
-  LITERARY:   'linear-gradient(135deg, #1c3328 0%, #2e4a3d 100%)',
-  MANAGEMENT: 'linear-gradient(135deg, #0d3822 0%, #1c3829 100%)',
-  GENERAL:    'linear-gradient(135deg, #0d3822 0%, #166534 100%)',
+  HACKATHON:          'linear-gradient(135deg, #0a2f1c 0%, #14532d 100%)',
+  IDEATHON:           'linear-gradient(135deg, #0d3822 0%, #166534 100%)',
+  CODING_COMPETITION: 'linear-gradient(135deg, #062b1a 0%, #15803d 100%)',
+  APTITUDE:           'linear-gradient(135deg, #1c3328 0%, #2e4a3d 100%)',
+  CULTURAL:           'linear-gradient(135deg, #7c2d12 0%, #92400e 100%)',
+  FRESHER_PARTY:      'linear-gradient(135deg, #14532d 0%, #166534 100%)',
+  BOOTCAMP:           'linear-gradient(135deg, #0d3822 0%, #15803d 100%)',
+  CAMPUS_DRIVE:       'linear-gradient(135deg, #0a2f1c 0%, #1c3829 100%)',
+  SEMINAR:            'linear-gradient(135deg, #0d3822 0%, #134e35 100%)',
+  TECHNICAL:          'linear-gradient(135deg, #0d3822 0%, #166534 100%)',
+  SPORTS:             'linear-gradient(135deg, #0f3822 0%, #15803d 100%)',
+  WORKSHOP:           'linear-gradient(135deg, #0d3822 0%, #134e35 100%)',
+  LITERARY:           'linear-gradient(135deg, #1c3328 0%, #2e4a3d 100%)',
+  MANAGEMENT:         'linear-gradient(135deg, #0d3822 0%, #1c3829 100%)',
+  GENERAL:            'linear-gradient(135deg, #0d3822 0%, #166534 100%)',
 };
 
 const PAGE_SIZE = 9;
@@ -85,26 +100,27 @@ const PAGE_SIZE = 9;
 // FAQ data
 const FAQ_ITEMS = [
   {
-    q: 'How do digital gate passes work at turnstiles?',
-    a: 'Once your registration is approved or auto-confirmed, a unique QR pass appears in your Pass Wallet. Present it at the gate — our volunteers scan it in under 50ms using HMAC-SHA256 cryptographic verification.',
+    q: 'How does event pass delivery work?',
+    a: 'Event passes are configured by campus organizers and administrators per event. If an event issues an official pass (e.g. Hackathons, Coding Contests, Campus Drives, Freshers Party), it is dispatched directly to your registered college email address.',
   },
   {
-    q: 'Can I register for multiple events at the same time?',
-    a: 'Yes! CampusPass supports multi-event registrations. Apply for hackathons, cultural fests, and workshops concurrently through your single student profile.',
+    q: 'Are passes mandatory for every event?',
+    a: 'No. Passes are not mandatory for all events. Open attendance events like Ideathons, Placement Aptitude assessments, Bootcamps, and Seminars do not require a pass — your seat is confirmed immediately upon registration, and you enter with your college ID card.',
   },
   {
-    q: 'How do team invitations work?',
-    a: 'A team leader creates a team and shares the event-specific invite code. Members accept the invitation, and once the minimum team size is met, the application is submitted — individual passes are issued to all members.',
+    q: 'How do I access or resend my email pass?',
+    a: 'Navigate to "My Registrations" in the sidebar. For any approved pass-required event, you can view the official email receipt details or click "Resend Email Pass" for instantaneous delivery.',
   },
   {
-    q: 'Where and when can I use my meal voucher?',
-    a: 'For events with meal provision, an encrypted Lunch Pass is auto-attached to your wallet. Present it at the dining hall counter during service hours for contactless verification.',
+    q: 'Can I register for multiple events at once?',
+    a: 'Yes! You can explore, filter, and register for Hackathons, Ideathons, Coding Competitions, Bootcamps, Seminars, and Campus Recruitment Drives concurrently using your student profile.',
   },
 ];
 
 export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
   onSelectEvent,
   onRegisterEvent,
+  onOpenRegistrations,
   onOpenPassWallet,
   searchOverride,
 }) => {
@@ -336,10 +352,10 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
       {/* ── Watermelon: Bento Grid — Quick Action Cards ── */}
       <div className="cp-bento-grid">
         {[
-          { icon: Ticket, title: 'My Pass Wallet', desc: 'View & download digital gate passes', color: '#166534', bg: '#dcfce7', action: () => onOpenPassWallet?.() },
-          { icon: Calendar, title: 'All Events', desc: `${events.length} events across 8 categories`, color: '#14532d', bg: '#f0fdf4', action: () => setSelectedCategory('ALL') },
-          { icon: Award, title: 'Hackathons', desc: 'Compete for prizes & recognition', color: '#d97706', bg: '#fef3c7', action: () => setSelectedCategory('HACKATHON') },
-          { icon: Zap, title: 'Quick Register', desc: 'Apply to open events instantly', color: '#166534', bg: '#f0fdf4', action: () => {} },
+          { icon: Mail, title: 'My Registrations', desc: 'Track admissions & email pass delivery', color: '#166534', bg: '#dcfce7', action: () => onOpenRegistrations?.() },
+          { icon: Cpu, title: 'Hackathons', desc: 'National coding & prototype sprints', color: '#14532d', bg: '#f0fdf4', action: () => setSelectedCategory('HACKATHON') },
+          { icon: Briefcase, title: 'Campus Drives', desc: 'Tier-1 recruitment & tech placements', color: '#166534', bg: '#f0fdf4', action: () => setSelectedCategory('CAMPUS_DRIVE') },
+          { icon: Palette, title: 'Cultural & Fests', desc: 'Gala nights, fresher parties & arts', color: '#d97706', bg: '#fef3c7', action: () => setSelectedCategory('CULTURAL') },
         ].map(card => (
           <div
             key={card.title}
@@ -514,6 +530,19 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                           Meal Included
                         </div>
                       )}
+                      {/* Pass policy badge */}
+                      <div style={{
+                        position: 'absolute', bottom: '10px', left: (event.includesLunch || event.lunchProvided) ? '108px' : '10px',
+                        display: 'flex', alignItems: 'center', gap: '4px',
+                        padding: '3px 8px', borderRadius: '6px',
+                        background: event.requiresPass !== false ? 'rgba(13,40,26,0.92)' : 'rgba(30,41,59,0.92)',
+                        color: event.requiresPass !== false ? '#86efac' : '#cbd5e1',
+                        fontSize: '10px', fontWeight: 700,
+                        border: event.requiresPass !== false ? '1px solid rgba(74,222,128,0.25)' : '1px solid rgba(148,163,184,0.25)',
+                      }}>
+                        {event.requiresPass !== false ? <Mail size={10} /> : <CheckCircle size={10} />}
+                        {event.requiresPass !== false ? 'Pass via Email' : 'No Pass Needed'}
+                      </div>
                       {/* Fee badge */}
                       <div style={{
                         position: 'absolute', bottom: '10px', right: '10px',

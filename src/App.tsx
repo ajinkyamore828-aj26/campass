@@ -21,13 +21,13 @@ import {
 export const App: React.FC = () => {
   const { activePortal, institutionProfile } = useCampusPass();
 
-  // Navigation View: DISCOVER | PASSES | LUNCH | APPLICATIONS | ORGANIZER | ANALYTICS | ADMIN
+  // Navigation View: DISCOVER | APPLICATIONS | ORGANIZER | ANALYTICS | ADMIN
   const [currentView, setCurrentView] = useState<string>('DISCOVER');
   const [globalSearch, setGlobalSearch] = useState<string>('');
 
   // Sync currentView when activePortal changes externally
   useEffect(() => {
-    if (activePortal === 'STUDENT' && !['DISCOVER', 'PASSES', 'LUNCH', 'APPLICATIONS'].includes(currentView)) {
+    if (activePortal === 'STUDENT' && !['DISCOVER', 'APPLICATIONS'].includes(currentView)) {
       setCurrentView('DISCOVER');
     } else if (activePortal === 'ORGANIZER') {
       setCurrentView('ORGANIZER');
@@ -63,23 +63,12 @@ export const App: React.FC = () => {
           {currentView === 'DISCOVER' && (
             <EventDiscovery
               searchOverride={globalSearch}
-              onOpenPassWallet={() => setCurrentView('PASSES')}
+              onOpenRegistrations={() => setCurrentView('APPLICATIONS')}
             />
-          )}
-
-          {currentView === 'PASSES' && (
-            <DigitalPassWallet
-              onBrowseEvents={() => setCurrentView('DISCOVER')}
-            />
-          )}
-
-          {currentView === 'LUNCH' && (
-            <LunchPassView />
           )}
 
           {currentView === 'APPLICATIONS' && (
             <MyApplicationsList
-              onOpenPassWallet={() => setCurrentView('PASSES')}
               onBrowseEvents={() => setCurrentView('DISCOVER')}
             />
           )}

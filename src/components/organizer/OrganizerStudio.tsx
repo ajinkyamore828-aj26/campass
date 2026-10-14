@@ -169,11 +169,12 @@ export const OrganizerStudio: React.FC = () => {
     maxTeamSize: 1,
     fee: 0,
     requiresApproval: true,
+    requiresPass: true,
     includesLunch: true,
     bannerUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
     tags: ['Technical', 'Campus', 'Festival'],
     rules: ['Valid college ID mandatory at entry', 'Adhere to institutional conduct rules'],
-    faqs: [{ q: 'Is attendance recorded?', a: 'Yes, via digital pass verification at event check-in.' }],
+    faqs: [{ q: 'Is attendance recorded?', a: 'Via digital pass verification or check-in desk.' }],
     contactEmail: currentUser.email,
     contactPhone: currentUser.phone || '+91 98765 01001'
   });
@@ -184,7 +185,7 @@ export const OrganizerStudio: React.FC = () => {
       title: '',
       shortDescription: '',
       description: '',
-      category: 'TECHNICAL',
+      category: 'HACKATHON',
       department: currentUser.department || 'Computer Science & Engineering',
       venue: 'Main Auditorium',
       date: '2026-10-25',
@@ -200,6 +201,7 @@ export const OrganizerStudio: React.FC = () => {
       maxTeamSize: 1,
       fee: 0,
       requiresApproval: true,
+      requiresPass: true,
       includesLunch: true,
       bannerUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
       tags: ['Technical', 'Campus', 'CollegeFestival'],
@@ -766,9 +768,16 @@ export const OrganizerStudio: React.FC = () => {
                       value={eventForm.category}
                       onChange={e => setEventForm({ ...eventForm, category: e.target.value as any })}
                     >
-                      <option value="TECHNICAL">TECHNICAL</option>
                       <option value="HACKATHON">HACKATHON</option>
-                      <option value="CULTURAL">CULTURAL</option>
+                      <option value="IDEATHON">IDEATHON</option>
+                      <option value="CODING_COMPETITION">CODING COMPETITION</option>
+                      <option value="APTITUDE">APTITUDE EVENT</option>
+                      <option value="CULTURAL">CULTURAL EVENT</option>
+                      <option value="FRESHER_PARTY">FRESHER PARTY EVENT</option>
+                      <option value="BOOTCAMP">BOOTCAMP REGISTRATION</option>
+                      <option value="CAMPUS_DRIVE">CAMPUS DRIVE</option>
+                      <option value="SEMINAR">SEMINAR</option>
+                      <option value="TECHNICAL">TECHNICAL</option>
                       <option value="SPORTS">SPORTS</option>
                       <option value="WORKSHOP">WORKSHOP</option>
                       <option value="LITERARY">LITERARY</option>
@@ -869,25 +878,42 @@ export const OrganizerStudio: React.FC = () => {
                 </div>
 
                 {/* Checkbox configs */}
-                <div style={{ display: 'flex', gap: '20px', padding: '4px 0' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={eventForm.requiresApproval}
-                      onChange={e => setEventForm({ ...eventForm, requiresApproval: e.target.checked })}
-                      style={{ width: '16px', height: '16px' }}
-                    />
-                    <span>Requires Organizer Approval</span>
-                  </label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '6px 0' }}>
+                  <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={eventForm.requiresApproval}
+                        onChange={e => setEventForm({ ...eventForm, requiresApproval: e.target.checked })}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Requires Organizer Approval</span>
+                    </label>
 
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={eventForm.includesLunch || eventForm.lunchProvided}
+                        onChange={e => setEventForm({ ...eventForm, includesLunch: e.target.checked, lunchProvided: e.target.checked })}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Includes Lunch Voucher</span>
+                    </label>
+                  </div>
+
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', background: '#f8fafc', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                     <input
                       type="checkbox"
-                      checked={eventForm.includesLunch || eventForm.lunchProvided}
-                      onChange={e => setEventForm({ ...eventForm, includesLunch: e.target.checked, lunchProvided: e.target.checked })}
+                      checked={eventForm.requiresPass ?? true}
+                      onChange={e => setEventForm({ ...eventForm, requiresPass: e.target.checked })}
                       style={{ width: '16px', height: '16px' }}
                     />
-                    <span>Includes Lunch Voucher</span>
+                    <div>
+                      <strong style={{ color: '#0f172a' }}>Issue Digital Pass via Email</strong>
+                      <div style={{ fontSize: '11.5px', color: '#64748b' }}>
+                        When enabled, approved students receive an encrypted barcode pass sent to their registered college email. If unchecked, event is open attendance with student ID.
+                      </div>
+                    </div>
                   </label>
                 </div>
               </div>

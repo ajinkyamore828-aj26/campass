@@ -37,6 +37,7 @@ interface CampusPassContextType {
   approveRegistration: (id: string, reviewerName?: string) => Promise<{ success: boolean; message: string }>;
   rejectRegistration: (id: string, reason: string, reviewerName?: string) => Promise<{ success: boolean; message: string }>;
   cancelRegistration: (id: string) => Promise<{ success: boolean; message: string }>;
+  resendEmailPass: (id: string) => Promise<{ success: boolean; message: string }>;
   
   createEvent: (data: Partial<CampusEvent>) => Promise<{ success: boolean; data?: CampusEvent }>;
   updateEvent: (id: string, data: Partial<CampusEvent>) => Promise<{ success: boolean; data?: CampusEvent }>;
@@ -78,9 +79,16 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       'Physical Education & Sports'
     ],
     eventCategories: [
-      'TECHNICAL',
       'HACKATHON',
+      'IDEATHON',
+      'CODING_COMPETITION',
+      'APTITUDE',
       'CULTURAL',
+      'FRESHER_PARTY',
+      'BOOTCAMP',
+      'CAMPUS_DRIVE',
+      'SEMINAR',
+      'TECHNICAL',
       'SPORTS',
       'WORKSHOP',
       'LITERARY',
@@ -229,6 +237,20 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return result;
     } catch (err: any) {
       return { success: false, message: err.message };
+    }
+  };
+
+  const resendEmailPass = async (id: string) => {
+    try {
+      const res = await fetch(`/api/registrations/${id}/resend-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const result = await res.json();
+      await refreshData();
+      return result;
+    } catch (err: any) {
+      return { success: false, message: err.message || 'Failed to resend pass email' };
     }
   };
 
@@ -410,6 +432,7 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         approveRegistration,
         rejectRegistration,
         cancelRegistration,
+        resendEmailPass,
         createEvent,
         updateEvent,
         revokePass,

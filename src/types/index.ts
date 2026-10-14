@@ -24,9 +24,16 @@ export interface CampusUser {
 }
 
 export type EventCategory = 
-  | 'TECHNICAL'
   | 'HACKATHON'
+  | 'IDEATHON'
+  | 'CODING_COMPETITION'
+  | 'APTITUDE'
   | 'CULTURAL'
+  | 'FRESHER_PARTY'
+  | 'BOOTCAMP'
+  | 'CAMPUS_DRIVE'
+  | 'SEMINAR'
+  | 'TECHNICAL'
   | 'SPORTS'
   | 'WORKSHOP'
   | 'LITERARY'
@@ -78,6 +85,7 @@ export interface CampusEvent {
   maxTeamSize: number;
   approvalMode: ApprovalMode;
   requiresApproval?: boolean;
+  requiresPass?: boolean; // Admin-controlled: true if official pass is issued via email, false if open registration
   includesLunch: boolean;
   lunchProvided?: boolean;
   rules: string[];
@@ -123,8 +131,12 @@ export interface CampusRegistration {
   teamName?: string;
   teamMembers?: TeamMemberInfo[];
   status: ApplicationStatus;
+  requiresPass?: boolean;
   passIssued: boolean;
   passId?: string;
+  passSentToEmail?: boolean;
+  passEmailAddress?: string;
+  passSentAt?: string;
   attended: boolean;
   lunchEligible: boolean;
   dietaryPreference?: 'VEG' | 'NON_VEG' | 'JAIN' | 'STANDARD';

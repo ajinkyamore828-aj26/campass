@@ -145,6 +145,20 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
                 </div>
               </div>
             </div>
+
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+              {event.requiresPass !== false ? (
+                <Mail size={15} style={{ color: '#166534', marginTop: '2px' }} />
+              ) : (
+                <CheckCircle size={15} style={{ color: '#475569', marginTop: '2px' }} />
+              )}
+              <div>
+                <strong style={{ color: '#0f172a' }}>Pass Requirement</strong>
+                <div style={{ color: event.requiresPass !== false ? '#166534' : '#64748b', fontWeight: event.requiresPass !== false ? 600 : 400 }}>
+                  {event.requiresPass !== false ? 'Official Pass Sent to Email' : 'Open Entry (No Pass Needed)'}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Capacity Progress Bar */}

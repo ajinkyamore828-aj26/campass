@@ -14,7 +14,8 @@ import {
   Calendar,
   MapPin,
   FileCheck,
-  ArrowRight
+  ArrowRight,
+  Mail
 } from 'lucide-react';
 
 interface EventRegistrationModalProps {
@@ -215,6 +216,35 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
               <div style={{ fontWeight: 800, color: '#0f172a' }}>
                 {(event.fee ?? event.registrationFee ?? 0) === 0 ? 'FREE ENTRY' : `₹${event.fee ?? event.registrationFee}`}
               </div>
+            </div>
+
+            {/* Pass Policy Disclosure */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 14px',
+              borderRadius: '10px',
+              backgroundColor: event.requiresPass !== false ? '#f0fdf4' : '#f8fafc',
+              border: event.requiresPass !== false ? '1px solid #bbf7d0' : '1px solid #e2e8f0',
+              fontSize: '12px',
+              color: event.requiresPass !== false ? '#166534' : '#475569'
+            }}>
+              {event.requiresPass !== false ? (
+                <>
+                  <Mail size={15} style={{ color: '#166534', flexShrink: 0 }} />
+                  <div>
+                    <strong>Pass Policy:</strong> Official Digital Entry Pass with verification barcode will be emailed directly to your registered address: <strong>{currentUser.email}</strong> upon confirmation.
+                  </div>
+                </>
+              ) : (
+                <>
+                  <CheckCircle size={15} style={{ color: '#475569', flexShrink: 0 }} />
+                  <div>
+                    <strong>Pass Policy:</strong> Open Attendance (No gate pass required). Online registration reserves your seat instantly; simply present your standard student ID.
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Error Banner */}

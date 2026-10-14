@@ -64,9 +64,7 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
 
   const studentNav = [
     { id: 'DISCOVER', icon: Compass, label: 'Event Discovery', badge: openEvents > 0 ? String(openEvents) : undefined, badgeColor: 'cyan' },
-    { id: 'PASSES', icon: Ticket, label: 'Pass Wallet', badge: studentPasses.length > 0 ? String(studentPasses.length) : undefined },
-    { id: 'LUNCH', icon: Utensils, label: 'Meal Vouchers', badge: studentLunchPasses.length > 0 ? String(studentLunchPasses.length) : undefined, badgeColor: 'amber' },
-    { id: 'APPLICATIONS', icon: FileText, label: 'My Applications' },
+    { id: 'APPLICATIONS', icon: FileText, label: 'My Registrations' },
   ];
 
   const adminNav = [

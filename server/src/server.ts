@@ -179,6 +179,7 @@ app.post('/api/registrations', (req, res) => {
 
   const regId = `CP-REG-2026-${(registrations.length + 1001).toString()}`;
   let passId: string | undefined = undefined;
+  const requiresPass = event.requiresPass !== false; // Admin-configured: true if official pass is issued via email
 
   const newReg: CampusRegistration = {
     id: regId,
@@ -197,7 +198,11 @@ app.post('/api/registrations', (req, res) => {
     teamName: registrationType === 'TEAM' ? teamName : undefined,
     teamMembers: registrationType === 'TEAM' ? teamMembers : undefined,
     status: isWaitlist ? 'WAITLISTED' : isAutoApprove ? 'APPROVED' : 'PENDING',
-    passIssued: isAutoApprove,
+    requiresPass,
+    passIssued: isAutoApprove && requiresPass,
+    passSentToEmail: isAutoApprove && requiresPass,
+    passEmailAddress: isAutoApprove && requiresPass ? studentEmail : undefined,
+    passSentAt: isAutoApprove && requiresPass ? new Date().toISOString() : undefined,
     attended: false,
     lunchEligible: event.includesLunch,
     dietaryPreference: dietaryPreference || 'VEG',
@@ -206,8 +211,8 @@ app.post('/api/registrations', (req, res) => {
     reviewedAt: isAutoApprove ? new Date().toISOString() : undefined,
   };
 
-  // If auto-approved, generate the Digital Event Pass & Lunch Pass immediately
-  if (isAutoApprove) {
+  // If auto-approved and event requires an official pass, generate Pass & Email it
+  if (isAutoApprove && requiresPass) {
     passId = `CP-PASS-${Date.now().toString().slice(-4)}`;
     newReg.passId = passId;
 
@@ -270,12 +275,14 @@ app.post('/api/registrations', (req, res) => {
     'REGISTRATION_SUBMITTED', 
     'REGISTRATION', 
     regId, 
-    `Registered for ${event.title} (${newReg.registrationType}) - Status: ${newReg.status}`
+    `Registered for ${event.title} (${newReg.registrationType}) - Pass required: ${requiresPass} - Status: ${newReg.status}`
   );
 
   res.status(201).json({ 
     success: true, 
-    message: isAutoApprove ? 'Registration confirmed! Digital Pass issued.' : 'Application submitted for review.',
+    message: isAutoApprove 
+      ? (requiresPass ? `Registration confirmed! Official pass emailed to ${studentEmail}.` : 'Registration confirmed! Direct entry (No pass required).')
+      : 'Application submitted for review.',
     data: newReg 
   });
 });
@@ -287,65 +294,125 @@ app.post('/api/registrations/:id/approve', (req, res) => {
 
   const event = events.find(e => e.id === reg.eventId);
   const reviewer = req.body.reviewerName || 'Event Organizer';
+  const requiresPass = reg.requiresPass !== false && (event?.requiresPass !== false);
 
-  const passId = `CP-PASS-${Date.now().toString().slice(-4)}`;
   reg.status = 'APPROVED';
-  reg.passIssued = true;
-  reg.passId = passId;
+  reg.requiresPass = requiresPass;
   reg.reviewedBy = reviewer;
   reg.reviewedAt = new Date().toISOString();
 
-  const newPass: DigitalEventPass = {
-    id: passId,
-    registrationId: reg.id,
-    eventId: reg.eventId,
-    eventTitle: reg.eventTitle,
-    eventCategory: reg.eventCategory,
-    eventDate: reg.eventDate,
-    eventTime: event?.startTime || '09:00 AM',
-    eventVenue: reg.eventVenue,
-    studentName: reg.studentName,
-    studentId: reg.studentId,
-    studentEmail: reg.studentEmail,
-    department: reg.department,
-    academicYear: reg.academicYear,
-    passType: reg.registrationType === 'TEAM' ? 'TEAM_ENTRY' : 'PARTICIPANT',
-    status: 'ACTIVE',
-    qrToken: `CPTOKEN_${reg.eventId}_${passId}_${reg.studentId}_HMAC_VERIFIED`,
-    qrSignature: `HMAC-SHA256-${passId}-${Date.now()}`,
-    entryCount: 0,
-    issuedAt: new Date().toISOString(),
-    expiresAt: `${reg.eventDate}T23:59:59Z`,
-    hasLunchPass: reg.lunchEligible
-  };
-  passes.unshift(newPass);
+  let passId: string | undefined = undefined;
 
-  if (reg.lunchEligible) {
-    const lunchId = `CP-MEAL-${Date.now().toString().slice(-4)}`;
-    const newLunch: LunchPass = {
-      id: lunchId,
-      passId,
+  if (requiresPass) {
+    passId = `CP-PASS-${Date.now().toString().slice(-4)}`;
+    reg.passIssued = true;
+    reg.passId = passId;
+    reg.passSentToEmail = true;
+    reg.passEmailAddress = reg.studentEmail;
+    reg.passSentAt = new Date().toISOString();
+
+    const newPass: DigitalEventPass = {
+      id: passId,
+      registrationId: reg.id,
       eventId: reg.eventId,
       eventTitle: reg.eventTitle,
+      eventCategory: reg.eventCategory,
+      eventDate: reg.eventDate,
+      eventTime: event?.startTime || '09:00 AM',
+      eventVenue: reg.eventVenue,
       studentName: reg.studentName,
       studentId: reg.studentId,
       studentEmail: reg.studentEmail,
       department: reg.department,
-      mealType: 'BUFFET_LUNCH',
-      sessionDate: reg.eventDate,
-      validFrom: '12:30 PM',
-      validUntil: '02:30 PM',
-      diningHallCounter: 'Dining Hall Station B (Courtyard Pavilion)',
-      dietaryPreference: reg.dietaryPreference || 'VEG',
-      status: 'AVAILABLE',
-      qrToken: `CPMEAL_${lunchId}_${reg.studentId}_HMAC_VERIFIED`,
-      createdAt: new Date().toISOString()
+      academicYear: reg.academicYear,
+      passType: reg.registrationType === 'TEAM' ? 'TEAM_ENTRY' : 'PARTICIPANT',
+      status: 'ACTIVE',
+      qrToken: `CPTOKEN_${reg.eventId}_${passId}_${reg.studentId}_HMAC_VERIFIED`,
+      qrSignature: `HMAC-SHA256-${passId}-${Date.now()}`,
+      entryCount: 0,
+      issuedAt: new Date().toISOString(),
+      expiresAt: `${reg.eventDate}T23:59:59Z`,
+      hasLunchPass: reg.lunchEligible
     };
-    lunchPasses.unshift(newLunch);
+    passes.unshift(newPass);
+
+    if (reg.lunchEligible) {
+      const lunchId = `CP-MEAL-${Date.now().toString().slice(-4)}`;
+      const newLunch: LunchPass = {
+        id: lunchId,
+        passId,
+        eventId: reg.eventId,
+        eventTitle: reg.eventTitle,
+        studentName: reg.studentName,
+        studentId: reg.studentId,
+        studentEmail: reg.studentEmail,
+        department: reg.department,
+        mealType: 'BUFFET_LUNCH',
+        sessionDate: reg.eventDate,
+        validFrom: '12:30 PM',
+        validUntil: '02:30 PM',
+        diningHallCounter: 'Dining Hall Station B (Courtyard Pavilion)',
+        dietaryPreference: reg.dietaryPreference || 'VEG',
+        status: 'AVAILABLE',
+        qrToken: `CPMEAL_${lunchId}_${reg.studentId}_HMAC_VERIFIED`,
+        createdAt: new Date().toISOString()
+      };
+      lunchPasses.unshift(newLunch);
+    }
+  } else {
+    reg.passIssued = false;
+    reg.passSentToEmail = false;
   }
 
-  addAudit(reviewer, 'ORGANIZER', 'REGISTRATION_APPROVED', 'REGISTRATION', reg.id, `Approved registration for ${reg.studentName}. Issued pass ${passId}.`);
-  res.json({ success: true, message: 'Registration approved and Digital Pass issued', data: reg });
+  addAudit(
+    reviewer, 
+    'ORGANIZER', 
+    'REGISTRATION_APPROVED', 
+    'REGISTRATION', 
+    reg.id, 
+    `Approved registration for ${reg.studentName}. ${requiresPass ? `Issued pass ${passId} and emailed to ${reg.studentEmail}.` : 'Direct entry confirmed (No pass required).'}`
+  );
+
+  res.json({ 
+    success: true, 
+    message: requiresPass 
+      ? `Registration approved! Digital Pass emailed to ${reg.studentEmail}.` 
+      : 'Registration approved! Direct entry confirmed (No pass required).', 
+    data: reg 
+  });
+});
+
+app.post('/api/registrations/:id/resend-email', (req, res) => {
+  const reg = registrations.find(r => r.id === req.params.id);
+  if (!reg) return res.status(404).json({ success: false, message: 'Registration not found' });
+  if (reg.status !== 'APPROVED') {
+    return res.status(400).json({ success: false, message: 'Only approved registrations have active event passes.' });
+  }
+  if (reg.requiresPass === false) {
+    return res.status(400).json({ success: false, message: 'This event does not require an entry pass. Students enter with college ID.' });
+  }
+
+  reg.passSentToEmail = true;
+  reg.passEmailAddress = reg.studentEmail;
+  reg.passSentAt = new Date().toISOString();
+
+  addAudit(
+    reg.studentName,
+    'SYSTEM',
+    'EMAIL_PASS_DISPATCHED',
+    'REGISTRATION',
+    reg.id,
+    `Resent official digital event pass to ${reg.studentEmail}`
+  );
+
+  res.json({
+    success: true,
+    message: `Official Digital Pass resent to ${reg.studentEmail}!`,
+    data: {
+      sentTo: reg.studentEmail,
+      sentAt: reg.passSentAt
+    }
+  });
 });
 
 app.post('/api/registrations/:id/reject', (req, res) => {
