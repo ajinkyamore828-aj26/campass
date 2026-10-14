@@ -987,51 +987,72 @@ body {
 .cp-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 16px;
 }
 
 .cp-modal {
   background: #141416;
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
-  max-width: 580px;
+  box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.9);
+  max-width: 640px;
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: min(88vh, 800px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   color: #ffffff;
   position: relative;
 }
 
 .cp-modal-header {
-  padding: 20px 24px 16px 24px;
+  padding: 18px 24px 14px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: #141416;
+  flex-shrink: 0;
 }
 
 .cp-modal-body { 
-  padding: 20px 26px;
+  padding: 18px 24px;
   background: #141416;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.cp-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+.cp-modal-body::-webkit-scrollbar-track {
+  background: #141416;
+}
+.cp-modal-body::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+.cp-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
 }
 
 .cp-modal-footer {
-  padding: 16px 26px;
+  padding: 14px 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
   background: #141416;
+  flex-shrink: 0;
 }
 
 /* ── Toast Notification ──────────────────────────────────── */

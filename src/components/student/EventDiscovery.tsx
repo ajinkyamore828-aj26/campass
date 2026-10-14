@@ -521,45 +521,53 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                       <span className={statusMeta.cls} style={{ position: 'absolute', top: '10px', right: '10px' }}>
                         {statusMeta.label}
                       </span>
-                      {/* Meal badge */}
-                      {(event.includesLunch || event.lunchProvided) && (
-                        <div style={{
-                          position: 'absolute', bottom: '10px', left: '10px',
-                          display: 'flex', alignItems: 'center', gap: '4px',
-                          padding: '3px 8px', borderRadius: '8px',
-                          background: 'rgba(0, 0, 0, 0.75)', color: '#86efac',
-                          fontSize: '10px', fontWeight: 700,
-                          backdropFilter: 'blur(6px)',
-                          border: '1px solid rgba(74, 222, 128, 0.25)',
-                        }}>
-                          <Utensils size={10} />
-                          Meal Included
+                      {/* Banner Bottom Badges Row */}
+                      <div style={{
+                        position: 'absolute', bottom: '10px', left: '10px', right: '10px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        gap: '6px', pointerEvents: 'none'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          {/* Meal badge */}
+                          {(event.includesLunch || event.lunchProvided) && (
+                            <div style={{
+                              display: 'flex', alignItems: 'center', gap: '4px',
+                              padding: '3px 8px', borderRadius: '8px',
+                              background: 'rgba(0, 0, 0, 0.75)', color: '#86efac',
+                              fontSize: '10px', fontWeight: 700,
+                              backdropFilter: 'blur(6px)',
+                              border: '1px solid rgba(74, 222, 128, 0.25)',
+                            }}>
+                              <Utensils size={10} />
+                              Meal Included
+                            </div>
+                          )}
+                          {/* Pass policy badge */}
+                          <div style={{
+                            display: 'flex', alignItems: 'center', gap: '4px',
+                            padding: '3px 8px', borderRadius: '8px',
+                            background: event.requiresPass !== false ? 'rgba(0, 0, 0, 0.8)' : 'rgba(30, 41, 59, 0.85)',
+                            color: event.requiresPass !== false ? '#86efac' : '#cbd5e1',
+                            fontSize: '10px', fontWeight: 700,
+                            backdropFilter: 'blur(6px)',
+                            border: event.requiresPass !== false ? '1px solid rgba(74, 222, 128, 0.25)' : '1px solid rgba(148, 163, 184, 0.25)',
+                          }}>
+                            {event.requiresPass !== false ? <Mail size={10} /> : <CheckCircle size={10} />}
+                            {event.requiresPass !== false ? 'Pass via Email' : 'No Pass Needed'}
+                          </div>
                         </div>
-                      )}
-                      {/* Pass policy badge */}
-                      <div style={{
-                        position: 'absolute', bottom: '10px', left: (event.includesLunch || event.lunchProvided) ? '108px' : '10px',
-                        display: 'flex', alignItems: 'center', gap: '4px',
-                        padding: '3px 8px', borderRadius: '8px',
-                        background: event.requiresPass !== false ? 'rgba(0, 0, 0, 0.8)' : 'rgba(30, 41, 59, 0.85)',
-                        color: event.requiresPass !== false ? '#86efac' : '#cbd5e1',
-                        fontSize: '10px', fontWeight: 700,
-                        backdropFilter: 'blur(6px)',
-                        border: event.requiresPass !== false ? '1px solid rgba(74, 222, 128, 0.25)' : '1px solid rgba(148, 163, 184, 0.25)',
-                      }}>
-                        {event.requiresPass !== false ? <Mail size={10} /> : <CheckCircle size={10} />}
-                        {event.requiresPass !== false ? 'Pass via Email' : 'No Pass Needed'}
-                      </div>
-                      {/* Fee badge */}
-                      <div style={{
-                        position: 'absolute', bottom: '10px', right: '10px',
-                        padding: '3px 8px', borderRadius: '8px',
-                        background: 'rgba(0, 0, 0, 0.75)', color: '#ffffff',
-                        fontSize: '10px', fontWeight: 800,
-                        backdropFilter: 'blur(6px)',
-                        border: '1px solid rgba(255, 255, 255, 0.16)',
-                      }}>
-                        {feeValue === 0 ? 'FREE' : `₹${feeValue}`}
+
+                        {/* Fee badge */}
+                        <div style={{
+                          padding: '3px 8px', borderRadius: '8px',
+                          background: 'rgba(0, 0, 0, 0.75)', color: '#ffffff',
+                          fontSize: '10px', fontWeight: 800,
+                          backdropFilter: 'blur(6px)',
+                          border: '1px solid rgba(255, 255, 255, 0.16)',
+                          flexShrink: 0
+                        }}>
+                          {feeValue === 0 ? 'FREE' : `₹${feeValue}`}
+                        </div>
                       </div>
                     </div>
 
@@ -644,33 +652,46 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                         </div>
                       </div>
 
-                      {/* Action Buttons with Plus Inspector */}
+                      {/* Action Buttons: '+' inspect button on left + Primary Action Button */}
                       <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        {/* Plus button replacing Details button */}
                         <button
-                          className="cp-btn"
+                          className="cp-btn cp-btn-icon"
                           style={{
-                            flex: 1, justifyContent: 'center', height: '36px',
-                            background: '#27272a', border: '1px solid rgba(255, 255, 255, 0.12)',
-                            color: '#ffffff', borderRadius: '12px', fontSize: '12px', fontWeight: 600
+                            background: '#27272a',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            color: '#e4e4e7',
+                            borderRadius: '12px',
+                            width: '38px',
+                            height: '38px',
+                            flexShrink: 0,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'background-color 0.12s'
                           }}
                           onClick={() => handleSelectEvent(event)}
+                          title="View Event Details"
+                          aria-label="View Event Details"
                         >
-                          Details
+                          <Plus size={16} />
                         </button>
+
                         {isRegistered ? (
                           <div style={{
                             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            gap: '5px', height: '36px', borderRadius: '12px',
+                            gap: '6px', height: '38px', borderRadius: '12px',
                             background: 'rgba(22, 101, 52, 0.3)', color: '#86efac', border: '1px solid rgba(74, 222, 128, 0.3)',
-                            fontSize: '12px', fontWeight: 700,
+                            fontSize: '12.5px', fontWeight: 700,
                           }}>
-                            <CheckCircle size={13} />
+                            <CheckCircle size={14} />
                             Applied
                           </div>
                         ) : isFull && !isWaitlist ? (
                           <button
                             className="cp-btn"
-                            style={{ flex: 1, justifyContent: 'center', height: '36px', opacity: 0.5, background: '#27272a', border: '1px solid rgba(255,255,255,0.08)', color: '#71717a', borderRadius: '12px' }}
+                            style={{ flex: 1, justifyContent: 'center', height: '38px', opacity: 0.5, background: '#27272a', border: '1px solid rgba(255,255,255,0.08)', color: '#71717a', borderRadius: '12px' }}
                             disabled
                           >
                             Full
@@ -678,24 +699,17 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                         ) : (
                           <button
                             className="cp-btn cp-btn-primary"
-                            style={{ flex: 1, justifyContent: 'center', height: '36px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}
+                            style={{
+                              flex: 1, justifyContent: 'center', height: '38px', borderRadius: '12px', fontSize: '12.5px', fontWeight: 700,
+                              background: '#166534', color: '#ffffff', border: '1px solid #166534',
+                              boxShadow: '0 2px 10px rgba(22, 101, 52, 0.3)'
+                            }}
                             onClick={() => handleRegisterEvent(event)}
                           >
-                            {isWaitlist ? 'Waitlist' : 'Apply'}
+                            <span>{isWaitlist ? 'Join Waitlist' : 'Apply Now'}</span>
                             <ArrowRight size={13} />
                           </button>
                         )}
-                        <button
-                          className="cp-btn cp-btn-icon"
-                          style={{
-                            background: '#27272a', border: '1px solid rgba(255, 255, 255, 0.12)',
-                            color: '#e4e4e7', borderRadius: '12px', width: '36px', height: '36px', flexShrink: 0
-                          }}
-                          onClick={() => handleSelectEvent(event)}
-                          title="Quick Inspect"
-                        >
-                          <Plus size={15} />
-                        </button>
                       </div>
                     </div>
                   </div>
