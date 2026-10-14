@@ -173,7 +173,7 @@ export const OrganizerStudio: React.FC = () => {
     bannerUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
     tags: ['Technical', 'Campus', 'Festival'],
     rules: ['Valid college ID mandatory at entry', 'Adhere to institutional conduct rules'],
-    faqs: [{ q: 'Is attendance recorded?', a: 'Yes, via digital QR scanner at the entry gate.' }],
+    faqs: [{ q: 'Is attendance recorded?', a: 'Yes, via digital pass verification at event check-in.' }],
     contactEmail: currentUser.email,
     contactPhone: currentUser.phone || '+91 98765 01001'
   });
@@ -646,7 +646,7 @@ export const OrganizerStudio: React.FC = () => {
                   {scanLogs.length === 0 ? (
                     <tr>
                       <td colSpan={6} style={{ padding: '36px 14px', textAlign: 'center', color: '#64748b' }}>
-                        No entry scans recorded yet. Volunteers can scan passes in the Gate Scanner Portal.
+                        No check-in activity recorded yet. Check-ins will appear here once attendees are verified.
                       </td>
                     </tr>
                   ) : (

@@ -7,7 +7,7 @@ import { DigitalPassWallet } from './components/student/DigitalPassWallet';
 import { LunchPassView } from './components/student/LunchPassView';
 import { MyApplicationsList } from './components/student/MyApplicationsList';
 import { OrganizerStudio } from './components/organizer/OrganizerStudio';
-import { GateScannerPortal } from './components/scanner/GateScannerPortal';
+import { AnalyticsDashboard } from './components/analytics/AnalyticsDashboard';
 import { AdminPortal } from './components/admin/AdminPortal';
 import {
   ShieldCheck,
@@ -21,7 +21,7 @@ import {
 export const App: React.FC = () => {
   const { activePortal, institutionProfile } = useCampusPass();
 
-  // Navigation View: DISCOVER | PASSES | LUNCH | APPLICATIONS | ORGANIZER | SCANNER | ADMIN
+  // Navigation View: DISCOVER | PASSES | LUNCH | APPLICATIONS | ORGANIZER | ANALYTICS | ADMIN
   const [currentView, setCurrentView] = useState<string>('DISCOVER');
   const [globalSearch, setGlobalSearch] = useState<string>('');
 
@@ -31,8 +31,6 @@ export const App: React.FC = () => {
       setCurrentView('DISCOVER');
     } else if (activePortal === 'ORGANIZER') {
       setCurrentView('ORGANIZER');
-    } else if (activePortal === 'VOLUNTEER') {
-      setCurrentView('SCANNER');
     } else if (activePortal === 'ADMIN') {
       setCurrentView('ADMIN');
     }
@@ -90,8 +88,8 @@ export const App: React.FC = () => {
             <OrganizerStudio />
           )}
 
-          {currentView === 'SCANNER' && (
-            <GateScannerPortal />
+          {currentView === 'ANALYTICS' && (
+            <AnalyticsDashboard />
           )}
 
           {currentView === 'ADMIN' && (

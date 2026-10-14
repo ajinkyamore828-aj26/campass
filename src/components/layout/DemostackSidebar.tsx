@@ -7,7 +7,6 @@ import {
   Utensils,
   FileText,
   Calendar,
-  Scan,
   ShieldAlert,
   ChevronDown,
   Server,
@@ -19,7 +18,9 @@ import {
   Building,
   Bell,
   BarChart3,
+  ShieldCheck,
 } from 'lucide-react';
+import { ApiStatusModal } from '../system/ApiStatusModal';
 
 interface DemostackSidebarProps {
   currentView: string;
@@ -29,7 +30,6 @@ interface DemostackSidebarProps {
 const ROLES = [
   { value: 'STUDENT' as const, label: 'Student Portal', desc: 'Event discovery & passes' },
   { value: 'ORGANIZER' as const, label: 'Event Organizer', desc: 'Manage your events' },
-  { value: 'VOLUNTEER' as const, label: 'Gate Volunteer', desc: 'Entry & scanning' },
   { value: 'ADMIN' as const, label: 'Administrator', desc: 'Full system control' },
 ];
 
@@ -47,18 +47,18 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
 
   const [orgOpen, setOrgOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
+  const [apiModalOpen, setApiModalOpen] = useState(false);
 
   const studentPasses = passes.filter(p => p.studentId === currentUser.studentId);
   const studentLunchPasses = lunchPasses.filter(lp => lp.studentId === currentUser.studentId);
   const pendingApprovals = registrations.filter(r => r.status === 'PENDING').length;
   const openEvents = events.filter(e => e.status === 'OPEN').length;
 
-  const handleRoleSwitch = (role: 'STUDENT' | 'ORGANIZER' | 'VOLUNTEER' | 'ADMIN') => {
-    switchUserRole(role);
+  const handleRoleSwitch = (role: 'STUDENT' | 'ORGANIZER' | 'ADMIN') => {
+    switchUserRole(role as any);
     setOrgOpen(false);
     if (role === 'STUDENT') onNavigate('DISCOVER');
     if (role === 'ORGANIZER') onNavigate('ORGANIZER');
-    if (role === 'VOLUNTEER') onNavigate('SCANNER');
     if (role === 'ADMIN') onNavigate('ADMIN');
   };
 
@@ -71,7 +71,7 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
 
   const adminNav = [
     { id: 'ORGANIZER', icon: Calendar, label: 'Organizer Studio', badge: pendingApprovals > 0 ? String(pendingApprovals) : undefined, badgeColor: 'amber' },
-    { id: 'SCANNER', icon: Scan, label: 'Gate Scanner HUD' },
+    { id: 'ANALYTICS', icon: BarChart3, label: 'Analytics Hub' },
     { id: 'ADMIN', icon: ShieldAlert, label: 'Admin Control' },
   ];
 
@@ -140,23 +140,35 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
           {/* System Links — visible to everyone */}
           <div className="cp-divider" />
           <p style={{ fontSize: '10.5px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '4px 2px 8px 2px' }}>
-            System
+            System Infrastructure
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <div className="ds-nav-item">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+            <button
+              type="button"
+              className="ds-nav-item"
+              onClick={() => setApiModalOpen(true)}
+              style={{ width: '100%', border: 'none', background: 'transparent', textAlign: 'left', cursor: 'pointer' }}
+              title="Inspect backend REST API health and latency"
+            >
               <Server size={15} />
               <span style={{ flex: 1, fontSize: '12.5px' }}>API Backend</span>
-              <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#22c55e' }} />
-            </div>
-            <div className="ds-nav-item">
-              <Activity size={15} />
-              <span style={{ flex: 1, fontSize: '12.5px' }}>Gate Telemetry</span>
-              <span style={{ fontSize: '10px', color: '#22c55e', fontWeight: 700 }}>LIVE</span>
-            </div>
-            <div className="ds-nav-item">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ fontSize: '10px', color: '#166534', fontWeight: 700 }}>4000</span>
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#22c55e' }} />
+              </div>
+            </button>
+
+            <button
+              type="button"
+              className={`ds-nav-item${currentView === 'ANALYTICS' ? ' active' : ''}`}
+              onClick={() => onNavigate('ANALYTICS')}
+              style={{ width: '100%', border: 'none', background: 'transparent', textAlign: 'left', cursor: 'pointer' }}
+              title="Open full campus analytics dashboard"
+            >
               <BarChart3 size={15} />
-              <span style={{ flex: 1, fontSize: '12.5px' }}>Analytics</span>
-            </div>
+              <span style={{ flex: 1, fontSize: '12.5px' }}>Platform Analytics</span>
+              <span style={{ fontSize: '10px', color: '#166534', fontWeight: 700 }}>LIVE</span>
+            </button>
           </div>
         </nav>
 
@@ -377,6 +389,9 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
         </div>
       </div>
     </div>
+
+    {/* Live API Backend Health Inspector Modal */}
+    <ApiStatusModal isOpen={apiModalOpen} onClose={() => setApiModalOpen(false)} />
   </aside>
 );
 };

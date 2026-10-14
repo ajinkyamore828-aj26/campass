@@ -56,6 +56,26 @@ const addAudit = (actorName: string, actorRole: string, action: string, resource
 };
 
 // ==========================================
+// 0. SYSTEM HEALTH API
+// ==========================================
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'HEALTHY',
+    service: 'CampusPass Central API Engine',
+    version: '1.0.0',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    metrics: {
+      events: events.length,
+      registrations: registrations.length,
+      passes: passes.length,
+      lunchPasses: lunchPasses.length,
+      auditLogs: auditLogs.length,
+    }
+  });
+});
+
+// ==========================================
 // 1. EVENTS API
 // ==========================================
 app.get('/api/events', (req, res) => {

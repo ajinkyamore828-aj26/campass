@@ -5,11 +5,11 @@ import {
   Bell,
   ChevronRight,
   X,
-  Scan,
   ShieldCheck,
   Clock,
   Calendar,
   Info,
+  BarChart3,
 } from 'lucide-react';
 
 interface DemostackTopbarProps {
@@ -25,7 +25,7 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   LUNCH:        { title: 'Meal Vouchers',              subtitle: 'Dining hall pass distribution' },
   APPLICATIONS: { title: 'My Applications',           subtitle: 'Track your registration status' },
   ORGANIZER:    { title: 'Event Operations Studio',   subtitle: 'Manage events & approvals' },
-  SCANNER:      { title: 'Gate Scanner HUD',          subtitle: 'QR verification & attendance' },
+  ANALYTICS:    { title: 'Platform Analytics',         subtitle: 'Event capacity, participation & metrics' },
   ADMIN:        { title: 'Admin Control Center',      subtitle: 'System administration' },
 };
 
@@ -136,16 +136,6 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
             </button>
           )}
         </div>
-
-        {/* Gate Scanner Quick Access */}
-        <button
-          className="cp-btn cp-btn-secondary cp-btn-sm"
-          onClick={() => onNavigate('SCANNER')}
-          style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
-        >
-          <Scan size={13} />
-          <span style={{ fontSize: '12px' }}>Scan Pass</span>
-        </button>
 
         {/* Notifications Bell */}
         <div style={{ position: 'relative' }} ref={notifRef}>

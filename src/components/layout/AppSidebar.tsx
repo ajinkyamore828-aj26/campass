@@ -8,7 +8,7 @@ import {
   Utensils, 
   FileText, 
   Calendar, 
-  Scan, 
+  BarChart3, 
   ShieldAlert, 
   User, 
   Layers, 
@@ -47,11 +47,10 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   const studentRegs = registrations.filter(r => r.studentId === currentUser.studentId);
   const pendingApprovals = registrations.filter(r => r.status === 'PENDING');
 
-  const handleRoleChange = (role: 'STUDENT' | 'ORGANIZER' | 'VOLUNTEER' | 'ADMIN') => {
-    switchUserRole(role);
+  const handleRoleChange = (role: 'STUDENT' | 'ORGANIZER' | 'ADMIN') => {
+    switchUserRole(role as any);
     if (role === 'STUDENT') onNavigate('DISCOVER');
     if (role === 'ORGANIZER') onNavigate('ORGANIZER');
-    if (role === 'VOLUNTEER') onNavigate('SCANNER');
     if (role === 'ADMIN') onNavigate('ADMIN');
   };
 
@@ -128,7 +127,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           >
             <option value="STUDENT">Student: Rohan Verma</option>
             <option value="ORGANIZER">Event Organizer: Dr. Sharma</option>
-            <option value="VOLUNTEER">Gate Volunteer: Priya Nair</option>
             <option value="ADMIN">Administrator: System Dean</option>
           </select>
         </div>
@@ -221,14 +219,14 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
           <button
             type="button"
-            className={`wm-sidebar-nav-item ${currentView === 'SCANNER' ? 'active' : ''}`}
-            onClick={() => onNavigate('SCANNER')}
+            className={`wm-sidebar-nav-item ${currentView === 'ANALYTICS' ? 'active' : ''}`}
+            onClick={() => onNavigate('ANALYTICS')}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Scan size={16} className="wm-nav-icon" />
-              <span>Turnstile Gate HUD</span>
+              <BarChart3 size={16} className="wm-nav-icon" />
+              <span>Platform Analytics</span>
             </div>
-            <span className="wm-nav-badge" style={{ backgroundColor: '#dcfce7', color: '#15803d' }}>
+            <span className="wm-nav-badge" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>
               Live
             </span>
           </button>

@@ -93,7 +93,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
               Digital Event Pass Wallet
             </h1>
             <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '6px', maxWidth: '580px', lineHeight: 1.5 }}>
-              HMAC-SHA256 cryptographically authenticated entry tokens. Present your high-density optical QR at automated speed turnstiles or volunteer scanner stations.
+              HMAC-SHA256 cryptographically authenticated entry tokens. Present your pass at venue gates for instant verification.
             </p>
           </div>
 
@@ -327,7 +327,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                       style={{ marginTop: '12px', gap: '6px' }}
                     >
                       <Maximize2 size={12} />
-                      <span>Full Turnstile Scanner Mode</span>
+                      <span>Enlarge Pass Fullscreen</span>
                     </button>
                   </div>
 
@@ -464,9 +464,9 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '8px' }}>
-              <Scan size={14} style={{ color: '#166534' }} />
+              <Ticket size={14} style={{ color: '#166534' }} />
               <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#166534' }}>
-                Optical Turnstile Presentation Mode
+                Official Event Pass Verification Mode
               </span>
             </div>
 
@@ -507,7 +507,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
             </div>
 
             <p style={{ fontSize: '12px', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
-              Hold device steady approximately 10–15 cm in front of the gate scanner lens at {enlargedPass.venue}.
+              Present this verified digital QR pass at {enlargedPass.venue} for event admission.
             </p>
           </div>
         </div>

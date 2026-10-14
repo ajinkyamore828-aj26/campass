@@ -127,15 +127,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           )}
         </button>
 
-        {/* Quick Navigate shortcut */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onNavigate('SCANNER')}
-          icon={<ShieldCheck size={14} />}
-        >
-          Scan Pass
-        </Button>
       </div>
 
       {/* Announcements Dropdown Overlay */}

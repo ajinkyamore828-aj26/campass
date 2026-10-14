@@ -4,7 +4,6 @@ import type { ActivePortal } from '../../types';
 import { 
   ShieldCheck, 
   GraduationCap, 
-  Scan, 
   Calendar, 
   ShieldAlert, 
   User, 
@@ -166,27 +165,6 @@ export const CampusPassNavbar: React.FC = () => {
             )}
           </button>
 
-          <button
-            type="button"
-            onClick={() => switchUserRole('VOLUNTEER')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              borderRadius: '7px',
-              border: 'none',
-              background: activePortal === 'VOLUNTEER' ? '#ffffff' : 'transparent',
-              color: activePortal === 'VOLUNTEER' ? '#0f172a' : '#cbd5e1',
-              fontSize: '0.78rem',
-              fontWeight: activePortal === 'VOLUNTEER' ? 700 : 500,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <Scan size={14} color={activePortal === 'VOLUNTEER' ? '#166534' : '#94a3b8'} />
-            <span>Gate Scanner</span>
-          </button>
 
           <button
             type="button"

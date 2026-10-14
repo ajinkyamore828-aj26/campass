@@ -687,7 +687,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
         )}
       </div>
 
-      {/* ── Watermelon: Integrations Block — Gate Hardware Telemetry ── */}
+      {/* ── Watermelon: Integrations Block — Campus Cloud Infrastructure Telemetry ── */}
       <div className="cp-section-card">
         <div className="cp-section-card-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -695,8 +695,8 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
               <Server size={16} />
             </div>
             <div>
-              <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Gate Hardware & Turnstile Telemetry</h4>
-              <p style={{ fontSize: '12px', color: '#64748b' }}>Real-time RFID gate, optical reader & dining counter status</p>
+              <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Campus Platform & Cloud Telemetry</h4>
+              <p style={{ fontSize: '12px', color: '#64748b' }}>Real-time microservices, database clusters & dining sync engines</p>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 600, color: '#15803d' }}>
@@ -706,10 +706,10 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
         </div>
         <div style={{ padding: '14px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
           {[
-            { name: 'Gate A — Turnstile Array', sub: 'East Entrance · 8 lanes active', status: '99.9%', color: '#15803d' },
-            { name: 'Gate B — Optical Readers', sub: 'Main Auditorium · 4 handhelds', status: 'ONLINE', color: '#15803d' },
-            { name: 'Gate C — Speed Pedestal', sub: 'Sports Complex · 28ms latency', status: 'ONLINE', color: '#15803d' },
-            { name: 'Dining Hall POS Counter', sub: 'Meal Ticket Verifier · Synced', status: 'SYNCED', color: '#166534' },
+            { name: 'Core API Microservice', sub: 'Express Engine · Port 4000', status: '99.99%', color: '#15803d' },
+            { name: 'Database Cluster', sub: 'Persistent Event Registry Store', status: 'ONLINE', color: '#15803d' },
+            { name: 'HMAC Cryptographic Engine', sub: 'SHA-256 Token Verification', status: 'ONLINE', color: '#15803d' },
+            { name: 'Dining Hall Allocation POS', sub: 'Meal Ticket Distribution Synced', status: 'SYNCED', color: '#166534' },
           ].map(g => (
             <div key={g.name} className="cp-integration-row">
               <div className="cp-integration-dot" style={{ background: '#22c55e' }} />
