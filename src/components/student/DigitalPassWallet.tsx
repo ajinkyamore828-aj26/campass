@@ -85,7 +85,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }} />
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#38bdf8' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#86efac' }}>
                 Secure Smart Credentials
               </span>
             </div>
@@ -110,11 +110,11 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
               alignItems: 'center',
               gap: '6px'
             }}>
-              <Ticket size={14} style={{ color: '#38bdf8' }} />
+              <Ticket size={14} style={{ color: '#86efac' }} />
               {studentPasses.length} {studentPasses.length === 1 ? 'Pass Issued' : 'Passes Issued'}
             </span>
             <button
-              className="cp-btn cp-btn-cyan cp-btn-sm"
+              className="cp-btn cp-btn-primary cp-btn-sm"
               onClick={onBrowseEvents}
             >
               Browse Events
@@ -173,7 +173,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                 <div className="cp-credential-header">
                   <div style={{ flex: 1, minWidth: 0, paddingRight: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 700 }}>
+                      <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#86efac', fontWeight: 700 }}>
                         {institutionProfile.collegeCode} • SMART ADMIT PASS
                       </span>
                     </div>
@@ -196,7 +196,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                     border: '1px solid rgba(255, 255, 255, 0.15)',
                     fontSize: '10px',
                     fontWeight: 700,
-                    color: '#38bdf8',
+                    color: '#86efac',
                     flexShrink: 0
                   }}>
                     <Lock size={10} />
@@ -220,7 +220,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                           Revoked
                         </span>
                       ) : (
-                        <span className="cp-badge cp-badge-wait" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+                        <span className="cp-badge cp-badge-wait" style={{ background: '#dcfce7', color: '#166534' }}>
                           <ShieldCheck size={11} />
                           Active & Verified
                         </span>
@@ -343,7 +343,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                     </div>
                     <div className="cp-credential-meta-cell">
                       <span className="cp-credential-meta-label">Access Tier</span>
-                      <span className="cp-credential-meta-value" style={{ color: '#0284c7' }}>
+                      <span className="cp-credential-meta-value" style={{ color: '#166534' }}>
                         {pass.passType?.replace('_', ' ') || 'GENERAL ENTRY'}
                       </span>
                     </div>
@@ -367,14 +367,14 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                     fontSize: '12px'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
-                      <Calendar size={13} style={{ color: '#0284c7', flexShrink: 0 }} />
+                      <Calendar size={13} style={{ color: '#166534', flexShrink: 0 }} />
                       <span>Date: <strong style={{ color: '#0f172a' }}>{pass.eventDate}</strong></span>
                       <span style={{ color: '#cbd5e1' }}>•</span>
-                      <Clock size={13} style={{ color: '#0284c7', flexShrink: 0 }} />
+                      <Clock size={13} style={{ color: '#166534', flexShrink: 0 }} />
                       <span>Time: <strong style={{ color: '#0f172a' }}>{pass.eventTime}</strong></span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
-                      <MapPin size={13} style={{ color: '#0284c7', flexShrink: 0 }} />
+                      <MapPin size={13} style={{ color: '#166534', flexShrink: 0 }} />
                       <span className="truncate">Venue: <strong style={{ color: '#0f172a' }}>{pass.venue}</strong></span>
                     </div>
                   </div>
@@ -399,7 +399,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: copiedToken === pass.qrToken ? '#15803d' : '#0284c7',
+                        color: copiedToken === pass.qrToken ? '#15803d' : '#166534',
                         cursor: 'pointer',
                         fontSize: '11px',
                         display: 'flex',
@@ -464,8 +464,8 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '8px' }}>
-              <Scan size={14} style={{ color: '#0284c7' }} />
-              <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0284c7' }}>
+              <Scan size={14} style={{ color: '#166534' }} />
+              <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#166534' }}>
                 Optical Turnstile Presentation Mode
               </span>
             </div>

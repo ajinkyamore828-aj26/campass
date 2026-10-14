@@ -70,14 +70,14 @@ const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  TECHNICAL:  'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)',
-  HACKATHON:  'linear-gradient(135deg, #0f172a 0%, #312e81 100%)',
+  TECHNICAL:  'linear-gradient(135deg, #0d3822 0%, #166534 100%)',
+  HACKATHON:  'linear-gradient(135deg, #0a2f1c 0%, #14532d 100%)',
   CULTURAL:   'linear-gradient(135deg, #7c2d12 0%, #92400e 100%)',
-  SPORTS:     'linear-gradient(135deg, #0f172a 0%, #052e16 100%)',
-  WORKSHOP:   'linear-gradient(135deg, #1e293b 0%, #134e4a 100%)',
-  LITERARY:   'linear-gradient(135deg, #1e293b 0%, #3b0764 100%)',
-  MANAGEMENT: 'linear-gradient(135deg, #0f172a 0%, #1c1917 100%)',
-  GENERAL:    'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+  SPORTS:     'linear-gradient(135deg, #0f3822 0%, #15803d 100%)',
+  WORKSHOP:   'linear-gradient(135deg, #0d3822 0%, #134e35 100%)',
+  LITERARY:   'linear-gradient(135deg, #1c3328 0%, #2e4a3d 100%)',
+  MANAGEMENT: 'linear-gradient(135deg, #0d3822 0%, #1c3829 100%)',
+  GENERAL:    'linear-gradient(135deg, #0d3822 0%, #166534 100%)',
 };
 
 const PAGE_SIZE = 9;
@@ -210,7 +210,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
             </div>
             <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.15, marginBottom: '10px' }}>
               Discover & Register for<br />
-              <span style={{ color: '#38bdf8' }}>College Events</span>
+              <span style={{ color: '#86efac' }}>College Events</span>
             </h1>
             <p style={{ fontSize: '13.5px', color: '#94a3b8', lineHeight: 1.55, maxWidth: '480px' }}>
               Apply for hackathons, cultural competitions, technical workshops, and sports events.
@@ -218,7 +218,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
             </p>
             {onOpenPassWallet && (
               <button
-                className="cp-btn cp-btn-cyan"
+                className="cp-btn cp-btn-primary"
                 style={{ marginTop: '16px', display: 'inline-flex' }}
                 onClick={onOpenPassWallet}
               >
@@ -246,7 +246,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                   minWidth: '100px',
                 }}
               >
-                <s.icon size={14} style={{ color: '#38bdf8', marginBottom: '6px' }} />
+                <s.icon size={14} style={{ color: '#86efac', marginBottom: '6px' }} />
                 <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>
                   {s.value}
                 </div>
@@ -262,7 +262,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
       {/* ── Watermelon: Stats Block — 4 KPI Cards ── */}
       <div className="cp-stats-grid">
         {[
-          { icon: Calendar, label: 'Total Events', value: String(events.length), sub: 'Across all categories', color: '#0284c7', bg: '#e0f2fe' },
+          { icon: Calendar, label: 'Total Events', value: String(events.length), sub: 'Across all categories', color: '#166534', bg: '#dcfce7' },
           { icon: Users, label: 'Applications', value: String(totalRegs), sub: 'Student registrations', color: '#0f766e', bg: '#ccfbf1' },
           { icon: CheckCircle, label: 'Approved', value: String(approvedPasses), sub: 'Passes issued', color: '#15803d', bg: '#dcfce7' },
           { icon: TrendingUp, label: 'Fill Rate', value: `${totalCapacity > 0 ? Math.round((totalRegs / totalCapacity) * 100) : 0}%`, sub: 'Avg seat occupancy', color: '#d97706', bg: '#fef3c7' },
@@ -285,7 +285,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
             style={{
               position: 'absolute', top: '-40px', right: '80px',
               width: '180px', height: '180px', borderRadius: '50%',
-              background: 'rgba(2, 132, 199, 0.07)', pointerEvents: 'none',
+              background: 'rgba(22, 101, 52, 0.1)', pointerEvents: 'none',
             }}
           />
           <div>
@@ -308,7 +308,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                 { icon: Users, text: `${featuredEvent.registeredCount}/${featuredEvent.capacity} seats` },
               ].map((item, i) => item.text && (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: '#64748b' }}>
-                  <item.icon size={12} style={{ color: '#38bdf8' }} />
+                  <item.icon size={12} style={{ color: '#166534' }} />
                   <span>{item.text}</span>
                 </div>
               ))}
@@ -316,7 +316,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
             <button
-              className="cp-btn cp-btn-cyan"
+              className="cp-btn cp-btn-primary"
               onClick={() => handleRegisterEvent(featuredEvent)}
             >
               Register Now
@@ -336,10 +336,10 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
       {/* ── Watermelon: Bento Grid — Quick Action Cards ── */}
       <div className="cp-bento-grid">
         {[
-          { icon: Ticket, title: 'My Pass Wallet', desc: 'View & download digital gate passes', color: '#0284c7', bg: '#e0f2fe', action: () => onOpenPassWallet?.() },
-          { icon: Calendar, title: 'All Events', desc: `${events.length} events across 8 categories`, color: '#0f766e', bg: '#ccfbf1', action: () => setSelectedCategory('ALL') },
+          { icon: Ticket, title: 'My Pass Wallet', desc: 'View & download digital gate passes', color: '#166534', bg: '#dcfce7', action: () => onOpenPassWallet?.() },
+          { icon: Calendar, title: 'All Events', desc: `${events.length} events across 8 categories`, color: '#14532d', bg: '#f0fdf4', action: () => setSelectedCategory('ALL') },
           { icon: Award, title: 'Hackathons', desc: 'Compete for prizes & recognition', color: '#d97706', bg: '#fef3c7', action: () => setSelectedCategory('HACKATHON') },
-          { icon: Zap, title: 'Quick Register', desc: 'Apply to open events instantly', color: '#0f172a', bg: '#f1f5f9', action: () => {} },
+          { icon: Zap, title: 'Quick Register', desc: 'Apply to open events instantly', color: '#166534', bg: '#f0fdf4', action: () => {} },
         ].map(card => (
           <div
             key={card.title}
@@ -506,9 +506,9 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                           position: 'absolute', bottom: '10px', left: '10px',
                           display: 'flex', alignItems: 'center', gap: '4px',
                           padding: '3px 8px', borderRadius: '6px',
-                          background: 'rgba(15,23,42,0.85)', color: '#38bdf8',
+                          background: 'rgba(13,40,26,0.85)', color: '#86efac',
                           fontSize: '10px', fontWeight: 700,
-                          border: '1px solid rgba(56,189,248,0.25)',
+                          border: '1px solid rgba(74,222,128,0.25)',
                         }}>
                           <Utensils size={10} />
                           Meal Included
@@ -518,7 +518,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                       <div style={{
                         position: 'absolute', bottom: '10px', right: '10px',
                         padding: '3px 8px', borderRadius: '6px',
-                        background: 'rgba(15,23,42,0.85)', color: '#ffffff',
+                        background: 'rgba(13,40,26,0.85)', color: '#ffffff',
                         fontSize: '10px', fontWeight: 800,
                         border: '1px solid rgba(255,255,255,0.15)',
                       }}>
@@ -530,7 +530,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                     <div className="cp-event-body">
                       {/* Dept */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: '#64748b', fontWeight: 600, height: '18px' }}>
-                        <Building size={12} style={{ color: '#0284c7', flexShrink: 0 }} />
+                        <Building size={12} style={{ color: '#166534', flexShrink: 0 }} />
                         <span className="truncate">{event.department}</span>
                       </div>
 
@@ -565,18 +565,18 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                         minHeight: '86px', justifyContent: 'center'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#475569', minWidth: 0 }}>
-                          <Calendar size={12} style={{ color: '#0284c7', flexShrink: 0 }} />
+                          <Calendar size={12} style={{ color: '#166534', flexShrink: 0 }} />
                           <strong className="truncate">{event.date || event.startDate}</strong>
                           <span style={{ color: '#cbd5e1' }}>•</span>
                           <Clock size={12} style={{ color: '#94a3b8', flexShrink: 0 }} />
                           <span className="truncate" style={{ color: '#64748b' }}>{event.startTime}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#475569', minWidth: 0 }}>
-                          <MapPin size={12} style={{ color: '#0284c7', flexShrink: 0 }} />
+                          <MapPin size={12} style={{ color: '#166534', flexShrink: 0 }} />
                           <span className="truncate" style={{ flex: 1 }}>{event.venue}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#475569', minWidth: 0 }}>
-                          <Users size={12} style={{ color: '#0284c7', flexShrink: 0 }} />
+                          <Users size={12} style={{ color: '#166534', flexShrink: 0 }} />
                           <span className="truncate">
                             {(event.registrationMode || event.participationType) === 'INDIVIDUAL'
                               ? 'Individual Entry'
@@ -691,7 +691,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
       <div className="cp-section-card">
         <div className="cp-section-card-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div className="cp-icon-box" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+            <div className="cp-icon-box" style={{ background: '#dcfce7', color: '#166534' }}>
               <Server size={16} />
             </div>
             <div>
@@ -709,15 +709,15 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
             { name: 'Gate A — Turnstile Array', sub: 'East Entrance · 8 lanes active', status: '99.9%', color: '#15803d' },
             { name: 'Gate B — Optical Readers', sub: 'Main Auditorium · 4 handhelds', status: 'ONLINE', color: '#15803d' },
             { name: 'Gate C — Speed Pedestal', sub: 'Sports Complex · 28ms latency', status: 'ONLINE', color: '#15803d' },
-            { name: 'Dining Hall POS Counter', sub: 'Meal Ticket Verifier · Synced', status: 'SYNCED', color: '#0284c7' },
+            { name: 'Dining Hall POS Counter', sub: 'Meal Ticket Verifier · Synced', status: 'SYNCED', color: '#166534' },
           ].map(g => (
             <div key={g.name} className="cp-integration-row">
-              <div className="cp-integration-dot" style={{ background: g.status === 'ONLINE' || g.status === 'SYNCED' ? '#22c55e' : '#d97706' }} />
+              <div className="cp-integration-dot" style={{ background: '#22c55e' }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a' }}>{g.name}</div>
                 <div style={{ fontSize: '11px', color: '#64748b', marginTop: '1px' }}>{g.sub}</div>
               </div>
-              <span style={{ fontSize: '10.5px', fontWeight: 800, color: g.color, background: g.color === '#0284c7' ? '#e0f2fe' : '#dcfce7', padding: '2px 7px', borderRadius: '5px', flexShrink: 0 }}>
+              <span style={{ fontSize: '10.5px', fontWeight: 800, color: g.color, background: '#dcfce7', padding: '2px 7px', borderRadius: '5px', flexShrink: 0 }}>
                 {g.status}
               </span>
             </div>
@@ -748,12 +748,12 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                     className="cp-accordion-trigger"
                     onClick={() => setOpenFaq(isOpen ? null : idx)}
                   >
-                    <span style={{ color: isOpen ? '#0284c7' : '#0f172a' }}>{item.q}</span>
+                    <span style={{ color: isOpen ? '#166534' : '#0f172a' }}>{item.q}</span>
                     <ChevronDown
                       size={15}
                       style={{
                         flexShrink: 0,
-                        color: isOpen ? '#0284c7' : '#94a3b8',
+                        color: isOpen ? '#166534' : '#94a3b8',
                         transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                         transition: 'transform 0.2s ease',
                       }}
@@ -773,7 +773,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
 
       {/* ── Watermelon: CTA Block ── */}
       <div style={{
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        background: 'linear-gradient(135deg, #0d3822 0%, #166534 100%)',
         borderRadius: '14px',
         padding: '28px 32px',
         display: 'flex',

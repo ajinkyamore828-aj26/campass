@@ -80,8 +80,8 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#0284c7' }} />
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#38bdf8' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#166534' }} />
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#86efac' }}>
                 Application Tracking Portal
               </span>
             </div>
@@ -95,7 +95,7 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
-              className="cp-btn cp-btn-cyan cp-btn-sm"
+              className="cp-btn cp-btn-primary cp-btn-sm"
               onClick={onBrowseEvents}
             >
               Browse Events
@@ -132,7 +132,7 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
           <div style={{ fontSize: '11px', color: '#94a3b8' }}>Gate pass generated</div>
         </div>
         <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#166534' }}>
             <Clock size={15} />
           </div>
           <div className="cp-stat-value">{waitlistCount}</div>
@@ -266,7 +266,7 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
 
                         {event && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#64748b', flexWrap: 'wrap' }}>
-                            <span style={{ fontWeight: 600, color: '#0284c7' }}>{event.category}</span>
+                            <span style={{ fontWeight: 600, color: '#166534' }}>{event.category}</span>
                             <span style={{ color: '#cbd5e1' }}>•</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                               <Calendar size={12} style={{ color: '#94a3b8' }} />
@@ -299,7 +299,7 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
                         fontSize: '12px'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
-                          <Users size={14} style={{ color: '#0284c7' }} />
+                          <Users size={14} style={{ color: '#166534' }} />
                           <span>Team Roster: {reg.teamName}</span>
                         </div>
 

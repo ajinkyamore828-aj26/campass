@@ -211,13 +211,13 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
                       style={{
                         padding: '10px 16px',
                         borderBottom: '1px solid #f8fafc',
-                        background: i === 0 ? '#f0f9ff' : 'transparent',
+                        background: i === 0 ? '#f0fdf4' : 'transparent',
                         cursor: 'pointer',
                         transition: 'background-color 0.1s',
                       }}
                     >
                       <div className="flex-center gap-2" style={{ marginBottom: '3px' }}>
-                        <Info size={12} style={{ color: '#0284c7', flexShrink: 0 }} />
+                        <Info size={12} style={{ color: '#166534', flexShrink: 0 }} />
                         <span style={{ fontWeight: 600, fontSize: '12.5px', color: '#0f172a' }}>{a.title}</span>
                       </div>
                       <p style={{ fontSize: '11.5px', color: '#64748b', lineHeight: 1.4 }}>

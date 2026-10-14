@@ -88,7 +88,7 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
             <div
               className="cp-icon-box"
               style={{
-                background: 'linear-gradient(135deg, #0284c7, #0f766e)',
+                background: 'linear-gradient(135deg, #166534, #14532d)',
                 color: '#fff',
                 width: '34px',
                 height: '34px',
@@ -188,7 +188,7 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
                   width: '28px',
                   height: '28px',
                   borderRadius: '8px',
-                  background: '#0f172a',
+                  background: '#166534',
                   color: '#fff',
                   display: 'flex',
                   alignItems: 'center',
@@ -248,7 +248,7 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
                       padding: '7px 10px',
                       borderRadius: '8px',
                       border: 'none',
-                      background: activePortal === role.value ? '#f1f5f9' : 'transparent',
+                      background: activePortal === role.value ? '#f0fdf4' : 'transparent',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'background-color 0.1s',
@@ -256,7 +256,7 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
                     onMouseEnter={e => { if (activePortal !== role.value) (e.currentTarget as HTMLButtonElement).style.background = '#f8fafc'; }}
                     onMouseLeave={e => { if (activePortal !== role.value) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
                   >
-                    <span style={{ fontSize: '12.5px', fontWeight: 600, color: activePortal === role.value ? '#0284c7' : '#0f172a' }}>
+                    <span style={{ fontSize: '12.5px', fontWeight: 600, color: activePortal === role.value ? '#166534' : '#0f172a' }}>
                       {role.label}
                     </span>
                     <span style={{ fontSize: '10.5px', color: '#94a3b8' }}>{role.desc}</span>
@@ -290,7 +290,7 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
             >
               <div
                 className="cp-avatar"
-                style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #0284c7, #0f766e)', color: '#fff', fontSize: '12px', fontWeight: 800 }}
+                style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #166534, #14532d)', color: '#fff', fontSize: '12px', fontWeight: 800 }}
               >
                 {currentUser.fullName.charAt(0).toUpperCase()}
               </div>

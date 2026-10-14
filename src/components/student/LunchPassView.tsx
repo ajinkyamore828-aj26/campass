@@ -80,7 +80,7 @@ export const LunchPassView: React.FC = () => {
               fontWeight: 700,
               color: '#ffffff'
             }}>
-              <ShieldCheck size={14} style={{ color: '#38bdf8' }} />
+              <ShieldCheck size={14} style={{ color: '#86efac' }} />
               Anti-Fraud Atomic Redemption
             </div>
           </div>
@@ -98,7 +98,7 @@ export const LunchPassView: React.FC = () => {
           <div style={{ fontSize: '11px', color: '#94a3b8' }}>Issued to your profile</div>
         </div>
         <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#166534' }}>
             <Clock size={15} />
           </div>
           <div className="cp-stat-value">{activeCount}</div>
@@ -114,7 +114,7 @@ export const LunchPassView: React.FC = () => {
           <div style={{ fontSize: '11px', color: '#94a3b8' }}>Verified & consumed</div>
         </div>
         <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#ccfbf1', color: '#0f766e' }}>
+          <div className="cp-stat-icon" style={{ background: '#f0fdf4', color: '#14532d' }}>
             <MapPin size={15} />
           </div>
           <div className="cp-stat-value">Central Hall</div>
@@ -169,8 +169,8 @@ export const LunchPassView: React.FC = () => {
                 <div style={{
                   padding: '16px 20px',
                   background: isRedeemed
-                    ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
-                    : 'linear-gradient(135deg, #0f766e 0%, #0f172a 100%)',
+                    ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
+                    : 'linear-gradient(135deg, #0d3822 0%, #166534 100%)',
                   color: '#ffffff',
                   display: 'flex',
                   alignItems: 'center',
@@ -179,7 +179,7 @@ export const LunchPassView: React.FC = () => {
                   gap: '12px'
                 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#99f6e4', fontWeight: 700 }}>
+                    <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#86efac', fontWeight: 700 }}>
                       COLLEGE DINING VOUCHER
                     </span>
                     <h3 style={{
@@ -191,8 +191,8 @@ export const LunchPassView: React.FC = () => {
                   </div>
 
                   <span className={isRedeemed ? 'cp-badge cp-badge-open' : 'cp-badge cp-badge-wait'} style={{
-                    background: isRedeemed ? '#dcfce7' : '#e0f2fe',
-                    color: isRedeemed ? '#15803d' : '#0284c7',
+                    background: isRedeemed ? '#dcfce7' : '#dcfce7',
+                    color: isRedeemed ? '#15803d' : '#166534',
                     flexShrink: 0
                   }}>
                     {isRedeemed ? 'Redeemed' : 'Active'}

@@ -103,7 +103,7 @@ export const StudentPortal: React.FC = () => {
             fontWeight: activeSubTab === 'DISCOVER' ? 700 : 500,
             cursor: 'pointer',
             border: 'none',
-            backgroundColor: activeSubTab === 'DISCOVER' ? '#0f172a' : 'transparent',
+            backgroundColor: activeSubTab === 'DISCOVER' ? '#166534' : 'transparent',
             color: activeSubTab === 'DISCOVER' ? '#ffffff' : 'var(--text-muted)',
             transition: 'all 0.15s ease',
             whiteSpace: 'nowrap'
@@ -126,7 +126,7 @@ export const StudentPortal: React.FC = () => {
             fontWeight: activeSubTab === 'PASSES' ? 700 : 500,
             cursor: 'pointer',
             border: 'none',
-            backgroundColor: activeSubTab === 'PASSES' ? '#0f172a' : 'transparent',
+            backgroundColor: activeSubTab === 'PASSES' ? '#166534' : 'transparent',
             color: activeSubTab === 'PASSES' ? '#ffffff' : 'var(--text-muted)',
             transition: 'all 0.15s ease',
             whiteSpace: 'nowrap'
@@ -161,7 +161,7 @@ export const StudentPortal: React.FC = () => {
             fontWeight: activeSubTab === 'LUNCH' ? 700 : 500,
             cursor: 'pointer',
             border: 'none',
-            backgroundColor: activeSubTab === 'LUNCH' ? '#0f172a' : 'transparent',
+            backgroundColor: activeSubTab === 'LUNCH' ? '#166534' : 'transparent',
             color: activeSubTab === 'LUNCH' ? '#ffffff' : 'var(--text-muted)',
             transition: 'all 0.15s ease',
             whiteSpace: 'nowrap'
@@ -196,7 +196,7 @@ export const StudentPortal: React.FC = () => {
             fontWeight: activeSubTab === 'APPLICATIONS' ? 700 : 500,
             cursor: 'pointer',
             border: 'none',
-            backgroundColor: activeSubTab === 'APPLICATIONS' ? '#0f172a' : 'transparent',
+            backgroundColor: activeSubTab === 'APPLICATIONS' ? '#166534' : 'transparent',
             color: activeSubTab === 'APPLICATIONS' ? '#ffffff' : 'var(--text-muted)',
             transition: 'all 0.15s ease',
             whiteSpace: 'nowrap'

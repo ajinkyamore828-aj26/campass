@@ -15,7 +15,7 @@ export async function downloadPassPdf(pass: DigitalEventPass): Promise<void> {
   const pageWidth = doc.internal.pageSize.getWidth();
   
   // Header Banner
-  doc.setFillColor(15, 23, 42); // #0f172a
+  doc.setFillColor(13, 56, 34); // #0d3822 (mid dark green)
   doc.rect(0, 0, pageWidth, 28, 'F');
 
   // Title
@@ -30,7 +30,7 @@ export async function downloadPassPdf(pass: DigitalEventPass): Promise<void> {
   doc.text('Apex Institute of Science & Technology • Official Credential', pageWidth / 2, 18, { align: 'center' });
 
   // Pass Type Pill
-  doc.setFillColor(2, 132, 199); // #0284c7
+  doc.setFillColor(22, 101, 52); // #166534
   doc.roundedRect(pageWidth / 2 - 22, 22, 44, 7, 2, 2, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');

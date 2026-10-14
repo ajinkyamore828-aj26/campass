@@ -102,9 +102,9 @@ export const App: React.FC = () => {
           <footer style={{
             marginTop: '40px',
             borderRadius: '16px',
-            border: '1px solid #e2e8f0',
-            backgroundColor: '#0f172a',
-            color: '#94a3b8',
+            border: '1px solid #166534',
+            backgroundColor: '#0d3822',
+            color: '#dcfce7',
             padding: '28px 24px 20px 24px'
           }}>
             <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -112,13 +112,13 @@ export const App: React.FC = () => {
                 {/* Institution summary */}
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff', marginBottom: '8px' }}>
-                    <GraduationCap size={20} style={{ color: '#38bdf8' }} />
+                    <GraduationCap size={20} style={{ color: '#86efac' }} />
                     <span style={{ fontWeight: 800, fontSize: '15px' }}>{institutionProfile.collegeName}</span>
                   </div>
-                  <p style={{ margin: '0 0 12px 0', fontSize: '12px', lineHeight: 1.5, color: '#94a3b8' }}>
+                  <p style={{ margin: '0 0 12px 0', fontSize: '12px', lineHeight: 1.5, color: '#86efac', opacity: 0.85 }}>
                     Centralized College Event Registration, Turnstile Digital Pass Generation, and Dining Allocation Engine.
                   </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#64748b' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#86efac', opacity: 0.7 }}>
                     <MapPin size={13} />
                     <span>{institutionProfile.address}</span>
                   </div>
@@ -131,15 +131,15 @@ export const App: React.FC = () => {
                   </h4>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
                     <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <ShieldCheck size={14} style={{ color: '#34d399' }} />
+                      <ShieldCheck size={14} style={{ color: '#86efac' }} />
                       <span>HMAC-SHA256 Signed Dynamic QR Passes</span>
                     </li>
                     <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Lock size={14} style={{ color: '#34d399' }} />
+                      <Lock size={14} style={{ color: '#86efac' }} />
                       <span>Atomic Anti-Duplicate Turnstile Enforcement</span>
                     </li>
                     <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <ShieldCheck size={14} style={{ color: '#34d399' }} />
+                      <ShieldCheck size={14} style={{ color: '#86efac' }} />
                       <span>Single-Use Meal Voucher Claim Engine</span>
                     </li>
                   </ul>
@@ -152,14 +152,14 @@ export const App: React.FC = () => {
                   </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Mail size={13} style={{ color: '#38bdf8' }} />
+                      <Mail size={13} style={{ color: '#86efac' }} />
                       <span>{institutionProfile.supportEmail}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Phone size={13} style={{ color: '#38bdf8' }} />
+                      <Phone size={13} style={{ color: '#86efac' }} />
                       <span>{institutionProfile.supportPhone}</span>
                     </div>
-                    <span style={{ color: '#64748b', marginTop: '4px', fontSize: '11px' }}>
+                    <span style={{ color: '#86efac', opacity: 0.7, marginTop: '4px', fontSize: '11px' }}>
                       Operational during campus festival hours (08:30 AM - 09:00 PM IST)
                     </span>
                   </div>

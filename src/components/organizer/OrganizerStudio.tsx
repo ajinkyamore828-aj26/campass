@@ -254,8 +254,8 @@ export const OrganizerStudio: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#0284c7' }} />
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#38bdf8' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#166534' }} />
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#86efac' }}>
                 Event Operations Studio
               </span>
             </div>
@@ -269,7 +269,7 @@ export const OrganizerStudio: React.FC = () => {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
-              className="cp-btn cp-btn-cyan"
+              className="cp-btn cp-btn-primary"
               onClick={handleOpenCreateModal}
             >
               <Plus size={15} />
@@ -306,7 +306,7 @@ export const OrganizerStudio: React.FC = () => {
           <div style={{ fontSize: '11px', color: '#94a3b8' }}>Published on platform</div>
         </div>
         <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#166534' }}>
             <BarChart3 size={15} />
           </div>
           <div className="cp-stat-value">{verifiedCheckIns}</div>
@@ -568,11 +568,11 @@ export const OrganizerStudio: React.FC = () => {
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#64748b' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Calendar size={12} style={{ color: '#0284c7' }} />
+                          <Calendar size={12} style={{ color: '#166534' }} />
                           <span>{ev.date || ev.startDate} • {ev.startTime}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <MapPin size={12} style={{ color: '#0284c7' }} />
+                          <MapPin size={12} style={{ color: '#166534' }} />
                           <span className="truncate">{ev.venue}</span>
                         </div>
                       </div>

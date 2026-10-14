@@ -56,12 +56,12 @@ export const CampusPassNavbar: React.FC = () => {
             width: '38px',
             height: '38px',
             borderRadius: '10px',
-            background: 'linear-gradient(135deg, #0284c7, #0f766e)',
+            background: 'linear-gradient(135deg, #166534, #14532d)',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(2, 132, 199, 0.4)',
+            boxShadow: '0 2px 8px rgba(22, 101, 52, 0.4)',
           }}>
             <GraduationCap size={22} />
           </div>
@@ -73,9 +73,9 @@ export const CampusPassNavbar: React.FC = () => {
               <span style={{
                 fontSize: '0.65rem',
                 fontWeight: 700,
-                background: 'rgba(56, 189, 248, 0.15)',
-                color: '#38bdf8',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
+                background: 'rgba(134, 239, 172, 0.15)',
+                color: '#86efac',
+                border: '1px solid rgba(134, 239, 172, 0.3)',
                 padding: '1px 6px',
                 borderRadius: '4px',
               }}>
@@ -116,12 +116,12 @@ export const CampusPassNavbar: React.FC = () => {
               transition: 'all 0.15s ease',
             }}
           >
-            <GraduationCap size={14} color={activePortal === 'STUDENT' ? '#0284c7' : '#94a3b8'} />
+            <GraduationCap size={14} color={activePortal === 'STUDENT' ? '#166534' : '#94a3b8'} />
             <span>Student Portal</span>
             {myPassesCount > 0 && (
               <span style={{
-                background: activePortal === 'STUDENT' ? '#e0f2fe' : 'rgba(255, 255, 255, 0.12)',
-                color: activePortal === 'STUDENT' ? '#0369a1' : '#38bdf8',
+                background: activePortal === 'STUDENT' ? '#dcfce7' : 'rgba(255, 255, 255, 0.12)',
+                color: activePortal === 'STUDENT' ? '#166534' : '#86efac',
                 fontSize: '0.62rem',
                 fontWeight: 800,
                 padding: '1px 5px',
@@ -184,7 +184,7 @@ export const CampusPassNavbar: React.FC = () => {
               transition: 'all 0.15s ease',
             }}
           >
-            <Scan size={14} color={activePortal === 'VOLUNTEER' ? '#0284c7' : '#94a3b8'} />
+            <Scan size={14} color={activePortal === 'VOLUNTEER' ? '#166534' : '#94a3b8'} />
             <span>Gate Scanner</span>
           </button>
 
@@ -242,7 +242,7 @@ export const CampusPassNavbar: React.FC = () => {
               width: '26px',
               height: '26px',
               borderRadius: '6px',
-              background: '#0284c7',
+              background: '#166534',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',

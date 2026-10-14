@@ -167,7 +167,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
         {/* Header */}
         <div className="cp-modal-header">
           <div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#0284c7', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Official Application Desk
             </span>
             <h2 style={{ fontSize: '18px', fontWeight: 800, margin: '2px 0 0 0', color: '#0f172a' }}>
@@ -205,11 +205,11 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
               color: '#475569'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Calendar size={13} style={{ color: '#0284c7' }} />
+                <Calendar size={13} style={{ color: '#166534' }} />
                 <span>{event.startDate || event.date} • {event.startTime}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <MapPin size={13} style={{ color: '#0284c7' }} />
+                <MapPin size={13} style={{ color: '#166534' }} />
                 <span className="truncate">{event.venue}</span>
               </div>
               <div style={{ fontWeight: 800, color: '#0f172a' }}>
@@ -307,7 +307,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '13px', color: '#0f172a' }}>
-                    <Users size={15} style={{ color: '#0284c7' }} />
+                    <Users size={15} style={{ color: '#166534' }} />
                     <span>Team Roster Builder</span>
                   </div>
                   <span style={{ fontSize: '11px', color: '#64748b' }}>
@@ -354,8 +354,8 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                             fontWeight: 700,
                             padding: '2px 6px',
                             borderRadius: '4px',
-                            backgroundColor: member.role === 'LEADER' ? '#e0f2fe' : '#f1f5f9',
-                            color: member.role === 'LEADER' ? '#0284c7' : '#475569'
+                            backgroundColor: member.role === 'LEADER' ? '#dcfce7' : '#f1f5f9',
+                            color: member.role === 'LEADER' ? '#166534' : '#475569'
                           }}>
                             {member.role}
                           </span>
@@ -442,13 +442,13 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
               <div style={{
                 padding: '12px 14px',
                 borderRadius: '10px',
-                border: '1px solid #bae6fd',
-                backgroundColor: '#f0f9ff',
+                border: '1px solid #bbf7d0',
+                backgroundColor: '#f0fdf4',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12.5px', fontWeight: 700, color: '#0369a1' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12.5px', fontWeight: 700, color: '#166534' }}>
                   <Utensils size={14} />
                   <span>Complimentary College Meal Voucher</span>
                 </div>

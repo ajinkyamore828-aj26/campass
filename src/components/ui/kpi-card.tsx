@@ -18,7 +18,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   subtitle,
   icon,
   trend,
-  accentColor = '#0284c7'
+  accentColor = '#166534'
 }) => {
   return (
     <div className="wm-kpi-card">

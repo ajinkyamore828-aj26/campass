@@ -178,7 +178,7 @@ export const GateScannerPortal: React.FC = () => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
               <span className="cp-scanner-status-dot" />
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#38bdf8' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#86efac' }}>
                 Turnstile Station Online • Optical Reticle Active
               </span>
             </div>
@@ -195,7 +195,7 @@ export const GateScannerPortal: React.FC = () => {
             <button
               type="button"
               className={`cp-tab${scannerMode === 'GATE' ? ' active' : ''}`}
-              style={{ color: scannerMode === 'GATE' ? '#0f172a' : '#ffffff' }}
+              style={{ color: scannerMode === 'GATE' ? '#166534' : '#ffffff' }}
               onClick={() => {
                 setScannerMode('GATE');
                 setVerdict({ status: 'IDLE' });
@@ -207,7 +207,7 @@ export const GateScannerPortal: React.FC = () => {
             <button
               type="button"
               className={`cp-tab${scannerMode === 'LUNCH' ? ' active' : ''}`}
-              style={{ color: scannerMode === 'LUNCH' ? '#0f172a' : '#ffffff' }}
+              style={{ color: scannerMode === 'LUNCH' ? '#166534' : '#ffffff' }}
               onClick={() => {
                 setScannerMode('LUNCH');
                 setVerdict({ status: 'IDLE' });
@@ -286,7 +286,7 @@ export const GateScannerPortal: React.FC = () => {
               justifyContent: 'space-between'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <User size={14} style={{ color: '#0284c7' }} />
+                <User size={14} style={{ color: '#166534' }} />
                 <span>{currentUser.fullName}</span>
               </div>
               <span className="cp-badge cp-badge-open" style={{ fontSize: '10.5px' }}>
@@ -304,7 +304,7 @@ export const GateScannerPortal: React.FC = () => {
         <div className="cp-scanner-terminal">
           <div className="cp-scanner-terminal-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Terminal size={14} style={{ color: '#38bdf8' }} />
+              <Terminal size={14} style={{ color: '#86efac' }} />
               <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#f1f5f9' }}>
                 TERMINAL::NODE-01
               </span>
@@ -370,7 +370,7 @@ export const GateScannerPortal: React.FC = () => {
                 textAlign: 'center',
                 padding: '24px'
               }}>
-                <Scan size={36} style={{ color: '#38bdf8', opacity: 0.8, marginBottom: '10px' }} />
+                <Scan size={36} style={{ color: '#86efac', opacity: 0.8, marginBottom: '10px' }} />
                 <h4 style={{ margin: '0 0 4px 0', fontSize: '13px', fontWeight: 700, color: '#f8fafc', letterSpacing: '0.02em' }}>
                   Optical Sensor Standby
                 </h4>
@@ -421,7 +421,7 @@ export const GateScannerPortal: React.FC = () => {
         <div className="cp-verdict-dossier">
           <div className="cp-verdict-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Activity size={15} style={{ color: '#0284c7' }} />
+              <Activity size={15} style={{ color: '#166534' }} />
               <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
                 Verification Verdict Dossier
               </h3>
@@ -477,7 +477,7 @@ export const GateScannerPortal: React.FC = () => {
                   <span style={{ fontSize: '10.5px', color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Engine Mode
                   </span>
-                  <strong style={{ fontSize: '12px', color: '#0284c7' }}>
+                  <strong style={{ fontSize: '12px', color: '#166534' }}>
                     {scannerMode === 'GATE' ? 'Turnstile Entry' : 'Meal Counter'}
                   </strong>
                 </div>
@@ -586,7 +586,7 @@ export const GateScannerPortal: React.FC = () => {
                       <span style={{ color: '#64748b', display: 'block' }}>
                         {scannerMode === 'GATE' ? 'Assigned Pass Tier' : 'Dietary Preference'}
                       </span>
-                      <strong style={{ color: '#0284c7', fontSize: '12px' }}>
+                      <strong style={{ color: '#166534', fontSize: '12px' }}>
                         {scannerMode === 'GATE'
                           ? (verdict.passData as DigitalEventPass).passType
                           : (verdict.passData as LunchPass).dietaryPreference}
@@ -606,7 +606,7 @@ export const GateScannerPortal: React.FC = () => {
                     paddingTop: '10px'
                   }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Fingerprint size={12} style={{ color: '#0284c7' }} />
+                      <Fingerprint size={12} style={{ color: '#166534' }} />
                       {getFingerprint(verdict.passData)}
                     </span>
                     <span>ATOMIC PASSBACK: CONSUMED</span>
@@ -885,7 +885,7 @@ export const GateScannerPortal: React.FC = () => {
       <div className="cp-section-card" style={{ padding: '22px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <History size={16} style={{ color: '#0284c7' }} />
+            <History size={16} style={{ color: '#166534' }} />
             <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
               Turnstile Audit & Scan Activity Stream
             </h3>

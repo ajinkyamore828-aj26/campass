@@ -78,7 +78,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
 
           <div style={{ position: 'absolute', bottom: '12px', left: '18px', right: '18px' }}>
             <span style={{
-              background: '#0284c7',
+              background: '#166534',
               color: '#ffffff',
               fontSize: '10px',
               fontWeight: 800,
@@ -109,7 +109,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
             fontSize: '12px',
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-              <Calendar size={15} style={{ color: '#0284c7', marginTop: '2px' }} />
+              <Calendar size={15} style={{ color: '#166534', marginTop: '2px' }} />
               <div>
                 <strong style={{ color: '#0f172a' }}>Date & Schedule</strong>
                 <div style={{ color: '#64748b' }}>{event.date || event.startDate}</div>
@@ -153,7 +153,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
               <span style={{ fontWeight: 600, color: '#334155' }}>
                 Seat Availability: <strong>{event.registeredCount} / {event.capacity}</strong> registered
               </span>
-              <span style={{ fontWeight: 700, color: isFull ? '#b91c1c' : '#0284c7' }}>
+              <span style={{ fontWeight: 700, color: isFull ? '#b91c1c' : '#166534' }}>
                 {isFull ? (isWaitlist ? 'Waitlist Open' : 'Event Full') : `${event.capacity - event.registeredCount} spots available`}
               </span>
             </div>

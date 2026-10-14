@@ -64,7 +64,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             width: '42px',
             height: '42px',
             borderRadius: '12px',
-            background: 'linear-gradient(135deg, #0284c7 0%, #0f766e 100%)',
+            background: 'linear-gradient(135deg, #166534 0%, #14532d 100%)',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
@@ -81,11 +81,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               <span style={{
                 fontSize: '9px',
                 fontWeight: 800,
-                backgroundColor: 'rgba(2, 132, 199, 0.1)',
-                color: '#0284c7',
+                backgroundColor: '#dcfce7',
+                color: '#166534',
                 padding: '1px 5px',
                 borderRadius: '4px',
-                border: '1px solid rgba(2, 132, 199, 0.2)'
+                border: '1px solid #bbf7d0'
               }}>
                 PRO
               </span>
@@ -162,7 +162,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               <span>Digital Pass Wallet</span>
             </div>
             {studentPasses.length > 0 && (
-              <span className="wm-nav-badge" style={{ backgroundColor: '#e0f2fe', color: '#0284c7' }}>
+              <span className="wm-nav-badge" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>
                 {studentPasses.length}
               </span>
             )}

@@ -25,11 +25,12 @@
   --color-input: oklch(0.922 0 0);
   --color-ring: oklch(0.708 0 0);
 
-  /* CampusPass Brand Accents */
-  --color-campus-cyan: #0284c7;
-  --color-campus-teal: #0f766e;
+  /* CampusPass Brand Accents (Mid Dark Green Secondary) */
+  --color-campus-cyan: #166534;
+  --color-campus-green: #166534;
+  --color-campus-teal: #14532d;
   --color-campus-amber: #d97706;
-  --color-campus-slate: #0f172a;
+  --color-campus-slate: #0d3822;
 
   --radius: 0.625rem;
 }
@@ -155,9 +156,9 @@ body {
 }
 
 .ds-nav-item.active {
-  background-color: #f1f5f9;
-  border-color: #e2e8f0;
-  color: #0f172a;
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #14532d;
   font-weight: 600;
 }
 
@@ -167,14 +168,15 @@ body {
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 5px;
-  background-color: #0f172a;
+  background-color: #166534;
   color: #ffffff;
   line-height: 1.4;
 }
 
-.ds-nav-badge.cyan {
-  background-color: #e0f2fe;
-  color: #0284c7;
+.ds-nav-badge.cyan,
+.ds-nav-badge.green {
+  background-color: #dcfce7;
+  color: #166534;
 }
 
 .ds-nav-badge.amber {
@@ -207,7 +209,8 @@ body {
 
 /* ── Page Section Headers ─────────────────────────────────── */
 .cp-page-hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  background: linear-gradient(135deg, #0d3822 0%, #166534 50%, #0d3822 100%);
+  border: 1px solid #1a4d2e;
   border-radius: 16px;
   padding: 28px 28px;
   color: #ffffff;
@@ -224,7 +227,7 @@ body {
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  background: rgba(2, 132, 199, 0.1);
+  background: rgba(34, 197, 94, 0.12);
   pointer-events: none;
 }
 
@@ -348,7 +351,7 @@ body {
 .cp-event-banner {
   position: relative;
   height: 150px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(135deg, #0d3822 0%, #166534 100%);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -398,8 +401,8 @@ body {
 }
 
 .cp-chip.active {
-  background: #0f172a;
-  border-color: #0f172a;
+  background: #166534;
+  border-color: #166534;
   color: #ffffff;
 }
 
@@ -423,11 +426,11 @@ body {
 .cp-btn:active { transform: scale(0.98); }
 
 .cp-btn-primary {
-  background-color: #0f172a;
+  background-color: #166534;
   color: #ffffff;
-  border-color: #0f172a;
+  border-color: #166534;
 }
-.cp-btn-primary:hover { background-color: #1e293b; }
+.cp-btn-primary:hover { background-color: #14532d; }
 
 .cp-btn-secondary {
   background-color: #f8fafc;
@@ -450,12 +453,14 @@ body {
 }
 .cp-btn-danger:hover { background-color: #fecaca; }
 
-.cp-btn-cyan {
-  background-color: #0284c7;
+.cp-btn-cyan,
+.cp-btn-green {
+  background-color: #166534;
   color: #ffffff;
-  border-color: #0284c7;
+  border-color: #166534;
 }
-.cp-btn-cyan:hover { background-color: #0369a1; }
+.cp-btn-cyan:hover,
+.cp-btn-green:hover { background-color: #14532d; }
 
 .cp-btn-sm {
   padding: 5px 10px;
@@ -546,7 +551,7 @@ body {
 .cp-badge-open     { background: #dcfce7; color: #15803d; }
 .cp-badge-closing  { background: #fef3c7; color: #d97706; }
 .cp-badge-full     { background: #fee2e2; color: #b91c1c; }
-.cp-badge-wait     { background: #e0f2fe; color: #0284c7; }
+.cp-badge-wait     { background: #dcfce7; color: #166534; }
 .cp-badge-closed   { background: #f1f5f9; color: #475569; }
 .cp-badge-approved { background: #dcfce7; color: #15803d; }
 .cp-badge-pending  { background: #fef3c7; color: #d97706; }
@@ -577,8 +582,8 @@ body {
 
 .cp-tab.active {
   background: #ffffff;
-  color: #0f172a;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  color: #166534;
+  box-shadow: 0 1px 2px rgba(22, 101, 52, 0.12);
 }
 
 /* ── Smart QR Credential Pass ────────────────────────────── */
@@ -601,7 +606,7 @@ body {
 }
 
 .cp-credential-header {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+  background: linear-gradient(135deg, #0d3822 0%, #166534 60%, #0d3822 100%);
   padding: 16px 20px;
   display: flex;
   align-items: center;
@@ -618,7 +623,7 @@ body {
   top: 0; right: 0;
   width: 90px; height: 90px;
   border-radius: 50%;
-  background: rgba(2, 132, 199, 0.12);
+  background: rgba(34, 197, 94, 0.12);
   transform: translate(25px, -25px);
   pointer-events: none;
 }
@@ -636,7 +641,7 @@ body {
   position: absolute;
   width: 16px;
   height: 16px;
-  border-color: #0f172a;
+  border-color: #166534;
   border-style: solid;
   border-width: 0;
 }
@@ -832,7 +837,7 @@ body {
 
 /* ── Featured Event (Marketing Hero) ─────────────────────── */
 .cp-featured-card {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0c1a2e 100%);
+  background: linear-gradient(135deg, #0d3822 0%, #166534 60%, #0d3822 100%);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 16px;
   padding: 24px 28px;
@@ -986,7 +991,7 @@ body {
   transition: transform 0.2s;
 }
 
-input:checked + .cp-toggle-slider { background: #0284c7; }
+input:checked + .cp-toggle-slider { background: #166534; }
 input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
 
 /* ── Hero Announcement Banner ────────────────────────────── */
@@ -996,9 +1001,9 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
   gap: 8px;
   padding: 7px 14px;
   border-radius: 999px;
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  color: #0369a1;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 16px;
@@ -1026,7 +1031,7 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
   transition: border-color 0.15s;
 }
 
-.cp-input:focus { border-color: #94a3b8; }
+.cp-input:focus { border-color: #166534; }
 .cp-input::placeholder { color: #94a3b8; }
 
 .cp-label {
@@ -1068,14 +1073,15 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
 /* ── Misc Utilities ──────────────────────────────────────── */
 .cp-text-main   { color: #0f172a; }
 .cp-text-muted  { color: #64748b; }
-.cp-text-cyan   { color: #0284c7; }
-.cp-text-teal   { color: #0f766e; }
+.cp-text-cyan,
+.cp-text-green  { color: #166534; }
+.cp-text-teal   { color: #14532d; }
 .cp-text-amber  { color: #d97706; }
 .cp-text-red    { color: #b91c1c; }
-.cp-text-green  { color: #15803d; }
 
-.cp-bg-cyan-light  { background: #e0f2fe; }
-.cp-bg-teal-light  { background: #ccfbf1; }
+.cp-bg-cyan-light,
+.cp-bg-green-light { background: #dcfce7; }
+.cp-bg-teal-light  { background: #dcfce7; }
 .cp-bg-amber-light { background: #fef3c7; }
 .cp-bg-red-light   { background: #fee2e2; }
 .cp-bg-green-light { background: #dcfce7; }
@@ -1103,8 +1109,8 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
 
 /* ── Industrial Optical Scanner Terminal ─────────────────── */
 .cp-scanner-terminal {
-  background: #090d16;
-  border: 1px solid #1e293b;
+  background: #06180e;
+  border: 1px solid #164328;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -1113,8 +1119,8 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
 }
 
 .cp-scanner-terminal-header {
-  background: #0f172a;
-  border-bottom: 1px solid #1e293b;
+  background: #0d281a;
+  border-bottom: 1px solid #164328;
   padding: 12px 16px;
   display: flex;
   align-items: center;
@@ -1126,13 +1132,13 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #10b981;
+  background: #22c55e;
   display: inline-block;
   margin-right: 6px;
 }
 
 .cp-scanner-status-dot.idle {
-  background: #0284c7;
+  background: #166534;
 }
 
 .cp-scanner-status-dot.error {
@@ -1142,7 +1148,7 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
 .cp-scanner-viewport {
   position: relative;
   height: 290px;
-  background: #020617;
+  background: #030e08;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -1163,7 +1169,7 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
   position: absolute;
   width: 200px;
   height: 200px;
-  border: 1px dashed rgba(56, 189, 248, 0.35);
+  border: 1px dashed rgba(74, 222, 128, 0.4);
   border-radius: 12px;
   pointer-events: none;
   display: flex;
@@ -1175,7 +1181,7 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
   position: absolute;
   width: 22px;
   height: 22px;
-  border-color: #38bdf8;
+  border-color: #22c55e;
   border-style: solid;
 }
 
@@ -1195,7 +1201,7 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
 .cp-scanner-reticle-crosshair::after {
   content: '';
   position: absolute;
-  background: rgba(56, 189, 248, 0.6);
+  background: rgba(74, 222, 128, 0.6);
 }
 
 .cp-scanner-reticle-crosshair::before {
@@ -1210,12 +1216,12 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
   position: absolute;
   padding: 3px 8px;
   border-radius: 4px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(51, 65, 85, 0.7);
+  background: rgba(13, 40, 26, 0.85);
+  border: 1px solid rgba(22, 67, 40, 0.7);
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.05em;
-  color: #94a3b8;
+  color: #86efac;
   pointer-events: none;
   z-index: 3;
 }
@@ -1230,7 +1236,7 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
   left: 10%;
   right: 10%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+  background: linear-gradient(90deg, transparent, #22c55e, transparent);
   opacity: 0.6;
   pointer-events: none;
   animation: cpScanSweep 3s ease-in-out infinite;
@@ -1243,8 +1249,8 @@ input:checked + .cp-toggle-slider::before { transform: translateX(16px); }
 }
 
 .cp-scanner-terminal-footer {
-  background: #0f172a;
-  border-top: 1px solid #1e293b;
+  background: #0d281a;
+  border-top: 1px solid #164328;
   padding: 14px 16px;
 }
 

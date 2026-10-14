@@ -259,8 +259,8 @@ export const AdminPortal: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#0284c7' }} />
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#38bdf8' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#166534' }} />
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#86efac' }}>
                 System Administration Authority
               </span>
             </div>
@@ -274,7 +274,7 @@ export const AdminPortal: React.FC = () => {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
-              className="cp-btn cp-btn-cyan cp-btn-sm"
+              className="cp-btn cp-btn-primary cp-btn-sm"
               onClick={() => setIsAddUserModalOpen(true)}
             >
               <Plus size={14} />
@@ -287,7 +287,7 @@ export const AdminPortal: React.FC = () => {
       {/* KPI Stats Row */}
       <div className="cp-stats-grid six-cols">
         <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#166534' }}>
             <Calendar size={15} />
           </div>
           <div className="cp-stat-value">{events.length}</div>
@@ -567,7 +567,7 @@ export const AdminPortal: React.FC = () => {
                         <span style={{ fontSize: '11px', color: '#64748b', display: 'block' }}>{p.studentId}</span>
                       </td>
                       <td style={{ color: '#0f172a', fontWeight: 500 }}>{p.eventTitle}</td>
-                      <td style={{ fontSize: '12px', color: '#0284c7' }}>{p.passType}</td>
+                      <td style={{ fontSize: '12px', color: '#166534', fontWeight: 600 }}>{p.passType}</td>
                       <td>
                         <span className={
                           p.status === 'ACTIVE' ? 'cp-badge cp-badge-open' :
