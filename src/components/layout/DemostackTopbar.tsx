@@ -10,6 +10,8 @@ import {
   Calendar,
   Info,
   BarChart3,
+  Filter,
+  AlertCircle,
 } from 'lucide-react';
 
 interface DemostackTopbarProps {
@@ -43,6 +45,17 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
 
   const unread = announcements.length;
   const meta = PAGE_META[currentView] ?? { title: 'CampusPass', subtitle: '' };
+  const [selectedNotifCat, setSelectedNotifCat] = useState<string>('all');
+
+  const filteredAnnouncements = announcements.filter(a => {
+    if (selectedNotifCat === 'all') return true;
+    const isAlert = a.priority === 'URGENT' || a.title?.toLowerCase().includes('guideline') || a.title?.toLowerCase().includes('alert') || a.title?.toLowerCase().includes('gate');
+    const isReminder = a.title?.toLowerCase().includes('close') || a.title?.toLowerCase().includes('reminder') || a.title?.toLowerCase().includes('registration');
+    if (selectedNotifCat === 'alerts') return isAlert;
+    if (selectedNotifCat === 'reminders') return isReminder;
+    if (selectedNotifCat === 'updates') return !isAlert && !isReminder;
+    return true;
+  });
 
   // ⌘K shortcut
   useEffect(() => {
@@ -137,30 +150,31 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
           )}
         </div>
 
-        {/* Notifications Bell */}
+        {/* Notifications Bell & Filter Popover */}
         <div style={{ position: 'relative' }} ref={notifRef}>
           <button
             className="cp-btn cp-btn-outline cp-btn-icon"
             onClick={() => setNotifOpen(!notifOpen)}
-            style={{ position: 'relative' }}
+            style={{ position: 'relative', borderRadius: '50%', width: '38px', height: '38px' }}
           >
-            <Bell size={15} />
+            <Bell size={16} />
             {unread > 0 && (
               <span style={{
                 position: 'absolute',
                 top: '-3px',
                 right: '-3px',
-                width: '15px',
-                height: '15px',
-                borderRadius: '50%',
-                background: '#b91c1c',
+                minWidth: '16px',
+                height: '16px',
+                padding: '0 4px',
+                borderRadius: '9999px',
+                background: '#dc2626',
                 color: '#fff',
-                fontSize: '9px',
+                fontSize: '10px',
                 fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '1.5px solid #fff',
+                border: '2px solid #fff',
               }}>
                 {unread}
               </span>
@@ -172,59 +186,116 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
               position: 'absolute',
               top: 'calc(100% + 8px)',
               right: 0,
-              width: '300px',
+              width: '340px',
               background: '#ffffff',
               border: '1px solid #e2e8f0',
-              borderRadius: '14px',
-              boxShadow: '0 12px 32px rgba(0,0,0,0.12)',
+              borderRadius: '16px',
+              boxShadow: '0 16px 36px -4px rgba(0,0,0,0.15)',
               zIndex: 200,
               overflow: 'hidden',
             }}>
-              <div style={{ padding: '14px 16px 10px 16px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div className="flex-center gap-2">
-                  <Bell size={14} style={{ color: '#64748b' }} />
-                  <span style={{ fontWeight: 700, fontSize: '13px' }}>Notifications</span>
+              {/* Header with filter */}
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Filter size={14} style={{ color: '#64748b' }} />
+                  <span style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a' }}>Notifications</span>
                 </div>
                 {unread > 0 && (
-                  <span className="cp-badge cp-badge-pending">{unread} new</span>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    background: '#dcfce7',
+                    color: '#166534',
+                  }}>
+                    {unread} Total
+                  </span>
                 )}
               </div>
-              <div style={{ maxHeight: '260px', overflowY: 'auto' }}>
-                {announcements.length === 0 ? (
-                  <div style={{ padding: '24px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>
-                    No notifications
+
+              {/* Category buttons strip */}
+              <div style={{ display: 'flex', gap: '6px', padding: '8px 12px', borderBottom: '1px solid #f1f5f9', background: '#ffffff', overflowX: 'auto' }}>
+                {[
+                  { key: 'all', label: 'All' },
+                  { key: 'updates', label: 'Updates' },
+                  { key: 'alerts', label: 'Alerts' },
+                  { key: 'reminders', label: 'Reminders' },
+                ].map(cat => (
+                  <button
+                    key={cat.key}
+                    type="button"
+                    onClick={() => setSelectedNotifCat(cat.key)}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '8px',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: selectedNotifCat === cat.key ? '#0f172a' : '#f1f5f9',
+                      color: selectedNotifCat === cat.key ? '#ffffff' : '#475569',
+                      transition: 'all 0.12s',
+                    }}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Notifications list */}
+              <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+                {filteredAnnouncements.length === 0 ? (
+                  <div style={{ padding: '32px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '12.5px' }}>
+                    No notifications in this category
                   </div>
                 ) : (
-                  announcements.slice(0, 5).map((a, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        padding: '10px 16px',
-                        borderBottom: '1px solid #f8fafc',
-                        background: i === 0 ? '#f0fdf4' : 'transparent',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.1s',
-                      }}
-                    >
-                      <div className="flex-center gap-2" style={{ marginBottom: '3px' }}>
-                        <Info size={12} style={{ color: '#166534', flexShrink: 0 }} />
-                        <span style={{ fontWeight: 600, fontSize: '12.5px', color: '#0f172a' }}>{a.title}</span>
+                  filteredAnnouncements.map((a, i) => {
+                    const isAlert = a.priority === 'URGENT' || a.title?.toLowerCase().includes('guideline') || a.title?.toLowerCase().includes('alert');
+                    const isReminder = a.title?.toLowerCase().includes('close') || a.title?.toLowerCase().includes('reminder');
+
+                    return (
+                      <div
+                        key={i}
+                        style={{
+                          padding: '12px 16px',
+                          borderBottom: '1px solid #f8fafc',
+                          background: i === 0 ? 'rgba(240, 253, 244, 0.4)' : '#ffffff',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.1s',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px', gap: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                            {isAlert ? (
+                              <AlertCircle size={13} style={{ color: '#b91c1c', flexShrink: 0 }} />
+                            ) : isReminder ? (
+                              <Calendar size={13} style={{ color: '#d97706', flexShrink: 0 }} />
+                            ) : (
+                              <Info size={13} style={{ color: '#166534', flexShrink: 0 }} />
+                            )}
+                            <span style={{ fontWeight: 700, fontSize: '12.5px', color: '#0f172a' }}>{a.title}</span>
+                          </div>
+                          <span style={{ fontSize: '10.5px', color: '#94a3b8', whiteSpace: 'nowrap' }}>
+                            {a.publishedAt ? new Date(a.publishedAt).toLocaleDateString() : 'Today'}
+                          </span>
+                        </div>
+                        <p style={{ fontSize: '11.5px', color: '#64748b', lineHeight: 1.45, margin: 0, paddingLeft: '20px' }}>
+                          {a.content || a.message}
+                        </p>
                       </div>
-                      <p style={{ fontSize: '11.5px', color: '#64748b', lineHeight: 1.4 }}>
-                        {a.content || a.message}
-                      </p>
-                      <div className="flex-center gap-1" style={{ marginTop: '5px' }}>
-                        <Clock size={10} style={{ color: '#94a3b8' }} />
-                        <span style={{ fontSize: '10px', color: '#94a3b8' }}>
-                          {a.publishedAt ? new Date(a.publishedAt).toLocaleDateString() : 'Today'}
-                        </span>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
-              <div style={{ padding: '10px 16px', borderTop: '1px solid #f1f5f9', textAlign: 'center' }}>
-                <button className="cp-btn cp-btn-outline cp-btn-sm" style={{ width: '100%', justifyContent: 'center' }}>
+
+              {/* Footer */}
+              <div style={{ padding: '10px 16px', borderTop: '1px solid #f1f5f9', background: '#f8fafc', textAlign: 'center' }}>
+                <button
+                  className="cp-btn cp-btn-outline cp-btn-sm"
+                  style={{ width: '100%', justifyContent: 'center', fontSize: '12px', fontWeight: 600 }}
+                  onClick={() => setNotifOpen(false)}
+                >
                   View All Notifications
                 </button>
               </div>

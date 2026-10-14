@@ -39,7 +39,8 @@ import {
   Lightbulb,
   PartyPopper,
   Mail,
-  GraduationCap
+  GraduationCap,
+  Plus
 } from 'lucide-react';
 import { EventDetailModal } from './EventDetailModal';
 import { EventRegistrationModal } from './EventRegistrationModal';
@@ -490,17 +491,29 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
 
                 return (
                   <div key={event.id} className="cp-event-card">
-                    {/* Card Banner */}
-                    <div className="cp-event-banner" style={{ background: bannerBg }}>
+                    {/* Card Banner with Photo */}
+                    <div className="cp-event-banner">
+                      {event.bannerUrl ? (
+                        <img src={event.bannerUrl} alt={event.title} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', background: bannerBg }} />
+                      )}
+                      <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to top, rgba(20, 20, 22, 0.85) 0%, rgba(20, 20, 22, 0.15) 50%, rgba(20, 20, 22, 0.4) 100%)',
+                        pointerEvents: 'none'
+                      }} />
+
                       {/* Category badge */}
                       <span style={{
                         position: 'absolute', top: '10px', left: '10px',
-                        padding: '3px 8px', borderRadius: '6px',
+                        padding: '3px 8px', borderRadius: '8px',
                         fontSize: '10px', fontWeight: 700,
-                        background: 'rgba(255,255,255,0.12)',
+                        background: 'rgba(0, 0, 0, 0.65)',
                         color: '#ffffff',
-                        backdropFilter: 'blur(6px)',
-                        border: '1px solid rgba(255,255,255,0.12)',
+                        backdropFilter: 'blur(8px)',
+                        border: '1px solid rgba(255, 255, 255, 0.16)',
                       }}>
                         {event.category}
                       </span>
@@ -513,10 +526,11 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                         <div style={{
                           position: 'absolute', bottom: '10px', left: '10px',
                           display: 'flex', alignItems: 'center', gap: '4px',
-                          padding: '3px 8px', borderRadius: '6px',
-                          background: 'rgba(13,40,26,0.85)', color: '#86efac',
+                          padding: '3px 8px', borderRadius: '8px',
+                          background: 'rgba(0, 0, 0, 0.75)', color: '#86efac',
                           fontSize: '10px', fontWeight: 700,
-                          border: '1px solid rgba(74,222,128,0.25)',
+                          backdropFilter: 'blur(6px)',
+                          border: '1px solid rgba(74, 222, 128, 0.25)',
                         }}>
                           <Utensils size={10} />
                           Meal Included
@@ -526,11 +540,12 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                       <div style={{
                         position: 'absolute', bottom: '10px', left: (event.includesLunch || event.lunchProvided) ? '108px' : '10px',
                         display: 'flex', alignItems: 'center', gap: '4px',
-                        padding: '3px 8px', borderRadius: '6px',
-                        background: event.requiresPass !== false ? 'rgba(13,40,26,0.92)' : 'rgba(30,41,59,0.92)',
+                        padding: '3px 8px', borderRadius: '8px',
+                        background: event.requiresPass !== false ? 'rgba(0, 0, 0, 0.8)' : 'rgba(30, 41, 59, 0.85)',
                         color: event.requiresPass !== false ? '#86efac' : '#cbd5e1',
                         fontSize: '10px', fontWeight: 700,
-                        border: event.requiresPass !== false ? '1px solid rgba(74,222,128,0.25)' : '1px solid rgba(148,163,184,0.25)',
+                        backdropFilter: 'blur(6px)',
+                        border: event.requiresPass !== false ? '1px solid rgba(74, 222, 128, 0.25)' : '1px solid rgba(148, 163, 184, 0.25)',
                       }}>
                         {event.requiresPass !== false ? <Mail size={10} /> : <CheckCircle size={10} />}
                         {event.requiresPass !== false ? 'Pass via Email' : 'No Pass Needed'}
@@ -538,10 +553,11 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                       {/* Fee badge */}
                       <div style={{
                         position: 'absolute', bottom: '10px', right: '10px',
-                        padding: '3px 8px', borderRadius: '6px',
-                        background: 'rgba(13,40,26,0.85)', color: '#ffffff',
+                        padding: '3px 8px', borderRadius: '8px',
+                        background: 'rgba(0, 0, 0, 0.75)', color: '#ffffff',
                         fontSize: '10px', fontWeight: 800,
-                        border: '1px solid rgba(255,255,255,0.15)',
+                        backdropFilter: 'blur(6px)',
+                        border: '1px solid rgba(255, 255, 255, 0.16)',
                       }}>
                         {feeValue === 0 ? 'FREE' : `₹${feeValue}`}
                       </div>
@@ -550,26 +566,27 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                     {/* Card Body */}
                     <div className="cp-event-body">
                       {/* Dept */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: '#64748b', fontWeight: 600, height: '18px' }}>
-                        <Building size={12} style={{ color: '#166534', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11.5px', color: '#a1a1aa', fontWeight: 500, height: '18px' }}>
+                        <Building size={12} style={{ color: '#86efac', flexShrink: 0 }} />
                         <span className="truncate">{event.department}</span>
                       </div>
 
-                      {/* Title — Strict 40px height so 1-line and 2-line titles occupy identical space */}
+                      {/* Title — Strict 42px height so 1-line and 2-line titles occupy identical space */}
                       <h3 style={{
-                        fontSize: '15px', fontWeight: 700, color: '#0f172a',
-                        lineHeight: 1.33, margin: 0, height: '40px',
+                        fontSize: '16px', fontWeight: 700, color: '#ffffff',
+                        lineHeight: 1.3, margin: 0, height: '42px',
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
+                        letterSpacing: '-0.015em'
                       }}>
                         {event.title}
                       </h3>
 
-                      {/* Summary — Strict 36px height so all cards align horizontally */}
+                      {/* Summary — Strict 36px height */}
                       <p style={{
-                        fontSize: '12px', color: '#64748b', lineHeight: 1.45, margin: 0, height: '36px',
+                        fontSize: '12px', color: '#a1a1aa', lineHeight: 1.45, margin: 0, height: '36px',
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
@@ -578,26 +595,26 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                         {event.summary || event.shortDescription || event.description}
                       </p>
 
-                      {/* Logistics Box — Strict structured height (86px) */}
+                      {/* Logistics Box — Dark card container */}
                       <div style={{
-                        background: '#f8fafc', border: '1px solid #f1f5f9',
-                        borderRadius: '10px', padding: '10px 12px',
+                        background: '#1c1c1f', border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '12px', padding: '10px 12px',
                         display: 'flex', flexDirection: 'column', gap: '6px',
                         minHeight: '86px', justifyContent: 'center'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#475569', minWidth: 0 }}>
-                          <Calendar size={12} style={{ color: '#166534', flexShrink: 0 }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#e4e4e7', minWidth: 0 }}>
+                          <Calendar size={12} style={{ color: '#86efac', flexShrink: 0 }} />
                           <strong className="truncate">{event.date || event.startDate}</strong>
-                          <span style={{ color: '#cbd5e1' }}>•</span>
-                          <Clock size={12} style={{ color: '#94a3b8', flexShrink: 0 }} />
-                          <span className="truncate" style={{ color: '#64748b' }}>{event.startTime}</span>
+                          <span style={{ color: '#52525b' }}>•</span>
+                          <Clock size={12} style={{ color: '#a1a1aa', flexShrink: 0 }} />
+                          <span className="truncate" style={{ color: '#a1a1aa' }}>{event.startTime}</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#475569', minWidth: 0 }}>
-                          <MapPin size={12} style={{ color: '#166534', flexShrink: 0 }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#e4e4e7', minWidth: 0 }}>
+                          <MapPin size={12} style={{ color: '#86efac', flexShrink: 0 }} />
                           <span className="truncate" style={{ flex: 1 }}>{event.venue}</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#475569', minWidth: 0 }}>
-                          <Users size={12} style={{ color: '#166534', flexShrink: 0 }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#e4e4e7', minWidth: 0 }}>
+                          <Users size={12} style={{ color: '#86efac', flexShrink: 0 }} />
                           <span className="truncate">
                             {(event.registrationMode || event.participationType) === 'INDIVIDUAL'
                               ? 'Individual Entry'
@@ -610,25 +627,32 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
 
                       {/* Capacity Progress Bar */}
                       <div style={{ minHeight: '30px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#a1a1aa', marginBottom: '4px' }}>
                           <span>Seats filled</span>
-                          <span style={{ fontWeight: 700, color: pct > 90 ? '#b91c1c' : pct > 75 ? '#d97706' : '#0f172a' }}>
+                          <span style={{ fontWeight: 700, color: pct > 90 ? '#f87171' : pct > 75 ? '#fbbf24' : '#ffffff' }}>
                             {event.registeredCount}/{event.capacity} ({pct}%)
                           </span>
                         </div>
-                        <div className="cp-progress">
+                        <div className="cp-progress" style={{ background: '#27272a' }}>
                           <div
                             className={`cp-progress-fill${pct > 90 ? ' danger' : pct > 75 ? ' warning' : ''}`}
-                            style={{ width: `${pct}%` }}
+                            style={{
+                              width: `${pct}%`,
+                              background: pct > 90 ? '#ef4444' : pct > 75 ? '#f59e0b' : '#166534'
+                            }}
                           />
                         </div>
                       </div>
 
-                      {/* Action Buttons — Pinned at bottom with identical heights */}
-                      <div style={{ marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid #f1f5f9', display: 'flex', gap: '8px' }}>
+                      {/* Action Buttons with Plus Inspector */}
+                      <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', gap: '8px', alignItems: 'center' }}>
                         <button
-                          className="cp-btn cp-btn-outline"
-                          style={{ flex: 1, justifyContent: 'center', height: '36px' }}
+                          className="cp-btn"
+                          style={{
+                            flex: 1, justifyContent: 'center', height: '36px',
+                            background: '#27272a', border: '1px solid rgba(255, 255, 255, 0.12)',
+                            color: '#ffffff', borderRadius: '12px', fontSize: '12px', fontWeight: 600
+                          }}
                           onClick={() => handleSelectEvent(event)}
                         >
                           Details
@@ -636,27 +660,42 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                         {isRegistered ? (
                           <div style={{
                             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            gap: '5px', height: '36px', borderRadius: '10px',
-                            background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0',
+                            gap: '5px', height: '36px', borderRadius: '12px',
+                            background: 'rgba(22, 101, 52, 0.3)', color: '#86efac', border: '1px solid rgba(74, 222, 128, 0.3)',
                             fontSize: '12px', fontWeight: 700,
                           }}>
                             <CheckCircle size={13} />
                             Applied
                           </div>
                         ) : isFull && !isWaitlist ? (
-                          <button className="cp-btn cp-btn-outline" style={{ flex: 1, justifyContent: 'center', height: '36px', opacity: 0.5 }} disabled>
+                          <button
+                            className="cp-btn"
+                            style={{ flex: 1, justifyContent: 'center', height: '36px', opacity: 0.5, background: '#27272a', border: '1px solid rgba(255,255,255,0.08)', color: '#71717a', borderRadius: '12px' }}
+                            disabled
+                          >
                             Full
                           </button>
                         ) : (
                           <button
                             className="cp-btn cp-btn-primary"
-                            style={{ flex: 1, justifyContent: 'center', height: '36px' }}
+                            style={{ flex: 1, justifyContent: 'center', height: '36px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}
                             onClick={() => handleRegisterEvent(event)}
                           >
                             {isWaitlist ? 'Waitlist' : 'Apply'}
                             <ArrowRight size={13} />
                           </button>
                         )}
+                        <button
+                          className="cp-btn cp-btn-icon"
+                          style={{
+                            background: '#27272a', border: '1px solid rgba(255, 255, 255, 0.12)',
+                            color: '#e4e4e7', borderRadius: '12px', width: '36px', height: '36px', flexShrink: 0
+                          }}
+                          onClick={() => handleSelectEvent(event)}
+                          title="Quick Inspect"
+                        >
+                          <Plus size={15} />
+                        </button>
                       </div>
                     </div>
                   </div>
