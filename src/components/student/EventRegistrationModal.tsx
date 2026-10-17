@@ -13,7 +13,12 @@ import {
   Calendar,
   MapPin,
   FileCheck,
-  Mail
+  Mail,
+  School,
+  GraduationCap,
+  BookOpen,
+  Phone,
+  Hash
 } from 'lucide-react';
 
 interface EventRegistrationModalProps {
@@ -21,6 +26,28 @@ interface EventRegistrationModalProps {
   onClose: () => void;
   onSuccess: (regId: string) => void;
 }
+
+const DEPARTMENTS = [
+  'Computer Science & Engineering (CSE)',
+  'Information Technology (IT)',
+  'Artificial Intelligence & Data Science (AI-DS)',
+  'Electronics & Telecommunication (E&TC)',
+  'Mechanical Engineering (ME)',
+  'Civil Engineering (CE)',
+  'Electrical Engineering (EE)',
+  'Master of Computer Applications (MCA)',
+  'MBA / Management Studies',
+  'Applied Sciences & Humanities',
+  'Other / Interdisciplinary'
+];
+
+const ACADEMIC_YEARS = [
+  'First Year (FY)',
+  'Second Year (SY)',
+  'Third Year (TY)',
+  'Final Year (Fourth Year / B.Tech / BE)',
+  'Postgraduate (PG / M.Tech / MBA / MCA)'
+];
 
 export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
   event,
@@ -34,15 +61,26 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
     event.participationType === 'TEAM' ? 'TEAM' : 'INDIVIDUAL'
   );
 
-  // Form states
+  // Primary Applicant Interactive Form States
+  const [studentName, setStudentName] = useState(currentUser.fullName || '');
+  const [studentId, setStudentId] = useState(currentUser.studentId || '');
+  const [collegeName, setCollegeName] = useState('Apex Institute of Technology');
+  const [department, setDepartment] = useState(currentUser.department || DEPARTMENTS[0]);
+  const [academicYear, setAcademicYear] = useState('Third Year (TY)');
+  const [studentEmail, setStudentEmail] = useState(currentUser.email || '');
+  const [studentPhone, setStudentPhone] = useState(currentUser.phone || '+91 98234 11220');
+
+  // Meal & Team states
   const [dietaryPreference, setDietaryPreference] = useState<DietaryPreference>('VEG');
   const [teamName, setTeamName] = useState('');
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
     {
-      studentId: currentUser.studentId || 'STU-APPLICANT',
-      name: currentUser.fullName,
-      email: currentUser.email,
-      department: currentUser.department,
+      studentId: currentUser.studentId || 'STU-LEADER',
+      name: currentUser.fullName || 'Team Leader',
+      email: currentUser.email || '',
+      collegeName: 'Apex Institute of Technology',
+      department: currentUser.department || DEPARTMENTS[0],
+      academicYear: 'Third Year (TY)',
       role: 'LEADER'
     }
   ]);
@@ -50,8 +88,10 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
   // New member draft inputs
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberStudentId, setNewMemberStudentId] = useState('');
+  const [newMemberCollege, setNewMemberCollege] = useState('Apex Institute of Technology');
   const [newMemberEmail, setNewMemberEmail] = useState('');
-  const [newMemberDepartment, setNewMemberDepartment] = useState(currentUser.department);
+  const [newMemberDepartment, setNewMemberDepartment] = useState(DEPARTMENTS[0]);
+  const [newMemberYear, setNewMemberYear] = useState(ACADEMIC_YEARS[2]);
 
   // Guidelines confirmation
   const [agreedToRules, setAgreedToRules] = useState(false);
@@ -84,7 +124,9 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
         studentId: newMemberStudentId.trim(),
         name: newMemberName.trim(),
         email: newMemberEmail.trim(),
+        collegeName: newMemberCollege.trim(),
         department: newMemberDepartment,
+        academicYear: newMemberYear,
         role: 'MEMBER'
       }
     ]);
@@ -96,12 +138,12 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
     setErrorMessage(null);
   };
 
-  const handleRemoveMember = (studentId: string) => {
-    if (studentId === currentUser.studentId) {
-      setErrorMessage('You cannot remove the team leader.');
+  const handleRemoveMember = (memberStudentId: string) => {
+    if (memberStudentId === studentId || memberStudentId === currentUser.studentId) {
+      setErrorMessage('You cannot remove the primary team leader.');
       return;
     }
-    setTeamMembers(teamMembers.filter(m => m.studentId !== studentId));
+    setTeamMembers(teamMembers.filter(m => m.studentId !== memberStudentId));
   };
 
   // Submit
@@ -109,6 +151,27 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
     e.preventDefault();
     setErrorMessage(null);
 
+    // Form Validations
+    if (!studentName.trim()) {
+      setErrorMessage('Please fill in your Full Name.');
+      return;
+    }
+    if (!studentId.trim()) {
+      setErrorMessage('Please fill in your Student Roll No / PRN.');
+      return;
+    }
+    if (!collegeName.trim()) {
+      setErrorMessage('Please provide your College / Institute Name.');
+      return;
+    }
+    if (!studentEmail.trim()) {
+      setErrorMessage('Please provide your Email Address for pass delivery.');
+      return;
+    }
+    if (!studentPhone.trim()) {
+      setErrorMessage('Please provide your Contact Phone Number.');
+      return;
+    }
     if (!agreedToRules) {
       setErrorMessage('You must acknowledge and accept the event rules and college code of conduct.');
       return;
@@ -128,17 +191,32 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
     setSubmitting(true);
 
     try {
+      // Update team leader info if team mode
+      const updatedMembers = participationType === 'TEAM'
+        ? teamMembers.map(m => m.role === 'LEADER' ? {
+            ...m,
+            name: studentName.trim(),
+            studentId: studentId.trim(),
+            email: studentEmail.trim(),
+            collegeName: collegeName.trim(),
+            department,
+            academicYear
+          } : m)
+        : undefined;
+
       const payload = {
         eventId: event.id,
-        studentId: currentUser.studentId,
-        studentName: currentUser.fullName,
-        studentEmail: currentUser.email,
-        department: currentUser.department,
-        academicYear: currentUser.academicYear,
-        phone: currentUser.phone,
+        studentId: studentId.trim(),
+        studentName: studentName.trim(),
+        studentEmail: studentEmail.trim(),
+        studentPhone: studentPhone.trim(),
+        phone: studentPhone.trim(),
+        collegeName: collegeName.trim(),
+        department,
+        academicYear,
         participationType,
         teamName: participationType === 'TEAM' ? teamName.trim() : undefined,
-        teamMembers: participationType === 'TEAM' ? teamMembers : undefined,
+        teamMembers: updatedMembers,
         dietaryPreference: event.lunchProvided || event.includesLunch ? dietaryPreference : undefined,
       };
 
@@ -156,11 +234,33 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
     }
   };
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '8px 12px',
+    borderRadius: '10px',
+    border: '1px solid rgba(255, 255, 255, 0.15)',
+    background: '#141416',
+    fontSize: '12.5px',
+    color: '#ffffff',
+    outline: 'none',
+    boxSizing: 'border-box'
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: '11px',
+    fontWeight: 600,
+    color: '#d4d4d8',
+    marginBottom: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px'
+  };
+
   return (
     <div className="cp-modal-overlay" onClick={onClose}>
       <div
         className="cp-modal"
-        style={{ maxWidth: '620px' }}
+        style={{ maxWidth: '640px' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Pinned Modal Header */}
@@ -253,7 +353,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                 <>
                   <Mail size={15} style={{ color: '#86efac', flexShrink: 0 }} />
                   <div>
-                    <strong style={{ color: '#ffffff' }}>Pass Delivery Policy:</strong> Official Digital Entry Pass with security barcode will be emailed directly to your registered address: <strong style={{ color: '#ffffff' }}>{currentUser.email}</strong> upon confirmation.
+                    <strong style={{ color: '#ffffff' }}>Pass Delivery Policy:</strong> Official Digital Entry Pass with security barcode will be emailed directly to: <strong style={{ color: '#ffffff' }}>{studentEmail || 'your entered email'}</strong> upon confirmation.
                   </div>
                 </>
               ) : (
@@ -337,36 +437,148 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
               </div>
             )}
 
-            {/* Applicant Profile Information */}
-            <div>
-              <label style={{ fontSize: '11.5px', fontWeight: 600, color: '#e4e4e7', marginBottom: '5px', display: 'block' }}>
-                Primary Applicant Profile
-              </label>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                gap: '8px',
-                padding: '10px 12px',
-                borderRadius: '12px',
-                backgroundColor: '#1c1c1f',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                fontSize: '11.5px'
-              }}>
+            {/* Student Applicant Information (Interactive Form Fields) */}
+            <div style={{
+              background: '#1c1c1f',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '14px',
+              padding: '14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', paddingBottom: '8px' }}>
+                <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <GraduationCap size={15} style={{ color: '#86efac' }} />
+                  Student Credentials & Institutional Details
+                </span>
+                <span style={{ fontSize: '10.5px', color: '#a1a1aa' }}>All fields required</span>
+              </div>
+
+              {/* Row 1: Full Name & Roll No */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '10px' }}>
                 <div>
-                  <span style={{ color: '#a1a1aa', display: 'block', fontSize: '10.5px' }}>Full Name</span>
-                  <strong style={{ color: '#ffffff' }}>{currentUser.fullName}</strong>
+                  <label style={labelStyle}>
+                    <User size={12} style={{ color: '#86efac' }} />
+                    Full Student Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Ajinkya More"
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    style={inputStyle}
+                  />
                 </div>
+
                 <div>
-                  <span style={{ color: '#a1a1aa', display: 'block', fontSize: '10.5px' }}>Student Roll No</span>
-                  <strong style={{ color: '#ffffff' }}>{currentUser.studentId}</strong>
+                  <label style={labelStyle}>
+                    <Hash size={12} style={{ color: '#86efac' }} />
+                    Student Roll No / PRN *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. STU-2023-CS-041"
+                    value={studentId}
+                    onChange={(e) => setStudentId(e.target.value)}
+                    style={inputStyle}
+                  />
                 </div>
+              </div>
+
+              {/* Row 2: College / Institute Name */}
+              <div>
+                <label style={labelStyle}>
+                  <School size={12} style={{ color: '#86efac' }} />
+                  College / Institute / University Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Apex Institute of Technology, PICT, COEP, VIT Pune"
+                  value={collegeName}
+                  onChange={(e) => setCollegeName(e.target.value)}
+                  style={inputStyle}
+                />
+              </div>
+
+              {/* Row 3: Department & Year of Study */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '10px' }}>
                 <div>
-                  <span style={{ color: '#a1a1aa', display: 'block', fontSize: '10.5px' }}>College Email</span>
-                  <span style={{ color: '#d4d4d8' }}>{currentUser.email}</span>
+                  <label style={labelStyle}>
+                    <BookOpen size={12} style={{ color: '#86efac' }} />
+                    Department / Branch *
+                  </label>
+                  <select
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    style={{ ...inputStyle, cursor: 'pointer' }}
+                  >
+                    {DEPARTMENTS.map((dept) => (
+                      <option key={dept} value={dept} style={{ background: '#1c1c1f', color: '#ffffff' }}>
+                        {dept}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+
                 <div>
-                  <span style={{ color: '#a1a1aa', display: 'block', fontSize: '10.5px' }}>Department</span>
-                  <span style={{ color: '#d4d4d8' }}>{currentUser.department}</span>
+                  <label style={labelStyle}>
+                    <GraduationCap size={12} style={{ color: '#86efac' }} />
+                    Year of Study (Academic Year) *
+                  </label>
+                  <select
+                    value={academicYear}
+                    onChange={(e) => setAcademicYear(e.target.value)}
+                    style={{ ...inputStyle, cursor: 'pointer' }}
+                  >
+                    {ACADEMIC_YEARS.map((yr) => (
+                      <option key={yr} value={yr} style={{ background: '#1c1c1f', color: '#ffffff' }}>
+                        {yr}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 4: Email Address & Phone Number */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '10px' }}>
+                <div>
+                  <label style={labelStyle}>
+                    <Mail size={12} style={{ color: '#86efac' }} />
+                    College / Personal Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. ajinkya.more@apex.edu"
+                    value={studentEmail}
+                    onChange={(e) => setStudentEmail(e.target.value)}
+                    style={inputStyle}
+                  />
+                  <span style={{ fontSize: '10px', color: '#a1a1aa', marginTop: '2px', display: 'block' }}>
+                    Digital QR entry pass will be emailed to this address
+                  </span>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>
+                    <Phone size={12} style={{ color: '#86efac' }} />
+                    Contact / WhatsApp Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="e.g. +91 98234 11220"
+                    value={studentPhone}
+                    onChange={(e) => setStudentPhone(e.target.value)}
+                    style={inputStyle}
+                  />
+                  <span style={{ fontSize: '10px', color: '#a1a1aa', marginTop: '2px', display: 'block' }}>
+                    Used for instant SMS / gate emergency notifications
+                  </span>
                 </div>
               </div>
             </div>
@@ -374,13 +586,13 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
             {/* Team Registration Section */}
             {participationType === 'TEAM' && (
               <div style={{
-                padding: '12px',
+                padding: '14px',
                 borderRadius: '14px',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 backgroundColor: '#1c1c1f',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '10px'
+                gap: '12px'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12.5px', color: '#ffffff' }}>
@@ -392,8 +604,8 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                   </span>
                 </div>
 
-                <div className="cp-form-group" style={{ marginBottom: 0 }}>
-                  <label style={{ fontSize: '11.5px', fontWeight: 600, color: '#e4e4e7', marginBottom: '4px', display: 'block' }}>
+                <div>
+                  <label style={labelStyle}>
                     Team Name *
                   </label>
                   <input
@@ -401,22 +613,13 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                     placeholder="e.g. Apex CyberKnights, Neural Forge"
                     value={teamName}
                     onChange={(e) => setTeamName(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      background: '#141416',
-                      fontSize: '12.5px',
-                      color: '#ffffff',
-                      outline: 'none'
-                    }}
+                    style={inputStyle}
                     required
                   />
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '11.5px', fontWeight: 600, color: '#e4e4e7', marginBottom: '4px', display: 'block' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: '#d4d4d8', marginBottom: '6px', display: 'block' }}>
                     Team Members ({teamMembers.length} / {event.maxTeamSize})
                   </label>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -427,7 +630,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          padding: '7px 10px',
+                          padding: '8px 12px',
                           borderRadius: '8px',
                           backgroundColor: '#141416',
                           border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -435,14 +638,17 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                         }}
                       >
                         <div>
-                          <strong style={{ color: '#ffffff' }}>{member.name}</strong> <span style={{ color: '#a1a1aa' }}>({member.studentId})</span>
-                          <div style={{ fontSize: '10.5px', color: '#a1a1aa' }}>{member.department}</div>
+                          <strong style={{ color: '#ffffff' }}>{member.role === 'LEADER' ? (studentName || member.name) : member.name}</strong>{' '}
+                          <span style={{ color: '#a1a1aa' }}>({member.role === 'LEADER' ? (studentId || member.studentId) : member.studentId})</span>
+                          <div style={{ fontSize: '10.5px', color: '#a1a1aa' }}>
+                            {member.role === 'LEADER' ? collegeName : (member.collegeName || collegeName)} • {member.role === 'LEADER' ? department : member.department} • {member.role === 'LEADER' ? academicYear : (member.academicYear || 'Third Year')}
+                          </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span style={{
                             fontSize: '9.5px',
                             fontWeight: 700,
-                            padding: '2px 5px',
+                            padding: '2px 6px',
                             borderRadius: '4px',
                             backgroundColor: member.role === 'LEADER' ? 'rgba(22, 101, 52, 0.3)' : 'rgba(255, 255, 255, 0.08)',
                             color: member.role === 'LEADER' ? '#86efac' : '#d4d4d8'
@@ -468,77 +674,71 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                 {/* Add New Member Input Group */}
                 {teamMembers.length < event.maxTeamSize && (
                   <div style={{
-                    padding: '10px',
+                    padding: '10px 12px',
                     borderRadius: '10px',
                     border: '1px dashed rgba(255, 255, 255, 0.18)',
                     backgroundColor: '#141416',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '6px'
+                    gap: '8px'
                   }}>
-                    <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#a1a1aa' }}>Add Teammate</span>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#86efac' }}>+ Add Teammate Details</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '6px' }}>
                       <input
                         type="text"
-                        placeholder="Student Full Name"
+                        placeholder="Teammate Full Name"
                         value={newMemberName}
                         onChange={(e) => setNewMemberName(e.target.value)}
-                        style={{
-                          padding: '6px 8px',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(255, 255, 255, 0.15)',
-                          background: '#1c1c1f',
-                          color: '#ffffff',
-                          fontSize: '11.5px',
-                          outline: 'none'
-                        }}
+                        style={inputStyle}
                       />
                       <input
                         type="text"
-                        placeholder="Roll No (e.g. STU-055)"
+                        placeholder="Roll No / PRN (e.g. STU-055)"
                         value={newMemberStudentId}
                         onChange={(e) => setNewMemberStudentId(e.target.value)}
-                        style={{
-                          padding: '6px 8px',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(255, 255, 255, 0.15)',
-                          background: '#1c1c1f',
-                          color: '#ffffff',
-                          fontSize: '11.5px',
-                          outline: 'none'
-                        }}
+                        style={inputStyle}
                       />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-                      <input
-                        type="email"
-                        placeholder="College Email"
-                        value={newMemberEmail}
-                        onChange={(e) => setNewMemberEmail(e.target.value)}
-                        style={{
-                          padding: '6px 8px',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(255, 255, 255, 0.15)',
-                          background: '#1c1c1f',
-                          color: '#ffffff',
-                          fontSize: '11.5px',
-                          outline: 'none'
-                        }}
-                      />
+                    <div>
                       <input
                         type="text"
-                        placeholder="Department"
+                        placeholder="Teammate College / Institute Name"
+                        value={newMemberCollege}
+                        onChange={(e) => setNewMemberCollege(e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '6px' }}>
+                      <select
                         value={newMemberDepartment}
                         onChange={(e) => setNewMemberDepartment(e.target.value)}
-                        style={{
-                          padding: '6px 8px',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(255, 255, 255, 0.15)',
-                          background: '#1c1c1f',
-                          color: '#ffffff',
-                          fontSize: '11.5px',
-                          outline: 'none'
-                        }}
+                        style={{ ...inputStyle, cursor: 'pointer' }}
+                      >
+                        {DEPARTMENTS.map((dept) => (
+                          <option key={dept} value={dept} style={{ background: '#1c1c1f', color: '#ffffff' }}>
+                            {dept}
+                          </option>
+                        ))}
+                      </select>
+                      <select
+                        value={newMemberYear}
+                        onChange={(e) => setNewMemberYear(e.target.value)}
+                        style={{ ...inputStyle, cursor: 'pointer' }}
+                      >
+                        {ACADEMIC_YEARS.map((yr) => (
+                          <option key={yr} value={yr} style={{ background: '#1c1c1f', color: '#ffffff' }}>
+                            {yr}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <input
+                        type="email"
+                        placeholder="Teammate Email Address"
+                        value={newMemberEmail}
+                        onChange={(e) => setNewMemberEmail(e.target.value)}
+                        style={inputStyle}
                       />
                     </div>
                     <button
@@ -550,8 +750,8 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '5px',
-                        padding: '5px 10px',
-                        borderRadius: '7px',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
                         fontSize: '11.5px',
                         fontWeight: 600,
                         background: 'rgba(255, 255, 255, 0.08)',
@@ -561,7 +761,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                       }}
                     >
                       <Plus size={11} />
-                      Add Member
+                      Add Teammate to Roster
                     </button>
                   </div>
                 )}

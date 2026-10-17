@@ -28,6 +28,7 @@ jspm_packages/
 dist/
 dist-ssr/
 build/
+server/dist/
 *.local
 
 # Environment variables

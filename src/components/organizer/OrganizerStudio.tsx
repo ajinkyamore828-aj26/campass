@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import type { CampusEvent, CampusRegistration, EventCategory, RegistrationMode } from '../../types';
 import { useCampusPass } from '../../context/CampusPassContext';
 import { exportToCsv } from '../../utils/exportCsv';
+import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
 import {
   Plus,
   Calendar,
@@ -253,7 +254,9 @@ export const OrganizerStudio: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Studio Header Page Hero */}
       <div className="cp-page-hero">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
+        <DynamicNeuroNoise />
+        <div className="cp-hero-overlay" />
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#86efac' }} />
@@ -381,7 +384,7 @@ export const OrganizerStudio: React.FC = () => {
         {activeTab === 'APPLICATIONS' && (
           <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {/* Filter Controls Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '12px', alignItems: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 210px), 1fr))', gap: '12px', alignItems: 'center' }}>
               <div>
                 <select
                   className="cp-select"
@@ -690,20 +693,36 @@ export const OrganizerStudio: React.FC = () => {
       {/* REJECTION REASON MODAL */}
       {rejectingReg && (
         <div className="cp-modal-overlay" onClick={() => setRejectingReg(null)}>
-          <div className="cp-modal" onClick={e => e.stopPropagation()}>
+          <div className="cp-modal" style={{ maxWidth: '500px' }} onClick={e => e.stopPropagation()}>
             <div className="cp-modal-header">
-              <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#b91c1c' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#f87171' }}>
                 Reject Application
               </h3>
-              <button type="button" onClick={() => setRejectingReg(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
-                <X size={18} />
+              <button
+                type="button"
+                onClick={() => setRejectingReg(null)}
+                aria-label="Close"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '50%',
+                  width: '30px',
+                  height: '30px',
+                  cursor: 'pointer',
+                  color: '#d4d4d8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={15} />
               </button>
             </div>
 
-            <form onSubmit={handleRejectSubmit}>
-              <div className="cp-modal-body">
-                <p style={{ margin: '0 0 14px 0', fontSize: '13px', color: '#64748b', lineHeight: 1.5 }}>
-                  Please state the official reason for rejecting <strong>{rejectingReg.studentName}</strong>'s application for <em>{rejectingReg.eventTitle}</em>.
+            <form onSubmit={handleRejectSubmit} style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0, overflow: 'hidden' }}>
+              <div className="cp-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: '#d4d4d8', lineHeight: 1.5 }}>
+                  Please state the official reason for rejecting <strong style={{ color: '#ffffff' }}>{rejectingReg.studentName}</strong>'s application for <em style={{ color: '#86efac' }}>{rejectingReg.eventTitle}</em>.
                 </p>
 
                 <div className="cp-form-group">
@@ -721,10 +740,35 @@ export const OrganizerStudio: React.FC = () => {
               </div>
 
               <div className="cp-modal-footer">
-                <button type="button" className="cp-btn cp-btn-outline" onClick={() => setRejectingReg(null)}>
+                <button
+                  type="button"
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    color: '#e4e4e7',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setRejectingReg(null)}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="cp-btn cp-btn-danger">
+                <button
+                  type="submit"
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    background: '#b91c1c',
+                    color: '#ffffff',
+                    border: '1px solid #b91c1c',
+                    cursor: 'pointer'
+                  }}
+                >
                   Confirm Rejection
                 </button>
               </div>
@@ -736,35 +780,74 @@ export const OrganizerStudio: React.FC = () => {
       {/* CREATE / EDIT EVENT MODAL */}
       {isEventModalOpen && (
         <div className="cp-modal-overlay" onClick={() => setIsEventModalOpen(false)}>
-          <div className="cp-modal" style={{ maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
+          <div className="cp-modal" style={{ maxWidth: '640px' }} onClick={e => e.stopPropagation()}>
             <div className="cp-modal-header">
-              <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
-                {editingEventId ? 'Edit Event Configuration' : 'Create & Publish New Campus Event'}
-              </h3>
-              <button type="button" onClick={() => setIsEventModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
-                <X size={18} />
+              <div>
+                <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  Event Studio Desk
+                </span>
+                <h3 style={{ fontSize: '17px', fontWeight: 800, margin: '2px 0 0 0', color: '#ffffff', lineHeight: 1.25 }}>
+                  {editingEventId ? 'Edit Event Configuration' : 'Create & Publish New Campus Event'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEventModalOpen(false)}
+                aria-label="Close"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  cursor: 'pointer',
+                  color: '#d4d4d8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background-color 0.12s'
+                }}
+              >
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveEvent}>
-              <div className="cp-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <form
+              onSubmit={handleSaveEvent}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flex: '1 1 auto',
+                minHeight: 0,
+                overflow: 'hidden'
+              }}
+            >
+              <div
+                className="cp-modal-body"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px'
+                }}
+              >
                 <div className="cp-form-group">
                   <label className="cp-label">Event Title *</label>
                   <input
                     type="text"
                     required
+                    placeholder="e.g. Apex HackSprint 2026: 24–Hour National Hackathon"
                     className="cp-input"
                     value={eventForm.title}
                     onChange={e => setEventForm({ ...eventForm, title: e.target.value })}
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '10px' }}>
                   <div className="cp-form-group">
                     <label className="cp-label">Category</label>
                     <select
                       className="cp-select"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', cursor: 'pointer' }}
                       value={eventForm.category}
                       onChange={e => setEventForm({ ...eventForm, category: e.target.value as any })}
                     >
@@ -787,9 +870,10 @@ export const OrganizerStudio: React.FC = () => {
                   </div>
 
                   <div className="cp-form-group">
-                    <label className="cp-label">Department</label>
+                    <label className="cp-label">Department / Organizing Host</label>
                     <input
                       type="text"
+                      placeholder="e.g. Computer Science & Engineering"
                       className="cp-input"
                       value={eventForm.department}
                       onChange={e => setEventForm({ ...eventForm, department: e.target.value })}
@@ -801,6 +885,7 @@ export const OrganizerStudio: React.FC = () => {
                   <label className="cp-label">Short Summary</label>
                   <input
                     type="text"
+                    placeholder="Brief 1-sentence teaser for cards"
                     className="cp-input"
                     value={eventForm.summary || eventForm.shortDescription || ''}
                     onChange={e => setEventForm({ ...eventForm, summary: e.target.value, shortDescription: e.target.value })}
@@ -812,18 +897,20 @@ export const OrganizerStudio: React.FC = () => {
                   <textarea
                     rows={3}
                     className="cp-input"
+                    placeholder="Comprehensive event details, agenda, rewards, and eligibility..."
                     style={{ resize: 'vertical' }}
                     value={eventForm.description}
                     onChange={e => setEventForm({ ...eventForm, description: e.target.value })}
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '10px' }}>
                   <div className="cp-form-group">
                     <label className="cp-label">Venue *</label>
                     <input
                       type="text"
                       required
+                      placeholder="e.g. Central Innovation Complex, Arena 1"
                       className="cp-input"
                       value={eventForm.venue}
                       onChange={e => setEventForm({ ...eventForm, venue: e.target.value })}
@@ -834,18 +921,18 @@ export const OrganizerStudio: React.FC = () => {
                     <label className="cp-label">Participation Mode</label>
                     <select
                       className="cp-select"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', cursor: 'pointer' }}
                       value={eventForm.registrationMode || eventForm.participationType}
                       onChange={e => setEventForm({ ...eventForm, registrationMode: e.target.value as any, participationType: e.target.value as any })}
                     >
-                      <option value="INDIVIDUAL">INDIVIDUAL</option>
-                      <option value="TEAM">TEAM</option>
+                      <option value="INDIVIDUAL">INDIVIDUAL ONLY</option>
+                      <option value="TEAM">TEAM ONLY</option>
                       <option value="BOTH">BOTH (Individual or Team)</option>
                     </select>
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
                   <div className="cp-form-group">
                     <label className="cp-label">Date</label>
                     <input
@@ -860,6 +947,7 @@ export const OrganizerStudio: React.FC = () => {
                     <label className="cp-label">Start Time</label>
                     <input
                       type="text"
+                      placeholder="e.g. 10:00 AM"
                       className="cp-input"
                       value={eventForm.startTime}
                       onChange={e => setEventForm({ ...eventForm, startTime: e.target.value })}
@@ -870,6 +958,7 @@ export const OrganizerStudio: React.FC = () => {
                     <label className="cp-label">Capacity (Seats)</label>
                     <input
                       type="number"
+                      placeholder="e.g. 150"
                       className="cp-input"
                       value={eventForm.capacity}
                       onChange={e => setEventForm({ ...eventForm, capacity: Number(e.target.value) })}
@@ -877,52 +966,102 @@ export const OrganizerStudio: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Checkbox configs */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '6px 0' }}>
+                {/* Checkbox configs container */}
+                <div style={{
+                  background: '#1c1c1f',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '12px',
+                  padding: '12px 14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px'
+                }}>
                   <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px', color: '#ffffff', cursor: 'pointer' }}>
                       <input
                         type="checkbox"
                         checked={eventForm.requiresApproval}
                         onChange={e => setEventForm({ ...eventForm, requiresApproval: e.target.checked })}
-                        style={{ width: '16px', height: '16px' }}
+                        style={{ accentColor: '#166534', width: '16px', height: '16px' }}
                       />
                       <span>Requires Organizer Approval</span>
                     </label>
 
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px', color: '#ffffff', cursor: 'pointer' }}>
                       <input
                         type="checkbox"
                         checked={eventForm.includesLunch || eventForm.lunchProvided}
                         onChange={e => setEventForm({ ...eventForm, includesLunch: e.target.checked, lunchProvided: e.target.checked })}
-                        style={{ width: '16px', height: '16px' }}
+                        style={{ accentColor: '#166534', width: '16px', height: '16px' }}
                       />
                       <span>Includes Lunch Voucher</span>
                     </label>
                   </div>
 
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', background: '#f8fafc', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '10px',
+                    fontSize: '12.5px',
+                    cursor: 'pointer',
+                    background: eventForm.requiresPass ? 'rgba(22, 101, 52, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    border: eventForm.requiresPass ? '1px solid rgba(134, 239, 172, 0.3)' : '1px solid rgba(255, 255, 255, 0.08)'
+                  }}>
                     <input
                       type="checkbox"
                       checked={eventForm.requiresPass ?? true}
                       onChange={e => setEventForm({ ...eventForm, requiresPass: e.target.checked })}
-                      style={{ width: '16px', height: '16px' }}
+                      style={{ accentColor: '#166534', width: '16px', height: '16px', marginTop: '2px' }}
                     />
                     <div>
-                      <strong style={{ color: '#0f172a' }}>Issue Digital Pass via Email</strong>
-                      <div style={{ fontSize: '11.5px', color: '#64748b' }}>
-                        When enabled, approved students receive an encrypted barcode pass sent to their registered college email. If unchecked, event is open attendance with student ID.
+                      <strong style={{ color: '#ffffff', display: 'block', marginBottom: '2px' }}>
+                        Issue Digital Entry Pass via Email
+                      </strong>
+                      <div style={{ fontSize: '11px', color: '#a1a1aa', lineHeight: 1.45 }}>
+                        When enabled, approved students receive an official barcode pass sent to their registered college email. If unchecked, event is open attendance with student ID.
                       </div>
                     </div>
                   </label>
                 </div>
               </div>
 
+              {/* Pinned Action Footer (ALWAYS 100% visible inside the card!) */}
               <div className="cp-modal-footer">
-                <button type="button" className="cp-btn cp-btn-outline" onClick={() => setIsEventModalOpen(false)}>
+                <button
+                  type="button"
+                  style={{
+                    padding: '9px 18px',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    color: '#e4e4e7',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setIsEventModalOpen(false)}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="cp-btn cp-btn-primary">
+                <button
+                  type="submit"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 22px',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    background: '#166534',
+                    color: '#ffffff',
+                    border: '1px solid #166534',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(22, 101, 52, 0.4)'
+                  }}
+                >
                   {editingEventId ? 'Save Changes' : 'Publish Event'}
                 </button>
               </div>

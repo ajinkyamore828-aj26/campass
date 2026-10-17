@@ -52,6 +52,46 @@ export type RegistrationMode = 'INDIVIDUAL' | 'TEAM' | 'BOTH';
 export type ParticipationType = RegistrationMode;
 export type ApprovalMode = 'AUTOMATIC' | 'MANUAL_REVIEW';
 
+export type RoundType = 
+  | 'APTITUDE' 
+  | 'TECHNICAL' 
+  | 'CODING' 
+  | 'PROBLEM_SOLVING' 
+  | 'PRESENTATION' 
+  | 'INTERVIEW' 
+  | 'HACKATHON' 
+  | 'GROUP_DISCUSSION' 
+  | 'QUIZ' 
+  | 'GENERAL';
+
+export type RoundStatus = 'UPCOMING' | 'ONGOING' | 'COMPLETED' | 'DELAYED';
+
+export interface EventRound {
+  id: string;
+  roundNumber: number;
+  name: string;
+  type: RoundType;
+  date: string;
+  startTime: string;
+  endTime: string;
+  venue: string;
+  description?: string;
+  status: RoundStatus;
+  eliminationRound?: boolean;
+  qualifyingCriteria?: string;
+}
+
+export interface ScheduleRescheduleInfo {
+  isRescheduled: boolean;
+  originalDate?: string;
+  originalStartTime?: string;
+  originalEndTime?: string;
+  rescheduledAt?: string;
+  reason?: string;
+  announcementBroadcasted?: boolean;
+  broadcastNote?: string;
+}
+
 export interface CampusEvent {
   id: string;
   title: string;
@@ -95,6 +135,8 @@ export interface CampusEvent {
   contactPhone: string;
   status: EventStatus;
   tags?: string[];
+  rounds?: EventRound[];
+  scheduleUpdate?: ScheduleRescheduleInfo;
 }
 
 export type RegistrationType = 'INDIVIDUAL' | 'TEAM';
@@ -104,6 +146,7 @@ export interface TeamMemberInfo {
   name: string;
   studentId: string;
   email: string;
+  collegeName?: string;
   department: string;
   academicYear?: string;
   role: 'LEADER' | 'MEMBER';
@@ -126,6 +169,7 @@ export interface CampusRegistration {
   studentEmail: string;
   studentPhone?: string;
   phone?: string;
+  collegeName?: string;
   department: string;
   academicYear: string;
   teamName?: string;
@@ -287,3 +331,22 @@ export interface InstitutionProfile {
 }
 
 export type ActivePortal = 'STUDENT' | 'ORGANIZER' | 'VOLUNTEER' | 'ADMIN';
+
+export interface HeroContentConfig {
+  headline: string;
+  subtitle: string;
+  primaryCtaText: string;
+  secondaryCtaText: string;
+}
+
+export interface BentoCardConfig {
+  id: string;
+  tag: string;
+  tagColor: string;
+  title: string;
+  description: string;
+  linkLabel: string;
+  targetCategory: string;
+  bg: string;
+  border: string;
+}

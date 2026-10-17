@@ -10,7 +10,9 @@ import type {
   CampusAnnouncement, 
   ActivePortal, 
   UserRole,
-  InstitutionProfile
+  InstitutionProfile,
+  HeroContentConfig,
+  BentoCardConfig
 } from '../types';
 
 interface CampusPassContextType {
@@ -32,6 +34,15 @@ interface CampusPassContextType {
   announcements: CampusAnnouncement[];
   institutionProfile: InstitutionProfile;
 
+  // Customization (Hero & Bento Highlights)
+  heroConfig: HeroContentConfig;
+  updateHeroConfig: (updates: Partial<HeroContentConfig>) => void;
+  resetHeroConfig: () => void;
+  bentoCards: BentoCardConfig[];
+  updateBentoCard: (id: string, updates: Partial<BentoCardConfig>) => void;
+  updateAllBentoCards: (cards: BentoCardConfig[]) => void;
+  resetBentoCards: () => void;
+
   // Actions
   submitRegistration: (data: Partial<CampusRegistration>) => Promise<{ success: boolean; message: string; data?: CampusRegistration }>;
   approveRegistration: (id: string, reviewerName?: string) => Promise<{ success: boolean; message: string }>;
@@ -39,8 +50,8 @@ interface CampusPassContextType {
   cancelRegistration: (id: string) => Promise<{ success: boolean; message: string }>;
   resendEmailPass: (id: string) => Promise<{ success: boolean; message: string }>;
   
-  createEvent: (data: Partial<CampusEvent>) => Promise<{ success: boolean; data?: CampusEvent }>;
-  updateEvent: (id: string, data: Partial<CampusEvent>) => Promise<{ success: boolean; data?: CampusEvent }>;
+  createEvent: (data: Partial<CampusEvent>) => Promise<{ success: boolean; message?: string; data?: CampusEvent }>;
+  updateEvent: (id: string, data: Partial<CampusEvent>) => Promise<{ success: boolean; message?: string; data?: CampusEvent }>;
 
   revokePass: (id: string, reason: string) => Promise<{ success: boolean; message: string }>;
   reissuePass: (id: string) => Promise<{ success: boolean; message: string; pass?: DigitalEventPass }>;
@@ -120,6 +131,225 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [scanLogs, setScanLogs] = useState<ScanLog[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [announcements, setAnnouncements] = useState<CampusAnnouncement[]>([]);
+
+  // ── Customizable Hero Text (Experience the difference, subtitle, CTAs) ──
+  const [heroConfig, setHeroConfig] = useState<HeroContentConfig>(() => {
+    try {
+      const saved = localStorage.getItem('campuspass_hero_config');
+      return saved ? JSON.parse(saved) : {
+        headline: 'Experience the difference',
+        subtitle: 'Join thousands of students registering for hackathons, cultural fests, workshops, and sports. Get your digital gate pass instantly after confirmation.',
+        primaryCtaText: 'My Registrations',
+        secondaryCtaText: 'Pass Wallet',
+      };
+    } catch {
+      return {
+        headline: 'Experience the difference',
+        subtitle: 'Join thousands of students registering for hackathons, cultural fests, workshops, and sports. Get your digital gate pass instantly after confirmation.',
+        primaryCtaText: 'My Registrations',
+        secondaryCtaText: 'Pass Wallet',
+      };
+    }
+  });
+
+  const updateHeroConfig = (updates: Partial<HeroContentConfig>) => {
+    setHeroConfig(prev => {
+      const next = { ...prev, ...updates };
+      try {
+        localStorage.setItem('campuspass_hero_config', JSON.stringify(next));
+      } catch (err) {
+        console.warn('Failed saving hero config to localStorage', err);
+      }
+      return next;
+    });
+  };
+
+  const resetHeroConfig = () => {
+    const defaults: HeroContentConfig = {
+      headline: 'Experience the difference',
+      subtitle: 'Join thousands of students registering for hackathons, cultural fests, workshops, and sports. Get your digital gate pass instantly after confirmation.',
+      primaryCtaText: 'My Registrations',
+      secondaryCtaText: 'Pass Wallet',
+    };
+    setHeroConfig(defaults);
+    try {
+      localStorage.removeItem('campuspass_hero_config');
+    } catch {}
+  };
+
+  // ── Customizable Highlight Cards (Bento 4-Card Showcase) ──
+  const [bentoCards, setBentoCards] = useState<BentoCardConfig[]>(() => {
+    try {
+      const saved = localStorage.getItem('campuspass_bento_cards');
+      return saved ? JSON.parse(saved) : [
+        {
+          id: 'bento-1',
+          tag: 'Active Passes',
+          tagColor: '#ea580c',
+          title: 'My Registrations',
+          description: 'Track admissions, passes & verified QR delivery in real-time.',
+          linkLabel: 'View passes',
+          targetCategory: 'PASSES',
+          bg: '#fff7ed',
+          border: '#fed7aa',
+        },
+        {
+          id: 'bento-2',
+          tag: 'Code Sprints',
+          tagColor: '#0284c7',
+          title: 'Hackathons',
+          description: 'National coding challenges, AI hackathons & live prototype sprints.',
+          linkLabel: 'Explore sprints',
+          targetCategory: 'HACKATHON',
+          bg: '#f0f9ff',
+          border: '#bae6fd',
+        },
+        {
+          id: 'bento-3',
+          tag: 'Recruitment',
+          tagColor: '#9333ea',
+          title: 'Campus Drives',
+          description: 'Corporate recruitment, technical interviews & placement drives.',
+          linkLabel: 'Browse drives',
+          targetCategory: 'CAMPUS_DRIVE',
+          bg: '#faf5ff',
+          border: '#e9d5ff',
+        },
+        {
+          id: 'bento-4',
+          tag: 'Live Fests',
+          tagColor: '#16a34a',
+          title: 'Cultural & Fests',
+          description: 'Gala nights, musical fests, dance showdowns & fresher carnivals.',
+          linkLabel: 'Join events',
+          targetCategory: 'CULTURAL',
+          bg: '#f0fdf4',
+          border: '#bbf7d0',
+        },
+      ];
+    } catch {
+      return [
+        {
+          id: 'bento-1',
+          tag: 'Active Passes',
+          tagColor: '#ea580c',
+          title: 'My Registrations',
+          description: 'Track admissions, passes & verified QR delivery in real-time.',
+          linkLabel: 'View passes',
+          targetCategory: 'PASSES',
+          bg: '#fff7ed',
+          border: '#fed7aa',
+        },
+        {
+          id: 'bento-2',
+          tag: 'Code Sprints',
+          tagColor: '#0284c7',
+          title: 'Hackathons',
+          description: 'National coding challenges, AI hackathons & live prototype sprints.',
+          linkLabel: 'Explore sprints',
+          targetCategory: 'HACKATHON',
+          bg: '#f0f9ff',
+          border: '#bae6fd',
+        },
+        {
+          id: 'bento-3',
+          tag: 'Recruitment',
+          tagColor: '#9333ea',
+          title: 'Campus Drives',
+          description: 'Corporate recruitment, technical interviews & placement drives.',
+          linkLabel: 'Browse drives',
+          targetCategory: 'CAMPUS_DRIVE',
+          bg: '#faf5ff',
+          border: '#e9d5ff',
+        },
+        {
+          id: 'bento-4',
+          tag: 'Live Fests',
+          tagColor: '#16a34a',
+          title: 'Cultural & Fests',
+          description: 'Gala nights, musical fests, dance showdowns & fresher carnivals.',
+          linkLabel: 'Join events',
+          targetCategory: 'CULTURAL',
+          bg: '#f0fdf4',
+          border: '#bbf7d0',
+        },
+      ];
+    }
+  });
+
+  const updateBentoCard = (id: string, updates: Partial<BentoCardConfig>) => {
+    setBentoCards(prev => {
+      const next = prev.map(c => c.id === id ? { ...c, ...updates } : c);
+      try {
+        localStorage.setItem('campuspass_bento_cards', JSON.stringify(next));
+      } catch (err) {
+        console.warn('Failed saving bento cards to localStorage', err);
+      }
+      return next;
+    });
+  };
+
+  const updateAllBentoCards = (cards: BentoCardConfig[]) => {
+    setBentoCards(cards);
+    try {
+      localStorage.setItem('campuspass_bento_cards', JSON.stringify(cards));
+    } catch (err) {
+      console.warn('Failed saving bento cards to localStorage', err);
+    }
+  };
+
+  const resetBentoCards = () => {
+    const defaults: BentoCardConfig[] = [
+      {
+        id: 'bento-1',
+        tag: 'Active Passes',
+        tagColor: '#ea580c',
+        title: 'My Registrations',
+        description: 'Track admissions, passes & verified QR delivery in real-time.',
+        linkLabel: 'View passes',
+        targetCategory: 'PASSES',
+        bg: '#fff7ed',
+        border: '#fed7aa',
+      },
+      {
+        id: 'bento-2',
+        tag: 'Code Sprints',
+        tagColor: '#0284c7',
+        title: 'Hackathons',
+        description: 'National coding challenges, AI hackathons & live prototype sprints.',
+        linkLabel: 'Explore sprints',
+        targetCategory: 'HACKATHON',
+        bg: '#f0f9ff',
+        border: '#bae6fd',
+      },
+      {
+        id: 'bento-3',
+        tag: 'Recruitment',
+        tagColor: '#9333ea',
+        title: 'Campus Drives',
+        description: 'Corporate recruitment, technical interviews & placement drives.',
+        linkLabel: 'Browse drives',
+        targetCategory: 'CAMPUS_DRIVE',
+        bg: '#faf5ff',
+        border: '#e9d5ff',
+      },
+      {
+        id: 'bento-4',
+        tag: 'Live Fests',
+        tagColor: '#16a34a',
+        title: 'Cultural & Fests',
+        description: 'Gala nights, musical fests, dance showdowns & fresher carnivals.',
+        linkLabel: 'Join events',
+        targetCategory: 'CULTURAL',
+        bg: '#f0fdf4',
+        border: '#bbf7d0',
+      },
+    ];
+    setBentoCards(defaults);
+    try {
+      localStorage.removeItem('campuspass_bento_cards');
+    } catch {}
+  };
 
   // Fetch data from backend
   const refreshData = async () => {
@@ -443,7 +673,14 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         toggleUserStatus,
         createUser,
         publishAnnouncement,
-        refreshData
+        refreshData,
+        heroConfig,
+        updateHeroConfig,
+        resetHeroConfig,
+        bentoCards,
+        updateBentoCard,
+        updateAllBentoCards,
+        resetBentoCards
       }}
     >
       {children}

@@ -4,6 +4,7 @@ import { useCampusPass } from '../../context/CampusPassContext';
 import { generateQrDataUrl } from '../../utils/qrGenerator';
 import { downloadPassPdf } from '../../utils/exportPdf';
 import confetti from 'canvas-confetti';
+import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
 import {
   Ticket,
   Calendar,
@@ -81,7 +82,9 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Wallet Hero Header */}
       <div className="cp-page-hero">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
+        <DynamicNeuroNoise />
+        <div className="cp-hero-overlay" />
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#86efac' }} />
@@ -158,7 +161,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
         /* Re-engineered Smart Optical QR Credential Grid */
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
           gap: '24px',
           alignItems: 'stretch'
         }}>

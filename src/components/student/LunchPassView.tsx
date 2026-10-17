@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { LunchPass } from '../../types';
 import { useCampusPass } from '../../context/CampusPassContext';
 import { generateQrDataUrl } from '../../utils/qrGenerator';
+import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
 import {
   Utensils,
   Calendar,
@@ -51,7 +52,9 @@ export const LunchPassView: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Page Hero */}
       <div className="cp-page-hero">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
+        <DynamicNeuroNoise />
+        <div className="cp-hero-overlay" />
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#fde047' }} />
@@ -150,7 +153,7 @@ export const LunchPassView: React.FC = () => {
       ) : (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
           gap: '24px',
           alignItems: 'stretch'
         }}>

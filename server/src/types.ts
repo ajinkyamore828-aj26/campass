@@ -47,6 +47,46 @@ export type EventStatus =
 export type RegistrationMode = 'INDIVIDUAL' | 'TEAM' | 'BOTH';
 export type ApprovalMode = 'AUTOMATIC' | 'MANUAL_REVIEW';
 
+export type RoundType = 
+  | 'APTITUDE' 
+  | 'TECHNICAL' 
+  | 'CODING' 
+  | 'PROBLEM_SOLVING' 
+  | 'PRESENTATION' 
+  | 'INTERVIEW' 
+  | 'HACKATHON' 
+  | 'GROUP_DISCUSSION' 
+  | 'QUIZ' 
+  | 'GENERAL';
+
+export type RoundStatus = 'UPCOMING' | 'ONGOING' | 'COMPLETED' | 'DELAYED';
+
+export interface EventRound {
+  id: string;
+  roundNumber: number;
+  name: string;
+  type: RoundType;
+  date: string;
+  startTime: string;
+  endTime: string;
+  venue: string;
+  description?: string;
+  status: RoundStatus;
+  eliminationRound?: boolean;
+  qualifyingCriteria?: string;
+}
+
+export interface ScheduleRescheduleInfo {
+  isRescheduled: boolean;
+  originalDate?: string;
+  originalStartTime?: string;
+  originalEndTime?: string;
+  rescheduledAt?: string;
+  reason?: string;
+  announcementBroadcasted?: boolean;
+  broadcastNote?: string;
+}
+
 export interface CampusEvent {
   id: string;
   title: string;
@@ -82,6 +122,8 @@ export interface CampusEvent {
   contactEmail: string;
   contactPhone: string;
   status: EventStatus;
+  rounds?: EventRound[];
+  scheduleUpdate?: ScheduleRescheduleInfo;
 }
 
 export type RegistrationType = 'INDIVIDUAL' | 'TEAM';
@@ -108,6 +150,7 @@ export interface CampusRegistration {
   studentId: string;
   studentEmail: string;
   studentPhone?: string;
+  collegeName?: string;
   department: string;
   academicYear: string;
   teamName?: string;

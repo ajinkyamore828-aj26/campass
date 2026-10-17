@@ -3,6 +3,7 @@ import type { CampusRegistration, DigitalEventPass } from '../../types';
 import { useCampusPass } from '../../context/CampusPassContext';
 import { generateQrDataUrl } from '../../utils/qrGenerator';
 import { downloadPassPdf } from '../../utils/exportPdf';
+import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
 import {
   FileText,
   Calendar,
@@ -165,7 +166,9 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Page Hero */}
       <div className="cp-page-hero">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
+        <DynamicNeuroNoise />
+        <div className="cp-hero-overlay" />
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#86efac' }} />

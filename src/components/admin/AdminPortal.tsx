@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import type { CampusUser, UserRole, DigitalEventPass, AuditLog } from '../../types';
+import type { CampusUser, UserRole, DigitalEventPass, AuditLog, CampusEvent, EventRound } from '../../types';
 import { useCampusPass } from '../../context/CampusPassContext';
 import { exportToCsv } from '../../utils/exportCsv';
+import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
 import {
   ShieldCheck,
   Users,
@@ -28,8 +29,19 @@ import {
   Activity,
   Award,
   Layers,
-  Send
+  Send,
+  Type,
+  LayoutGrid,
+  Trophy,
+  Clock,
+  Edit3,
+  Filter
 } from 'lucide-react';
+import { EditHeroTextModal } from '../student/EditHeroTextModal';
+import { EditBentoCardsModal } from '../student/EditBentoCardsModal';
+import { ManageEventRoundsModal } from './ManageEventRoundsModal';
+import { RescheduleEventModal } from './RescheduleEventModal';
+import { EditEventRegistryModal } from '../student/EditEventRegistryModal';
 
 export const AdminPortal: React.FC = () => {
   const {
@@ -48,10 +60,33 @@ export const AdminPortal: React.FC = () => {
     updateUserRole,
     toggleUserStatus,
     createUser,
-    publishAnnouncement
+    publishAnnouncement,
+    createEvent,
+    updateEvent,
+    heroConfig,
+    updateHeroConfig,
+    resetHeroConfig,
+    bentoCards,
+    updateBentoCard,
+    updateAllBentoCards,
+    resetBentoCards
   } = useCampusPass();
 
-  const [activeTab, setActiveTab] = useState<'ANALYTICS' | 'USERS' | 'PASSES' | 'AUDIT' | 'ANNOUNCEMENTS'>('ANALYTICS');
+  const [activeTab, setActiveTab] = useState<'ANALYTICS' | 'EVENTS' | 'USERS' | 'PASSES' | 'AUDIT' | 'ANNOUNCEMENTS'>('ANALYTICS');
+
+  // Event & Rounds Management states
+  const [eventSearchQuery, setEventSearchQuery] = useState('');
+  const [eventCategoryFilter, setEventCategoryFilter] = useState('ALL');
+  const [eventFilterMode, setEventFilterMode] = useState<'ALL' | 'MULTI_ROUND' | 'RESCHEDULED'>('ALL');
+  const [selectedEventForRounds, setSelectedEventForRounds] = useState<CampusEvent | null>(null);
+  const [selectedEventForReschedule, setSelectedEventForReschedule] = useState<CampusEvent | null>(null);
+  const [selectedEventForEdit, setSelectedEventForEdit] = useState<CampusEvent | null>(null);
+  const [isRegistryModalOpen, setIsRegistryModalOpen] = useState(false);
+  const [pinnedFeaturedId, setPinnedFeaturedId] = useState<string | null>(null);
+
+  // Hero & Bento customizer modals
+  const [isHeroModalOpen, setIsHeroModalOpen] = useState(false);
+  const [isBentoModalOpen, setIsBentoModalOpen] = useState(false);
 
   // User management states
   const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -95,6 +130,62 @@ export const AdminPortal: React.FC = () => {
       return true;
     });
   }, [users, userRoleFilter, userSearchQuery]);
+
+  // Filtered Events for Admin Management
+  const filteredAdminEvents = useMemo(() => {
+    return events.filter(e => {
+      if (eventCategoryFilter !== 'ALL' && e.category !== eventCategoryFilter) return false;
+      if (eventFilterMode === 'MULTI_ROUND' && (e.rounds?.length || 0) <= 1) return false;
+      if (eventFilterMode === 'RESCHEDULED' && !e.scheduleUpdate?.isRescheduled) return false;
+      if (eventSearchQuery.trim()) {
+        const q = eventSearchQuery.toLowerCase();
+        const matchesTitle = e.title.toLowerCase().includes(q);
+        const matchesDept = e.department?.toLowerCase().includes(q) || false;
+        const matchesVenue = e.venue?.toLowerCase().includes(q) || false;
+        const matchesId = e.id.toLowerCase().includes(q);
+        if (!matchesTitle && !matchesDept && !matchesVenue && !matchesId) return false;
+      }
+      return true;
+    });
+  }, [events, eventCategoryFilter, eventFilterMode, eventSearchQuery]);
+
+  // Multi-Round and Reschedule Handlers
+  const handleSaveRounds = async (eventId: string, updatedRounds: EventRound[]) => {
+    try {
+      const res = await updateEvent(eventId, { rounds: updatedRounds });
+      if (res.success) {
+        setFeedback({ type: 'success', message: `Updated competition stages for event.` });
+      }
+    } catch {
+      setFeedback({ type: 'error', message: 'Failed to update competition rounds.' });
+    }
+    setTimeout(() => setFeedback(null), 4000);
+  };
+
+  const handleRescheduleEvent = async (eventId: string, updates: any) => {
+    try {
+      const res = await updateEvent(eventId, updates);
+      if (res.success) {
+        setFeedback({ type: 'success', message: `Event schedule successfully updated and broadcasted.` });
+      }
+    } catch {
+      setFeedback({ type: 'error', message: 'Failed to reschedule event.' });
+    }
+    setTimeout(() => setFeedback(null), 4000);
+  };
+
+  const handleBroadcastFromReschedule = async (title: string, message: string) => {
+    try {
+      await publishAnnouncement({
+        title,
+        message,
+        priority: 'URGENT',
+        createdBy: currentUser.fullName
+      });
+    } catch {
+      // ignore
+    }
+  };
 
   // KPIs
   const totalRegistrations = registrations.length;
@@ -256,7 +347,9 @@ export const AdminPortal: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Page Hero */}
       <div className="cp-page-hero">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
+        <DynamicNeuroNoise />
+        <div className="cp-hero-overlay" />
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#86efac' }} />
@@ -272,10 +365,27 @@ export const AdminPortal: React.FC = () => {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <button
+              className="cp-hero-btn-secondary"
+              onClick={() => setIsHeroModalOpen(true)}
+              style={{ fontSize: '13px', padding: '8px 14px', borderRadius: '8px', color: '#ffffff', background: 'rgba(255, 255, 255, 0.12)', borderColor: 'rgba(255, 255, 255, 0.28)', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
+            >
+              <Type size={14} />
+              <span>Edit Hero Text</span>
+            </button>
+            <button
+              className="cp-hero-btn-secondary"
+              onClick={() => setIsBentoModalOpen(true)}
+              style={{ fontSize: '13px', padding: '8px 14px', borderRadius: '8px', color: '#ffffff', background: 'rgba(255, 255, 255, 0.12)', borderColor: 'rgba(255, 255, 255, 0.28)', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
+            >
+              <LayoutGrid size={14} />
+              <span>Edit Highlight Cards</span>
+            </button>
             <button
               className="cp-hero-pill-btn cp-hero-pill-btn-solid"
               onClick={() => setIsAddUserModalOpen(true)}
+              style={{ fontSize: '13px', padding: '8px 16px', borderRadius: '8px', color: '#09090b', background: '#ffffff', border: '1px solid #ffffff', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: 700 }}
             >
               <Plus size={14} />
               <span>Add User Account</span>
@@ -379,6 +489,12 @@ export const AdminPortal: React.FC = () => {
               Institution KPIs
             </button>
             <button
+              className={`cp-tab${activeTab === 'EVENTS' ? ' active' : ''}`}
+              onClick={() => setActiveTab('EVENTS')}
+            >
+              Event Registry &amp; Rounds ({events.length})
+            </button>
+            <button
               className={`cp-tab${activeTab === 'USERS' ? ' active' : ''}`}
               onClick={() => setActiveTab('USERS')}
             >
@@ -434,6 +550,287 @@ export const AdminPortal: React.FC = () => {
                   );
                 })}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: EVENTS & MULTI-ROUND SCHEDULE MANAGEMENT */}
+        {activeTab === 'EVENTS' && (
+          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Action Bar & Filters */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '280px', flexWrap: 'wrap' }}>
+                <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
+                  <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                  <input
+                    type="text"
+                    className="cp-input"
+                    value={eventSearchQuery}
+                    onChange={(e) => setEventSearchQuery(e.target.value)}
+                    placeholder="Search events by title, venue, or department..."
+                    style={{ paddingLeft: '34px', height: '36px', fontSize: '12.5px' }}
+                  />
+                </div>
+
+                {/* Filter Mode Buttons */}
+                <div style={{ display: 'inline-flex', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <button
+                    type="button"
+                    onClick={() => setEventFilterMode('ALL')}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      fontWeight: eventFilterMode === 'ALL' ? 700 : 500,
+                      background: eventFilterMode === 'ALL' ? '#0f172a' : '#f8fafc',
+                      color: eventFilterMode === 'ALL' ? '#ffffff' : '#475569',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    All Events ({events.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEventFilterMode('MULTI_ROUND')}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      fontWeight: eventFilterMode === 'MULTI_ROUND' ? 700 : 500,
+                      background: eventFilterMode === 'MULTI_ROUND' ? '#166534' : '#f8fafc',
+                      color: eventFilterMode === 'MULTI_ROUND' ? '#ffffff' : '#475569',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <Trophy size={12} />
+                    <span>Multi-Round ({events.filter(e => (e.rounds?.length || 0) > 1).length})</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEventFilterMode('RESCHEDULED')}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      fontWeight: eventFilterMode === 'RESCHEDULED' ? 700 : 500,
+                      background: eventFilterMode === 'RESCHEDULED' ? '#b45309' : '#f8fafc',
+                      color: eventFilterMode === 'RESCHEDULED' ? '#ffffff' : '#475569',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <AlertTriangle size={12} />
+                    <span>Rescheduled / Delayed ({events.filter(e => e.scheduleUpdate?.isRescheduled).length})</span>
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="cp-btn cp-btn-primary cp-btn-sm"
+                  onClick={() => {
+                    setSelectedEventForEdit(null);
+                    setIsRegistryModalOpen(true);
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '36px' }}
+                >
+                  <Plus size={14} />
+                  <span>Register New Event</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Event List Table */}
+            <div className="cp-table-container">
+              <table className="cp-table">
+                <thead>
+                  <tr>
+                    <th>Event &amp; Details</th>
+                    <th>Category</th>
+                    <th>Current Schedule</th>
+                    <th>Multi-Round Stages</th>
+                    <th>Schedule Status</th>
+                    <th>Capacity</th>
+                    <th style={{ textAlign: 'right' }}>Admin Management</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAdminEvents.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '36px 12px', color: '#94a3b8' }}>
+                        No events found matching your criteria.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredAdminEvents.map(ev => {
+                      const roundCount = ev.rounds?.length || 0;
+                      const isRescheduled = ev.scheduleUpdate?.isRescheduled;
+                      return (
+                        <tr key={ev.id}>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div style={{ width: '44px', height: '44px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, background: '#f1f5f9' }}>
+                                <img src={ev.bannerUrl} alt={ev.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>
+                                  {ev.title}
+                                </div>
+                                <div style={{ fontSize: '11px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                                  <span>{ev.department}</span>
+                                  <span>•</span>
+                                  <span>ID: {ev.id}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span className="cp-badge cp-badge-open" style={{ fontSize: '10px' }}>
+                              {ev.category}
+                            </span>
+                          </td>
+                          <td>
+                            <div style={{ fontSize: '12px', color: '#0f172a', fontWeight: 600 }}>
+                              {ev.date}
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#64748b' }}>
+                              {ev.startTime} - {ev.endTime}
+                            </div>
+                            <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>
+                              {ev.venue}
+                            </div>
+                          </td>
+                          <td>
+                            {roundCount > 1 ? (
+                              <div>
+                                <span style={{
+                                  background: '#dcfce7',
+                                  color: '#166534',
+                                  border: '1px solid #bbf7d0',
+                                  padding: '2px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '11px',
+                                  fontWeight: 700,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}>
+                                  <Trophy size={11} />
+                                  {roundCount} Competition Rounds
+                                </span>
+                                <div style={{ fontSize: '10.5px', color: '#475569', marginTop: '4px', maxWidth: '240px', lineHeight: 1.3 }}>
+                                  {ev.rounds?.map((r, i) => `${i + 1}. ${r.name.replace(/^Round \d+:\s*/i, '')}`).join(' → ')}
+                                </div>
+                              </div>
+                            ) : (
+                              <span style={{
+                                background: '#f1f5f9',
+                                color: '#64748b',
+                                padding: '2px 8px',
+                                borderRadius: '6px',
+                                fontSize: '11px',
+                                fontWeight: 600
+                              }}>
+                                Single Stage
+                              </span>
+                            )}
+                          </td>
+                          <td>
+                            {isRescheduled ? (
+                              <div>
+                                <span style={{
+                                  background: '#fef3c7',
+                                  color: '#b45309',
+                                  border: '1px solid #fde68a',
+                                  padding: '3px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '11px',
+                                  fontWeight: 700,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}>
+                                  <AlertTriangle size={11} />
+                                  Delayed / Rescheduled
+                                </span>
+                                {ev.scheduleUpdate?.reason && (
+                                  <div style={{ fontSize: '10.5px', color: '#92400e', marginTop: '4px', maxWidth: '200px', lineHeight: 1.3 }} title={ev.scheduleUpdate.reason}>
+                                    Reason: {ev.scheduleUpdate.reason}
+                                  </div>
+                                )}
+                                {ev.scheduleUpdate?.originalDate && (
+                                  <div style={{ fontSize: '10px', color: '#78350f', marginTop: '2px' }}>
+                                    Was: <span style={{ textDecoration: 'line-through' }}>{ev.scheduleUpdate.originalDate} ({ev.scheduleUpdate.originalStartTime})</span>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <span style={{
+                                background: '#f0fdf4',
+                                color: '#15803d',
+                                padding: '2px 8px',
+                                borderRadius: '6px',
+                                fontSize: '11px',
+                                fontWeight: 600
+                              }}>
+                                On Schedule
+                              </span>
+                            )}
+                          </td>
+                          <td>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#0f172a' }}>
+                              {ev.registeredCount} / {ev.capacity}
+                            </div>
+                            <div style={{ fontSize: '10.5px', color: '#64748b' }}>
+                              {Math.round((ev.registeredCount / Math.max(1, ev.capacity)) * 100)}% filled
+                            </div>
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                              <button
+                                type="button"
+                                className="cp-btn cp-btn-secondary cp-btn-sm"
+                                onClick={() => setSelectedEventForRounds(ev)}
+                                title="Configure Multi-Round Stages"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11.5px', padding: '5px 9px' }}
+                              >
+                                <Trophy size={12} color="#166534" />
+                                <span>Manage Rounds</span>
+                              </button>
+                              <button
+                                type="button"
+                                className="cp-btn cp-btn-secondary cp-btn-sm"
+                                onClick={() => setSelectedEventForReschedule(ev)}
+                                title="Reschedule or Delay Timing"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11.5px', padding: '5px 9px' }}
+                              >
+                                <Calendar size={12} color="#b45309" />
+                                <span>Reschedule</span>
+                              </button>
+                              <button
+                                type="button"
+                                className="cp-btn cp-btn-secondary cp-btn-sm"
+                                onClick={() => setSelectedEventForEdit(ev)}
+                                title="Edit Full Event Details"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11.5px', padding: '5px 9px' }}
+                              >
+                                <Edit3 size={12} />
+                                <span>Edit</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -738,20 +1135,36 @@ export const AdminPortal: React.FC = () => {
       {/* PASS REVOCATION MODAL */}
       {revokingPass && (
         <div className="cp-modal-overlay" onClick={() => setRevokingPass(null)}>
-          <div className="cp-modal" onClick={e => e.stopPropagation()}>
+          <div className="cp-modal" style={{ maxWidth: '500px' }} onClick={e => e.stopPropagation()}>
             <div className="cp-modal-header">
-              <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#b91c1c' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#f87171' }}>
                 Revoke Digital Pass
               </h3>
-              <button type="button" onClick={() => setRevokingPass(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
-                <X size={18} />
+              <button
+                type="button"
+                onClick={() => setRevokingPass(null)}
+                aria-label="Close"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '50%',
+                  width: '30px',
+                  height: '30px',
+                  cursor: 'pointer',
+                  color: '#d4d4d8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={15} />
               </button>
             </div>
 
-            <form onSubmit={handleRevokePassSubmit}>
-              <div className="cp-modal-body">
-                <p style={{ margin: '0 0 14px 0', fontSize: '13px', color: '#64748b', lineHeight: 1.5 }}>
-                  You are about to revoke pass <strong>{revokingPass.id}</strong> issued to <strong>{revokingPass.studentName}</strong> for <em>{revokingPass.eventTitle}</em>. The turnstile will immediately reject this QR token.
+            <form onSubmit={handleRevokePassSubmit} style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0, overflow: 'hidden' }}>
+              <div className="cp-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: '#d4d4d8', lineHeight: 1.5 }}>
+                  You are about to revoke pass <strong style={{ color: '#ffffff' }}>{revokingPass.id}</strong> issued to <strong style={{ color: '#ffffff' }}>{revokingPass.studentName}</strong> for <em style={{ color: '#86efac' }}>{revokingPass.eventTitle}</em>. The turnstile will immediately reject this QR token.
                 </p>
 
                 <div className="cp-form-group">
@@ -769,10 +1182,35 @@ export const AdminPortal: React.FC = () => {
               </div>
 
               <div className="cp-modal-footer">
-                <button type="button" className="cp-btn cp-btn-outline" onClick={() => setRevokingPass(null)}>
+                <button
+                  type="button"
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    color: '#e4e4e7',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setRevokingPass(null)}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="cp-btn cp-btn-danger">
+                <button
+                  type="submit"
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    background: '#b91c1c',
+                    color: '#ffffff',
+                    border: '1px solid #b91c1c',
+                    cursor: 'pointer'
+                  }}
+                >
                   Confirm Revocation
                 </button>
               </div>
@@ -784,22 +1222,44 @@ export const AdminPortal: React.FC = () => {
       {/* ADD USER MODAL */}
       {isAddUserModalOpen && (
         <div className="cp-modal-overlay" onClick={() => setIsAddUserModalOpen(false)}>
-          <div className="cp-modal" onClick={e => e.stopPropagation()}>
+          <div className="cp-modal" style={{ maxWidth: '580px' }} onClick={e => e.stopPropagation()}>
             <div className="cp-modal-header">
-              <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
-                Add New Campus User Account
-              </h3>
-              <button type="button" onClick={() => setIsAddUserModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
-                <X size={18} />
+              <div>
+                <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  User Management
+                </span>
+                <h3 style={{ fontSize: '17px', fontWeight: 800, margin: '2px 0 0 0', color: '#ffffff' }}>
+                  Add New Campus User Account
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddUserModalOpen(false)}
+                aria-label="Close"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  cursor: 'pointer',
+                  color: '#d4d4d8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleCreateUserSubmit}>
+            <form onSubmit={handleCreateUserSubmit} style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0, overflow: 'hidden' }}>
               <div className="cp-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div className="cp-form-group">
                   <label className="cp-label">Full Name *</label>
                   <input
                     required
+                    placeholder="e.g. Dr. Rajesh Sharma"
                     className="cp-input"
                     value={newUserForm.fullName}
                     onChange={e => setNewUserForm({ ...newUserForm, fullName: e.target.value })}
@@ -811,16 +1271,18 @@ export const AdminPortal: React.FC = () => {
                   <input
                     type="email"
                     required
+                    placeholder="e.g. rajesh.sharma@apex.edu"
                     className="cp-input"
                     value={newUserForm.email}
                     onChange={e => setNewUserForm({ ...newUserForm, email: e.target.value })}
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
                   <div className="cp-form-group">
                     <label className="cp-label">Student Roll No</label>
                     <input
+                      placeholder="e.g. STU-2026-099"
                       className="cp-input"
                       value={newUserForm.studentId}
                       onChange={e => setNewUserForm({ ...newUserForm, studentId: e.target.value })}
@@ -831,7 +1293,7 @@ export const AdminPortal: React.FC = () => {
                     <label className="cp-label">Role</label>
                     <select
                       className="cp-select"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', cursor: 'pointer' }}
                       value={newUserForm.role}
                       onChange={e => setNewUserForm({ ...newUserForm, role: e.target.value as any })}
                     >
@@ -847,7 +1309,7 @@ export const AdminPortal: React.FC = () => {
                   <label className="cp-label">Department</label>
                   <select
                     className="cp-select"
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', cursor: 'pointer' }}
                     value={newUserForm.department}
                     onChange={e => setNewUserForm({ ...newUserForm, department: e.target.value })}
                   >
@@ -859,16 +1321,104 @@ export const AdminPortal: React.FC = () => {
               </div>
 
               <div className="cp-modal-footer">
-                <button type="button" className="cp-btn cp-btn-outline" onClick={() => setIsAddUserModalOpen(false)}>
+                <button
+                  type="button"
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    color: '#e4e4e7',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setIsAddUserModalOpen(false)}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="cp-btn cp-btn-primary">
+                <button
+                  type="submit"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '9px 20px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    background: '#166534',
+                    color: '#ffffff',
+                    border: '1px solid #166534',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(22, 101, 52, 0.4)'
+                  }}
+                >
                   Create User
                 </button>
               </div>
             </form>
           </div>
         </div>
+      )}
+
+      {/* Hero Text Customizer Modal */}
+      {isHeroModalOpen && (
+        <EditHeroTextModal
+          heroConfig={heroConfig}
+          onClose={() => setIsHeroModalOpen(false)}
+          onUpdateHero={updateHeroConfig}
+          onResetHero={resetHeroConfig}
+          onSuccessNotice={(msg) => setFeedback({ type: 'success', message: msg })}
+        />
+      )}
+
+      {/* Bento Highlight Cards Customizer Modal */}
+      {isBentoModalOpen && (
+        <EditBentoCardsModal
+          bentoCards={bentoCards}
+          onClose={() => setIsBentoModalOpen(false)}
+          onUpdateCard={updateBentoCard}
+          onUpdateAllCards={updateAllBentoCards}
+          onResetCards={resetBentoCards}
+          onSuccessNotice={(msg) => setFeedback({ type: 'success', message: msg })}
+        />
+      )}
+
+      {/* Multi-Round Stage Configurator Modal */}
+      {selectedEventForRounds && (
+        <ManageEventRoundsModal
+          event={selectedEventForRounds}
+          onClose={() => setSelectedEventForRounds(null)}
+          onSaveRounds={handleSaveRounds}
+        />
+      )}
+
+      {/* Reschedule & Delay Management Modal */}
+      {selectedEventForReschedule && (
+        <RescheduleEventModal
+          event={selectedEventForReschedule}
+          onClose={() => setSelectedEventForReschedule(null)}
+          onReschedule={handleRescheduleEvent}
+          onBroadcastAnnouncement={handleBroadcastFromReschedule}
+        />
+      )}
+
+      {/* Full Event Registry Editor Modal */}
+      {(isRegistryModalOpen || selectedEventForEdit) && (
+        <EditEventRegistryModal
+          events={events}
+          onClose={() => {
+            setIsRegistryModalOpen(false);
+            setSelectedEventForEdit(null);
+          }}
+          initialEditingEvent={selectedEventForEdit}
+          onSetPinnedFeaturedId={(id) => setPinnedFeaturedId(id)}
+          pinnedFeaturedId={pinnedFeaturedId}
+          onUpdateEvent={updateEvent}
+          onCreateEvent={createEvent}
+          onSuccessNotice={(msg) => setFeedback({ type: 'success', message: msg })}
+        />
       )}
     </div>
   );

@@ -95,7 +95,47 @@ export const initialEvents: CampusEvent[] = [
     ],
     contactEmail: 'genesis@apex.edu',
     contactPhone: '+91 98765 01012',
-    status: 'OPEN'
+    status: 'OPEN',
+    scheduleUpdate: {
+      isRescheduled: true,
+      originalDate: '2026-11-20',
+      originalStartTime: '09:00 AM',
+      originalEndTime: '03:00 PM',
+      rescheduledAt: '2026-10-16T14:30:00Z',
+      reason: 'Keynote Speaker flight delay & University Green Council Auditorium maintenance',
+      announcementBroadcasted: true,
+      broadcastNote: 'Event shifted forward by 2 days to Nov 22 to accommodate live jury panel.'
+    },
+    rounds: [
+      {
+        id: 'RND-IDEA-01',
+        roundNumber: 1,
+        name: 'Round 1: Executive Pitch Deck Screening',
+        type: 'PRESENTATION',
+        date: '2026-11-22',
+        startTime: '10:00 AM',
+        endTime: '01:00 PM',
+        venue: 'Green Technology Pavilion 101',
+        description: '5-minute rapid pitch to panel of sustainability mentors.',
+        status: 'UPCOMING',
+        eliminationRound: true,
+        qualifyingCriteria: 'Top 10 teams advance to Grand Demo Finals'
+      },
+      {
+        id: 'RND-IDEA-02',
+        roundNumber: 2,
+        name: 'Round 2: Grand Prototype Demo & Jury Q&A',
+        type: 'HACKATHON',
+        date: '2026-11-22',
+        startTime: '02:00 PM',
+        endTime: '04:00 PM',
+        venue: 'Open Amphitheatre Stage',
+        description: 'Working demo and live evaluation in front of VC and campus sustainability leaders.',
+        status: 'UPCOMING',
+        eliminationRound: false,
+        qualifyingCriteria: 'Top 3 teams awarded ₹75,000 seed incubation grants'
+      }
+    ]
   },
   {
     id: 'EVT-CODE-03',
@@ -137,7 +177,51 @@ export const initialEvents: CampusEvent[] = [
     ],
     contactEmail: 'bytecode@apex.edu',
     contactPhone: '+91 98765 01014',
-    status: 'CLOSING_SOON'
+    status: 'CLOSING_SOON',
+    rounds: [
+      {
+        id: 'RND-BYTE-01',
+        roundNumber: 1,
+        name: 'Round 1: Quantitative & CS Aptitude Screening',
+        type: 'APTITUDE',
+        date: '2026-11-24',
+        startTime: '10:00 AM',
+        endTime: '11:15 AM',
+        venue: 'Turing Computer Lab A',
+        description: '45 MCQs covering discrete mathematics, algorithmic complexity, data structure dry runs, and quantitative puzzles.',
+        status: 'UPCOMING',
+        eliminationRound: true,
+        qualifyingCriteria: 'Top 60 candidates advance to Technical MCQ round'
+      },
+      {
+        id: 'RND-BYTE-02',
+        roundNumber: 2,
+        name: 'Round 2: Technical Core & Systems Assessment',
+        type: 'TECHNICAL',
+        date: '2026-11-24',
+        startTime: '12:00 PM',
+        endTime: '01:30 PM',
+        venue: 'Turing Computer Lab B',
+        description: 'Hands-on debugging and multi-choice systems evaluation (OS Concurrency, DBMS indexing, networks, and memory layout).',
+        status: 'UPCOMING',
+        eliminationRound: true,
+        qualifyingCriteria: 'Top 25 candidates qualify for the Grand Problem Solving Arena'
+      },
+      {
+        id: 'RND-BYTE-03',
+        roundNumber: 3,
+        name: 'Round 3: Advanced Algorithmic Problem Solving',
+        type: 'PROBLEM_SOLVING',
+        date: '2026-11-24',
+        startTime: '02:30 PM',
+        endTime: '05:30 PM',
+        venue: 'Grand Tech Arena Sandboxes',
+        description: '3-hour live competitive programming contest with 4 complex problems on Dynamic Programming, Segment Trees, and Flow Networks.',
+        status: 'UPCOMING',
+        eliminationRound: false,
+        qualifyingCriteria: 'Cumulative leaderboard score decides Podium Champions'
+      }
+    ]
   },
   {
     id: 'EVT-APTI-04',

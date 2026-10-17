@@ -19,12 +19,15 @@ import {
   Bell,
   BarChart3,
   ShieldCheck,
+  Home,
+  PanelLeftClose,
 } from 'lucide-react';
-import { ApiStatusModal } from '../system/ApiStatusModal';
 
 interface DemostackSidebarProps {
   currentView: string;
   onNavigate: (view: string) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 const ROLES = [
@@ -33,7 +36,7 @@ const ROLES = [
   { value: 'ADMIN' as const, label: 'Administrator', desc: 'Full system control' },
 ];
 
-export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView, onNavigate }) => {
+export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView, onNavigate, isOpen = true, onClose }) => {
   const {
     activePortal,
     switchUserRole,
@@ -47,7 +50,6 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
 
   const [orgOpen, setOrgOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
-  const [apiModalOpen, setApiModalOpen] = useState(false);
 
   const studentPasses = passes.filter(p => p.studentId === currentUser.studentId);
   const studentLunchPasses = lunchPasses.filter(lp => lp.studentId === currentUser.studentId);
@@ -77,36 +79,71 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
   const currentNavItems = activePortal === 'STUDENT' ? studentNav : adminNav;
 
   return (
-    <aside className="ds-sidebar">
+    <aside className={`ds-sidebar${!isOpen ? ' is-collapsed' : ''}`}>
       <div className="ds-sidebar-inner">
         {/* Header: Brand */}
         <div className="ds-sidebar-header">
           {/* Institution Brand */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 4px' }}>
-            <div
-              className="cp-icon-box"
-              style={{
-                background: 'linear-gradient(135deg, #166534, #14532d)',
-                color: '#fff',
-                width: '34px',
-                height: '34px',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}
-            >
-              <GraduationCap size={18} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', padding: '6px 4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
+              <div
+                className="cp-icon-box"
+                style={{
+                  background: 'linear-gradient(135deg, #166534, #14532d)',
+                  color: '#fff',
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}
+              >
+                <GraduationCap size={18} />
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <p className="truncate" style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>
+                  {institutionProfile.collegeName}
+                </p>
+                <p style={{ fontSize: '10.5px', color: '#64748b', marginTop: '2px', fontWeight: 500 }}>
+                  CampusPass Platform
+                </p>
+              </div>
             </div>
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <p className="truncate" style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>
-                {institutionProfile.collegeName}
-              </p>
-              <p style={{ fontSize: '10.5px', color: '#64748b', marginTop: '2px', fontWeight: 500 }}>
-                CampusPass Platform
-              </p>
-            </div>
+
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                title="Hide sidebar"
+                aria-label="Hide sidebar"
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#64748b',
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f1f5f9';
+                  e.currentTarget.style.color = '#0f172a';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                  e.currentTarget.style.color = '#64748b';
+                }}
+              >
+                <PanelLeftClose size={14} />
+              </button>
+            )}
           </div>
         </div>
 
@@ -141,21 +178,6 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
             System Infrastructure
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-            <button
-              type="button"
-              className="ds-nav-item"
-              onClick={() => setApiModalOpen(true)}
-              style={{ width: '100%', border: 'none', background: 'transparent', textAlign: 'left', cursor: 'pointer' }}
-              title="Inspect backend REST API health and latency"
-            >
-              <Server size={15} />
-              <span style={{ flex: 1, fontSize: '12.5px' }}>API Backend</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{ fontSize: '10px', color: '#166534', fontWeight: 700 }}>4000</span>
-                <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#22c55e' }} />
-              </div>
-            </button>
-
             <button
               type="button"
               className={`ds-nav-item${currentView === 'ANALYTICS' ? ' active' : ''}`}
@@ -359,8 +381,38 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={() => {
+                  setUserOpen(false);
+                  onNavigate('LANDING');
+                }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 10px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
+                  color: '#374151',
+                  transition: 'background-color 0.1s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#f8fafc'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+              >
+                <Home size={14} style={{ color: '#64748b' }} />
+                Public Landing Page
+              </button>
               <div className="cp-divider" style={{ margin: '4px 0' }} />
               <button
+                onClick={() => {
+                  setUserOpen(false);
+                  onNavigate('LANDING');
+                }}
                 style={{
                   width: '100%',
                   display: 'flex',
@@ -387,9 +439,6 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
         </div>
       </div>
     </div>
-
-    {/* Live API Backend Health Inspector Modal */}
-    <ApiStatusModal isOpen={apiModalOpen} onClose={() => setApiModalOpen(false)} />
   </aside>
 );
 };

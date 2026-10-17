@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { DigitalEventPass, LunchPass } from '../../types';
 import { useCampusPass } from '../../context/CampusPassContext';
+import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
 import {
   Scan,
   Camera,
@@ -174,7 +175,9 @@ export const GateScannerPortal: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Page Hero */}
       <div className="cp-page-hero">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
+        <DynamicNeuroNoise />
+        <div className="cp-hero-overlay" />
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <span className="cp-scanner-status-dot" />
@@ -222,7 +225,7 @@ export const GateScannerPortal: React.FC = () => {
 
       {/* Hardware Telemetry & Configuration Bar */}
       <div className="cp-section-card">
-        <div style={{ padding: '18px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', alignItems: 'center' }}>
+        <div style={{ padding: '18px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px', alignItems: 'center' }}>
           {scannerMode === 'GATE' ? (
             <>
               <div>
@@ -298,7 +301,7 @@ export const GateScannerPortal: React.FC = () => {
       </div>
 
       {/* Main Workstation: Industrial Scanner Terminal (Left) + Verdict Dossier (Right) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '22px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '22px' }}>
         
         {/* Left: Industrial Scanner Hardware Terminal */}
         <div className="cp-scanner-terminal">

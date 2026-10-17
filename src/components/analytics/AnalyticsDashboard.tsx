@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useCampusPass } from '../../context/CampusPassContext';
+import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
 import {
   BarChart3,
   TrendingUp,
@@ -94,7 +95,9 @@ export const AnalyticsDashboard: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Hero Banner (Mid Dark Green Secondary Canvas) */}
       <div className="cp-page-hero">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+        <DynamicNeuroNoise />
+        <div className="cp-hero-overlay" />
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
               <span className="cp-page-hero-tag" style={{ color: '#86efac' }}>
@@ -209,7 +212,7 @@ export const AnalyticsDashboard: React.FC = () => {
       </div>
 
       {/* Main Grid: Department Matrix + Dietary Demand */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '20px' }}>
         {/* Department Participation Card */}
         <div className="cp-section-card" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>

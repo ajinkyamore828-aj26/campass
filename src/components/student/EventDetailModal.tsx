@@ -13,9 +13,11 @@ import {
   Phone,
   FileText,
   AlertCircle,
+  AlertTriangle,
   CheckCircle,
   ArrowRight,
-  Ticket
+  Ticket,
+  Trophy
 } from 'lucide-react';
 
 interface EventDetailModalProps {
@@ -157,6 +159,39 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
           gap: '16px',
           paddingTop: '6px'
         }}>
+          {/* Urgent Reschedule / Delay Notification Alert */}
+          {event.scheduleUpdate?.isRescheduled && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(120, 53, 15, 0.45) 0%, rgba(69, 26, 3, 0.65) 100%)',
+              border: '1px solid rgba(253, 224, 71, 0.35)',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <AlertTriangle size={16} color="#fde047" />
+                <span style={{ fontSize: '12px', fontWeight: 800, color: '#fde047', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Official Notice: Schedule Updated / Delayed
+                </span>
+              </div>
+              <div style={{ fontSize: '12.5px', color: '#fef08a', lineHeight: 1.45 }}>
+                {event.scheduleUpdate.reason}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', color: '#d4d4d8', marginTop: '4px', flexWrap: 'wrap' }}>
+                <span>
+                  Revised Date: <strong style={{ color: '#86efac' }}>{event.date} ({event.startTime} - {event.endTime})</strong>
+                </span>
+                {event.scheduleUpdate.originalDate && (
+                  <span>
+                    Original Date: <span style={{ color: '#a1a1aa', textDecoration: 'line-through' }}>{event.scheduleUpdate.originalDate} ({event.scheduleUpdate.originalStartTime})</span>
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Title Header with Organizer Metadata */}
           <div>
             <h2 style={{
@@ -179,7 +214,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
           {/* Key Logistics strip (Dark obsidian cards) */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
             gap: '10px',
             background: '#1c1c1f',
             border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -333,6 +368,138 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
               {event.description}
             </p>
           </div>
+
+          {/* Multi-Round Stages & Competition Pipeline */}
+          {event.rounds && event.rounds.length > 0 && (
+            <div style={{
+              background: '#1c1c1f',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '16px',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ background: '#166534', color: '#86efac', padding: '5px', borderRadius: '8px' }}>
+                    <Trophy size={15} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#ffffff', margin: 0 }}>
+                      Competition Pipeline ({event.rounds.length} Rounds)
+                    </h3>
+                    <span style={{ fontSize: '11px', color: '#a1a1aa' }}>
+                      Official stage structure, evaluation criteria, and venues
+                    </span>
+                  </div>
+                </div>
+                <span style={{
+                  background: 'rgba(134, 239, 172, 0.15)',
+                  color: '#86efac',
+                  border: '1px solid rgba(134, 239, 172, 0.3)',
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  fontSize: '11px',
+                  fontWeight: 700
+                }}>
+                  {event.rounds.length} Stages
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {event.rounds.map((rnd, idx) => (
+                  <div
+                    key={rnd.id || idx}
+                    style={{
+                      background: '#242428',
+                      border: '1px solid rgba(255, 255, 255, 0.06)',
+                      borderRadius: '10px',
+                      padding: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                          background: '#27272a',
+                          color: '#86efac',
+                          border: '1px solid rgba(255, 255, 255, 0.14)',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: 800
+                        }}>
+                          Round {rnd.roundNumber}
+                        </span>
+                        <strong style={{ color: '#ffffff', fontSize: '13px' }}>
+                          {rnd.name}
+                        </strong>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{
+                          background: 'rgba(56, 189, 248, 0.15)',
+                          color: '#38bdf8',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          fontSize: '10px',
+                          fontWeight: 700
+                        }}>
+                          {rnd.type}
+                        </span>
+                        {rnd.eliminationRound && (
+                          <span style={{
+                            background: 'rgba(239, 68, 68, 0.15)',
+                            color: '#f87171',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            fontSize: '10px',
+                            fontWeight: 700
+                          }}>
+                            Knockout
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {rnd.description && (
+                      <div style={{ fontSize: '11.5px', color: '#d4d4d8', lineHeight: 1.4 }}>
+                        {rnd.description}
+                      </div>
+                    )}
+
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      fontSize: '11px',
+                      color: '#a1a1aa',
+                      marginTop: '2px',
+                      flexWrap: 'wrap'
+                    }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Calendar size={11} color="#86efac" /> {rnd.date}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Clock size={11} color="#38bdf8" /> {rnd.startTime} - {rnd.endTime}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <MapPin size={11} color="#fbbf24" /> {rnd.venue}
+                      </span>
+                      {rnd.qualifyingCriteria && (
+                        <span style={{ color: '#fef08a' }}>
+                          • Criteria: {rnd.qualifyingCriteria}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Rules and Guidelines */}
           {event.rules && event.rules.length > 0 && (
