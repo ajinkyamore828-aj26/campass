@@ -96,6 +96,8 @@ export interface CampusEvent {
   category: EventCategory;
   bannerUrl: string;
   date: string;
+  startDate?: string;
+  endDate?: string;
   startTime: string;
   endTime: string;
   venue: string;
@@ -124,6 +126,7 @@ export interface CampusEvent {
   status: EventStatus;
   rounds?: EventRound[];
   scheduleUpdate?: ScheduleRescheduleInfo;
+  allowConcurrentRegistration?: boolean;
 }
 
 export type RegistrationType = 'INDIVIDUAL' | 'TEAM';

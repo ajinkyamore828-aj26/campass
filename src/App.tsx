@@ -1,138 +1,228 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useCampusPass } from './context/CampusPassContext';
-import { DemostackTopbar } from './components/layout/DemostackTopbar';
-import { EventDiscovery } from './components/student/EventDiscovery';
-import { DigitalPassWallet } from './components/student/DigitalPassWallet';
-import { LunchPassView } from './components/student/LunchPassView';
-import { MyApplicationsList } from './components/student/MyApplicationsList';
-import { OrganizerStudio } from './components/organizer/OrganizerStudio';
-import { AnalyticsDashboard } from './components/analytics/AnalyticsDashboard';
-import { AdminPortal } from './components/admin/AdminPortal';
+import { StudentPortalLayout } from './components/student/StudentPortalLayout';
+import { AdminPortalLayout } from './components/admin/AdminPortalLayout';
 import { LandingPage } from './components/landing/LandingPage';
+import { SidebarDemo } from './components/ui/demo';
+
+interface ParsedRoute {
+  portal: 'LANDING' | 'STUDENT' | 'ADMIN' | 'SIDEBAR_DEMO';
+  view: string;
+  path: string;
+}
+
+const parseRoute = (pathname: string, hash: string): ParsedRoute => {
+  const normalizedPath = pathname.toLowerCase();
+  const normalizedHash = hash.replace(/^#/, '').toLowerCase();
+
+  // 0. Sidebar Demo routing: /sidebar or /demo
+  if (
+    normalizedPath === '/sidebar' ||
+    normalizedPath === '/sidebar/' ||
+    normalizedPath === '/demo' ||
+    normalizedPath === '/demo/' ||
+    normalizedHash === 'sidebar'
+  ) {
+    return { portal: 'SIDEBAR_DEMO', view: 'SIDEBAR_DEMO', path: '/sidebar' };
+  }
+
+  // 1. Direct pathname routing: /admin
+  if (normalizedPath === '/admin' || normalizedPath === '/admin/') {
+    return { portal: 'ADMIN', view: 'ADMIN', path: '/admin' };
+  }
+  if (normalizedPath === '/admin/events' || normalizedPath === '/admin/discover') {
+    return { portal: 'ADMIN', view: 'DISCOVER', path: '/admin/events' };
+  }
+  if (normalizedPath === '/admin/organizer') {
+    return { portal: 'ADMIN', view: 'ORGANIZER', path: '/admin/organizer' };
+  }
+  if (normalizedPath === '/admin/analytics') {
+    return { portal: 'ADMIN', view: 'ANALYTICS', path: '/admin/analytics' };
+  }
+  if (normalizedPath.startsWith('/admin')) {
+    return { portal: 'ADMIN', view: 'ADMIN', path: '/admin' };
+  }
+
+  // 2. Direct pathname routing: /students or /student
+  if (
+    normalizedPath === '/students' ||
+    normalizedPath === '/students/' ||
+    normalizedPath === '/student' ||
+    normalizedPath === '/student/'
+  ) {
+    return { portal: 'STUDENT', view: 'DISCOVER', path: '/students' };
+  }
+  if (
+    normalizedPath === '/students/applications' ||
+    normalizedPath === '/students/passes' ||
+    normalizedPath === '/student/applications' ||
+    normalizedPath === '/student/passes'
+  ) {
+    return { portal: 'STUDENT', view: 'APPLICATIONS', path: '/students/applications' };
+  }
+  if (normalizedPath.startsWith('/students') || normalizedPath.startsWith('/student')) {
+    return { portal: 'STUDENT', view: 'DISCOVER', path: '/students' };
+  }
+
+  // 3. Fallback for hash navigations from bookmarks or older references
+  if (normalizedHash === 'admin') {
+    return { portal: 'ADMIN', view: 'ADMIN', path: '/admin' };
+  }
+  if (normalizedHash === 'organizer') {
+    return { portal: 'ADMIN', view: 'ORGANIZER', path: '/admin/organizer' };
+  }
+  if (normalizedHash === 'analytics') {
+    return { portal: 'ADMIN', view: 'ANALYTICS', path: '/admin/analytics' };
+  }
+  if (['events', 'discover'].includes(normalizedHash)) {
+    return { portal: 'STUDENT', view: 'DISCOVER', path: '/students' };
+  }
+  if (['passes', 'applications'].includes(normalizedHash)) {
+    return { portal: 'STUDENT', view: 'APPLICATIONS', path: '/students/applications' };
+  }
+
+  // 4. Default to Welcome Landing Page (/)
+  return { portal: 'LANDING', view: 'LANDING', path: '/' };
+};
 
 export const App: React.FC = () => {
-  const { activePortal } = useCampusPass();
+  const { activePortal, setActivePortal, currentUser, switchUserRole } = useCampusPass();
 
-  const getViewFromHash = (hash: string): string => {
-    const clean = hash.replace('#', '').toLowerCase();
-    if (['events', 'discover'].includes(clean)) return 'DISCOVER';
-    if (['passes', 'applications'].includes(clean)) return 'APPLICATIONS';
-    if (['organizer'].includes(clean)) return 'ORGANIZER';
-    if (['analytics'].includes(clean)) return 'ANALYTICS';
-    if (['admin'].includes(clean)) return 'ADMIN';
-    return 'LANDING';
-  };
-
-  const getHashForView = (view: string): string => {
-    switch (view) {
-      case 'DISCOVER':
-        return '#events';
-      case 'APPLICATIONS':
-        return '#passes';
-      case 'ORGANIZER':
-        return '#organizer';
-      case 'ANALYTICS':
-        return '#analytics';
-      case 'ADMIN':
-        return '#admin';
-      case 'LANDING':
-      default:
-        return '#campuspass';
-    }
-  };
-
-  // Navigation View: LANDING | DISCOVER | APPLICATIONS | ORGANIZER | ANALYTICS | ADMIN
-  const [currentView, setCurrentView] = useState<string>(() => {
-    return getViewFromHash(window.location.hash);
+  const [route, setRoute] = useState<ParsedRoute>(() => {
+    return parseRoute(window.location.pathname, window.location.hash);
   });
-  const [globalSearch, setGlobalSearch] = useState<string>('');
 
-  // Handle browser back/forward buttons (popstate)
+  // Handle browser back/forward buttons (popstate) & initial URL normalization
   useEffect(() => {
-    const initialView = getViewFromHash(window.location.hash);
-    const initialHash = getHashForView(initialView);
-    // Normalize URL: replaces stale hash (e.g. #contact) immediately with #campuspass
-    window.history.replaceState({ view: initialView }, '', initialHash);
+    const initialRoute = parseRoute(window.location.pathname, window.location.hash);
+    if (window.location.hash && window.location.pathname === '/') {
+      // Normalize URL path cleanly
+      window.history.replaceState(
+        { path: initialRoute.path, view: initialRoute.view, portal: initialRoute.portal },
+        '',
+        initialRoute.path
+      );
+    }
 
-    const handlePopState = (event: PopStateEvent) => {
-      if (event.state && event.state.view) {
-        setCurrentView(event.state.view);
-      } else {
-        const view = getViewFromHash(window.location.hash);
-        setCurrentView(view);
-      }
+    const handlePopState = () => {
+      const current = parseRoute(window.location.pathname, window.location.hash);
+      setRoute(current);
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const handleNavigate = (view: string) => {
-    if (view === currentView) return;
-    const targetHash = getHashForView(view);
-    window.history.pushState({ view }, '', targetHash);
-    setCurrentView(view);
-  };
-
-  // Sync currentView when activePortal changes externally and enforce RBAC
+  // Synchronize RBAC role & context when portal changes
   useEffect(() => {
-    const isManager = activePortal === 'ADMIN' || activePortal === 'ORGANIZER';
-    if (activePortal === 'STUDENT' && !['DISCOVER', 'APPLICATIONS', 'LANDING'].includes(currentView)) {
-      handleNavigate('DISCOVER');
-    } else if (isManager && !['DISCOVER', 'ORGANIZER', 'ADMIN', 'ANALYTICS', 'APPLICATIONS', 'LANDING'].includes(currentView)) {
-      handleNavigate('DISCOVER');
+    if (route.portal === 'ADMIN') {
+      if (activePortal !== 'ADMIN') {
+        setActivePortal('ADMIN');
+      }
+      if (currentUser.role !== 'ADMIN') {
+        switchUserRole('ADMIN');
+      }
+    } else if (route.portal === 'STUDENT') {
+      if (activePortal !== 'STUDENT') {
+        setActivePortal('STUDENT');
+      }
+      if (currentUser.role !== 'STUDENT') {
+        switchUserRole('STUDENT');
+      }
     }
-  }, [activePortal]);
+  }, [route.portal, activePortal, currentUser.role, setActivePortal, switchUserRole]);
 
-  // ── Standalone Landing Page View (NO Dashboard Shell, NO Sidebar, NO Topbar) ──
-  if (currentView === 'LANDING') {
+  // Centralized navigation handler
+  const handleNavigate = useCallback((view: string, customPath?: string) => {
+    let targetPath = customPath;
+
+    if (!targetPath) {
+      if (view === 'LANDING') {
+        targetPath = '/';
+      } else if (view === 'ADMIN') {
+        targetPath = '/admin';
+      } else if (view === 'ORGANIZER') {
+        targetPath = '/admin/organizer';
+      } else if (view === 'ANALYTICS') {
+        targetPath = '/admin/analytics';
+      } else if (view === 'APPLICATIONS') {
+        targetPath = '/students/applications';
+      } else if (view === 'DISCOVER') {
+        targetPath = route.portal === 'ADMIN' ? '/admin/events' : '/students';
+      } else if (view === 'SIDEBAR_DEMO') {
+        targetPath = '/sidebar';
+      } else {
+        targetPath = '/';
+      }
+    }
+
+    const nextRoute = parseRoute(targetPath, '');
+    if (window.location.pathname !== nextRoute.path) {
+      window.history.pushState(
+        { path: nextRoute.path, view: nextRoute.view, portal: nextRoute.portal },
+        '',
+        nextRoute.path
+      );
+    }
+    setRoute(nextRoute);
+  }, [route.portal]);
+
+  // 0. Dedicated Sidebar Demo Showcase
+  if (route.portal === 'SIDEBAR_DEMO') {
     return (
-      <LandingPage
-        onExploreEvents={() => handleNavigate('DISCOVER')}
+      <div className="min-h-screen bg-neutral-950 text-neutral-100 p-4 md:p-8 flex flex-col gap-6">
+        <div className="max-w-7xl w-full mx-auto flex items-center justify-between pb-4 border-b border-neutral-800">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => handleNavigate('LANDING', '/')}
+              className="cp-btn cp-btn-secondary cp-btn-sm"
+              style={{ cursor: 'pointer' }}
+            >
+              ← Back to CampusPass
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-white">Aceternity Animated Sidebar Showcase</h1>
+              <p className="text-xs text-neutral-400">Desktop hover-expandable (60px ↔ 300px) & mobile responsive drawer</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-neutral-400">Component: <code className="text-neutral-200">/components/ui/sidebar.tsx</code></span>
+          </div>
+        </div>
+        <div className="max-w-7xl w-full mx-auto flex-1 flex flex-col justify-center">
+          <SidebarDemo />
+        </div>
+      </div>
+    );
+  }
+
+  // 1. Admin Portal Layout: Dedicated /admin Route
+  if (route.portal === 'ADMIN') {
+    return (
+      <AdminPortalLayout
+        currentView={route.view}
         onNavigate={handleNavigate}
       />
     );
   }
 
-  // ── CampusPass Platform Dashboard ─────────────────────────────────────────────
+  // 2. Student Portal Layout: Dedicated /students Route
+  if (route.portal === 'STUDENT') {
+    return (
+      <StudentPortalLayout
+        currentView={route.view}
+        onNavigate={handleNavigate}
+      />
+    );
+  }
+
+  // 3. Welcome Landing Page: Root (/) Route
   return (
-    <div className="demostack-shell">
-      {/* Demostack Main Container (Full width) */}
-      <div className="ds-main">
-        {/* Demostack Topbar with Animated Hamburger Nav + Portal Switcher + Notifications */}
-        <DemostackTopbar
-          currentView={currentView}
-          onNavigate={handleNavigate}
-        />
-
-        {/* Dynamic Content Surface */}
-        <main className="ds-content">
-          {currentView === 'DISCOVER' && (
-            <EventDiscovery
-              searchOverride={globalSearch}
-              onOpenRegistrations={() => setCurrentView('APPLICATIONS')}
-            />
-          )}
-
-          {currentView === 'APPLICATIONS' && (
-            <MyApplicationsList
-              onBrowseEvents={() => setCurrentView('DISCOVER')}
-            />
-          )}
-
-          {currentView === 'ORGANIZER' && (
-            <OrganizerStudio />
-          )}
-
-          {currentView === 'ANALYTICS' && (
-            <AnalyticsDashboard />
-          )}
-
-          {currentView === 'ADMIN' && (
-            <AdminPortal />
-          )}
-        </main>
-      </div>
-    </div>
+    <LandingPage
+      onExploreEvents={() => handleNavigate('DISCOVER', '/students')}
+      onNavigate={handleNavigate}
+    />
   );
 };
+
+export default App;

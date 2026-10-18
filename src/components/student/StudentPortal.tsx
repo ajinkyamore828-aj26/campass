@@ -75,7 +75,7 @@ export const StudentPortal: React.FC = () => {
         </div>
       )}
 
-      {/* Subtab Navigation Strip (Watermelon UI Segmented Control) */}
+      {/* Subtab Navigation Strip (CampusPass Segmented Control) */}
       <div style={{
         display: 'inline-flex',
         alignItems: 'center',

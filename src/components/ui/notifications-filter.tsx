@@ -123,7 +123,7 @@ export default function NotificationsFilter({
               size="sm"
               className={`text-xs px-2.5 py-1 h-7 rounded-lg font-medium transition-colors ${
                 selected === cat.key 
-                  ? "bg-slate-900 text-white hover:bg-slate-800" 
+                  ? "bg-zinc-900 text-white hover:bg-zinc-800" 
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
               onClick={() => setSelected(cat.key)}

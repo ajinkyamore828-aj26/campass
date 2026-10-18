@@ -23,7 +23,8 @@ import {
 } from 'lucide-react';
 
 export const LunchPassView: React.FC = () => {
-  const { lunchPasses, currentUser, institutionProfile } = useCampusPass();
+  const { lunchPasses, currentUser, institutionProfile, theme } = useCampusPass();
+  const isDark = theme === 'dark';
   const [qrImages, setQrImages] = useState<Record<string, string>>({});
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
@@ -134,19 +135,19 @@ export const LunchPassView: React.FC = () => {
             width: '64px',
             height: '64px',
             borderRadius: '20px',
-            background: '#f8fafc',
+            background: isDark ? '#18181b' : '#f8fafc',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 16px auto',
-            color: '#94a3b8'
+            color: isDark ? '#a1a1aa' : '#94a3b8'
           }}>
             <Utensils size={32} />
           </div>
-          <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: '0 0 6px 0' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 800, color: isDark ? '#f4f4f5' : '#0f172a', margin: '0 0 6px 0' }}>
             No Meal Vouchers Currently Available
           </h3>
-          <p style={{ color: '#64748b', fontSize: '13.5px', maxWidth: '440px', margin: '0 auto', lineHeight: 1.5 }}>
+          <p style={{ color: isDark ? '#a1a1aa' : '#64748b', fontSize: '13.5px', maxWidth: '440px', margin: '0 auto', lineHeight: 1.5 }}>
             Meal passes are automatically provisioned when an event you registered for provides lunch catering and your application is approved.
           </p>
         </div>
@@ -173,7 +174,7 @@ export const LunchPassView: React.FC = () => {
                 <div style={{
                   padding: '16px 20px',
                   background: isRedeemed
-                    ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
+                    ? 'linear-gradient(135deg, #18181b 0%, #27272a 100%)'
                     : 'linear-gradient(135deg, #0d3822 0%, #166534 100%)',
                   color: '#ffffff',
                   display: 'flex',
@@ -211,16 +212,16 @@ export const LunchPassView: React.FC = () => {
                     flexDirection: 'column',
                     gap: '6px',
                     fontSize: '12px',
-                    color: '#475569',
-                    backgroundColor: '#f8fafc',
-                    border: '1px solid #f1f5f9',
+                    color: isDark ? '#a1a1aa' : '#475569',
+                    backgroundColor: isDark ? '#141416' : '#f8fafc',
+                    border: isDark ? '1px solid #27272a' : '1px solid #f1f5f9',
                     padding: '12px',
                     borderRadius: '10px'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Calendar size={13} style={{ color: '#0f766e' }} />
-                        <strong style={{ color: '#0f172a' }}>{pass.mealDate}</strong>
+                        <strong style={{ color: isDark ? '#f4f4f5' : '#0f172a' }}>{pass.mealDate}</strong>
                       </div>
                       <span style={{
                         padding: '3px 8px',
@@ -249,7 +250,7 @@ export const LunchPassView: React.FC = () => {
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <MapPin size={13} style={{ color: '#0f766e' }} />
-                      <span style={{ color: '#0f172a', fontWeight: 600 }}>{pass.diningLocation || 'Central Dining Mess, Ground Floor'}</span>
+                      <span style={{ color: isDark ? '#f4f4f5' : '#0f172a', fontWeight: 600 }}>{pass.diningLocation || 'Central Dining Mess, Ground Floor'}</span>
                     </div>
                   </div>
 
@@ -344,11 +345,11 @@ export const LunchPassView: React.FC = () => {
                     justifyContent: 'space-between',
                     padding: '8px 12px',
                     borderRadius: '8px',
-                    background: '#f8fafc',
-                    border: '1px solid #e2e8f0',
+                    background: isDark ? '#141416' : '#f8fafc',
+                    border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
                     fontSize: '11px'
                   }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '200px' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: isDark ? '#a1a1aa' : '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '200px' }}>
                       Token: {pass.qrToken.substring(0, 16)}...
                     </span>
                     <button

@@ -65,12 +65,51 @@ interface CampusPassContextType {
 
   publishAnnouncement: (data: Partial<CampusAnnouncement>) => Promise<{ success: boolean; data?: CampusAnnouncement }>;
   refreshData: () => Promise<void>;
+
+  // System Administration Policies
+  allowConcurrentRegistrations: boolean;
+  toggleAllowConcurrentRegistrations: (allowed?: boolean) => Promise<boolean>;
+
+  // Theme (Dark / Light Mode)
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
+  toggleTheme: () => void;
 }
 
 const CampusPassContext = createContext<CampusPassContextType | undefined>(undefined);
 
 export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activePortal, setActivePortal] = useState<ActivePortal>('STUDENT');
+
+  // Theme (Dark / Light Mode) with localStorage persistence
+  const [theme, setThemeState] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('campuspass_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+    }
+    return 'dark'; // default to dark
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('campuspass_theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setThemeState(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  const setTheme = (newTheme: 'dark' | 'light') => {
+    setThemeState(newTheme);
+  };
 
   const institutionProfile: InstitutionProfile = {
     collegeName: 'Apex Institute of Science & Technology',
@@ -131,6 +170,35 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [scanLogs, setScanLogs] = useState<ScanLog[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [announcements, setAnnouncements] = useState<CampusAnnouncement[]>([]);
+
+  // ── Global System Administration Policy: Concurrent / Multiple Event Entries ──
+  const [allowConcurrentRegistrations, setAllowConcurrentRegistrationsState] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('cp_allow_concurrent_registrations');
+      return saved === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleAllowConcurrentRegistrations = async (allowed?: boolean): Promise<boolean> => {
+    const nextVal = typeof allowed === 'boolean' ? allowed : !allowConcurrentRegistrations;
+    setAllowConcurrentRegistrationsState(nextVal);
+    try {
+      localStorage.setItem('cp_allow_concurrent_registrations', String(nextVal));
+    } catch {}
+
+    try {
+      await fetch('/api/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ allowConcurrentRegistrations: nextVal })
+      });
+    } catch (err) {
+      console.warn('Failed to sync settings to server', err);
+    }
+    return nextVal;
+  };
 
   // ── Customizable Hero Text (Experience the difference, subtitle, CTAs) ──
   const [heroConfig, setHeroConfig] = useState<HeroContentConfig>(() => {
@@ -362,7 +430,8 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         userRes, 
         scanRes, 
         auditRes, 
-        annRes
+        annRes,
+        settingsRes
       ] = await Promise.all([
         fetch('/api/events').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/registrations').then(r => r.json()).catch(() => ({ data: [] })),
@@ -371,7 +440,8 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         fetch('/api/users').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/scanner/logs').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/admin/audit-logs').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/announcements').then(r => r.json()).catch(() => ({ data: [] }))
+        fetch('/api/announcements').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/settings').then(r => r.json()).catch(() => ({ data: null }))
       ]);
 
       if (evRes.data) setEvents(evRes.data);
@@ -387,6 +457,9 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       if (scanRes.data) setScanLogs(scanRes.data);
       if (auditRes.data) setAuditLogs(auditRes.data);
       if (annRes.data) setAnnouncements(annRes.data);
+      if (settingsRes?.data && typeof settingsRes.data.allowConcurrentRegistrations === 'boolean') {
+        setAllowConcurrentRegistrationsState(settingsRes.data.allowConcurrentRegistrations);
+      }
     } catch (err) {
       console.warn('Backend sync failed, using loaded state', err);
     }
@@ -680,7 +753,12 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         bentoCards,
         updateBentoCard,
         updateAllBentoCards,
-        resetBentoCards
+        resetBentoCards,
+        allowConcurrentRegistrations,
+        toggleAllowConcurrentRegistrations,
+        theme,
+        setTheme,
+        toggleTheme
       }}
     >
       {children}

@@ -137,6 +137,7 @@ export interface CampusEvent {
   tags?: string[];
   rounds?: EventRound[];
   scheduleUpdate?: ScheduleRescheduleInfo;
+  allowConcurrentRegistration?: boolean; // Admin-controlled: allow students to register even if another event overlaps
 }
 
 export type RegistrationType = 'INDIVIDUAL' | 'TEAM';

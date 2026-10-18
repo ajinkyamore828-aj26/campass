@@ -66,10 +66,11 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
 
   const studentNav = [
     { id: 'DISCOVER', icon: Compass, label: 'Event Discovery', badge: openEvents > 0 ? String(openEvents) : undefined, badgeColor: 'cyan' },
-    { id: 'APPLICATIONS', icon: FileText, label: 'My Registrations' },
+    { id: 'APPLICATIONS', icon: FileText, label: 'My Applications' },
   ];
 
   const adminNav = [
+    { id: 'DISCOVER', icon: Compass, label: 'Event Discovery', badge: openEvents > 0 ? String(openEvents) : undefined, badgeColor: 'cyan' },
     { id: 'ORGANIZER', icon: Calendar, label: 'Organizer Studio', badge: pendingApprovals > 0 ? String(pendingApprovals) : undefined, badgeColor: 'amber' },
     { id: 'ANALYTICS', icon: BarChart3, label: 'Analytics Hub' },
     { id: 'ADMIN', icon: ShieldAlert, label: 'Admin Control' },

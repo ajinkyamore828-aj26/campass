@@ -6,7 +6,7 @@ import { Button31 } from "@/components/ui/button-31";
 
 export interface Hero37Props {
   onExploreEvents?: () => void;
-  onNavigate?: (view: string) => void;
+  onNavigate?: (view: string, customPath?: string) => void;
   brandName?: string;
   headlineLine1?: string;
   headlineLine2?: string;
@@ -27,11 +27,6 @@ export default function Hero37({
   headlineLine2 = "Meets Impact.",
   subtitle = "CampusPass empowers students to build, explore, and participate in premier college hackathons, technical workshops, and cultural fests with cryptographic instant passes.",
   ctaText = "Explore College Events",
-  stat1Value = "9 Live Events",
-  stat1Label = "Competitions & Fests",
-  stat2Value = "Instant Gate Pass",
-  stat2Label = "Turnstile Verification",
-  tagline = "Centralized College Event & Digital Pass Management Infrastructure",
 }: Hero37Props) {
   // Nav: drops from top with blur — settles fast so it doesn't steal focus
   const navVariants: Variants = {
@@ -94,37 +89,6 @@ export default function Hero37({
     },
   };
 
-  // Stats container: staggers each stat
-  const statsContainerVariants: Variants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.12, delayChildren: 1.4 },
-    },
-  };
-
-  // Each stat: rises from bottom with blur
-  const statItemVariants: Variants = {
-    hidden: { opacity: 0, y: 22, filter: 'blur(7px)' },
-    show: {
-      opacity: 1,
-      y: 0,
-      filter: 'blur(0px)',
-      transition: { type: 'spring', damping: 24, stiffness: 100 },
-    },
-  };
-
-  // Right tagline (bottom-right): fades in last
-  const taglineVariants: Variants = {
-    hidden: { opacity: 0, x: 18, filter: 'blur(5px)' },
-    show: {
-      opacity: 1,
-      x: 0,
-      filter: 'blur(0px)',
-      transition: { type: 'spring', damping: 24, stiffness: 100, delay: 1.6 },
-    },
-  };
-
   const handleNavClick = (view: string) => (e: React.MouseEvent) => {
     if (onNavigate) {
       e.preventDefault();
@@ -146,7 +110,7 @@ export default function Hero37({
         <img
           src="https://assets.watermelon.sh/bg-hero-37.avif"
           alt="Dramatic glow wave background"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover opacity-100"
         />
       </motion.div>
 
@@ -155,15 +119,17 @@ export default function Hero37({
           variants={navVariants}
           initial="hidden"
           animate="show"
+          className="hero-nav"
           style={{
             display: 'flex',
             width: '100%',
             boxSizing: 'border-box',
             alignItems: 'center',
+            justifyContent: 'space-between',
             paddingLeft: '8%',
             paddingRight: '8%',
-            paddingTop: '28px',
-            paddingBottom: '28px',
+            paddingTop: '24px',
+            paddingBottom: '24px',
           }}
         >
           {/* Logo — grid icon + brand wordmark */}
@@ -175,8 +141,9 @@ export default function Hero37({
           </div>
         </motion.nav>
 
-        {/* ── Main hero content */}
+        {/* ── Main hero content (exact original for web) */}
         <main
+          className="hero-main"
           style={{
             display: 'flex',
             flex: 1,
@@ -233,16 +200,16 @@ export default function Hero37({
               {subtitle}
             </motion.p>
 
-            {/* CTA button — Button31 Design */}
+            {/* CTA buttons — Dedicated Student & Admin Portals */}
             <motion.div
               variants={ctaVariants}
               initial="hidden"
               animate="show"
-              style={{ marginTop: '28px' }}
-              className="will-change-transform"
+              className="hero-cta-container"
+              style={{ marginTop: '28px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}
             >
               <Button31
-                onClick={() => onExploreEvents ? onExploreEvents() : onNavigate?.('DISCOVER')}
+                onClick={() => onNavigate ? onNavigate('DISCOVER', '/students') : onExploreEvents?.()}
                 style={{
                   paddingLeft: '28px',
                   paddingRight: '28px',
@@ -253,10 +220,36 @@ export default function Hero37({
                   justifyContent: 'center',
                   gap: '10px',
                   borderRadius: '8px',
+                  backgroundColor: '#ffffff',
+                  color: '#09090b',
                 }}
                 className="group min-h-[44px] text-[14.5px] font-semibold tracking-[-0.005em] shadow-[0_1px_3px_rgba(0,0,0,0.25),0_4px_16px_rgba(0,0,0,0.18)] active:scale-[0.96]"
               >
-                <span>{ctaText}</span>
+                <span>Enter Student Portal</span>
+                <ArrowRight
+                  className="h-4 w-4 transition-transform duration-150 ease-out group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </Button31>
+
+              <Button31
+                onClick={() => onNavigate?.('ADMIN', '/admin')}
+                style={{
+                  paddingLeft: '28px',
+                  paddingRight: '28px',
+                  paddingTop: '12px',
+                  paddingBottom: '12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                  borderRadius: '8px',
+                  backgroundColor: '#ffffff',
+                  color: '#09090b',
+                }}
+                className="group min-h-[44px] text-[14.5px] font-semibold tracking-[-0.005em] shadow-[0_1px_3px_rgba(0,0,0,0.25),0_4px_16px_rgba(0,0,0,0.18)] active:scale-[0.96]"
+              >
+                <span>Admin &amp; Faculty Portal</span>
                 <ArrowRight
                   className="h-4 w-4 transition-transform duration-150 ease-out group-hover:translate-x-1"
                   aria-hidden="true"
@@ -264,9 +257,36 @@ export default function Hero37({
               </Button31>
             </motion.div>
           </div>
-
         </main>
       </div>
+
+      {/* Scoped CSS: ONLY active on mobile screens, zero effect on desktop web */}
+      <style>{`
+        @media (max-width: 768px) {
+          .hero-nav {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+            padding-top: 18px !important;
+            padding-bottom: 18px !important;
+          }
+          .hero-main {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+            padding-top: 24px !important;
+            padding-bottom: 36px !important;
+          }
+          .hero-cta-container {
+            width: 100% !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          .hero-cta-container > * {
+            width: 100% !important;
+            justify-content: center !important;
+            min-height: 48px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

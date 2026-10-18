@@ -21,7 +21,14 @@ import {
   Sparkles,
   RotateCcw,
   Code,
-  Trophy
+  Trophy,
+  Image as ImageIcon,
+  FolderOpen,
+  Upload,
+  Camera,
+  CheckCircle2,
+  Smartphone,
+  Laptop
 } from 'lucide-react';
 
 interface EditEventRegistryModalProps {
@@ -46,6 +53,15 @@ const ROUND_TYPES: { value: RoundType; label: string }[] = [
   { value: 'GROUP_DISCUSSION', label: 'Group Discussion' },
   { value: 'QUIZ', label: 'General / Tech Quiz' },
   { value: 'GENERAL', label: 'General Stage Round' },
+];
+
+const QUICK_PRESETS = [
+  { label: 'Hackathon', url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80' },
+  { label: 'Freshers Gala', url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80' },
+  { label: 'DJ Night', url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' },
+  { label: 'Auditorium', url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80' },
+  { label: 'Coding Lab', url: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1200&q=80' },
+  { label: 'Sports Meet', url: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80' },
 ];
 
 export const EditEventRegistryModal: React.FC<EditEventRegistryModalProps> = ({
@@ -98,19 +114,82 @@ export const EditEventRegistryModal: React.FC<EditEventRegistryModalProps> = ({
       requiresApproval: true,
       requiresPass: true,
       includesLunch: true,
+      allowConcurrentRegistration: false,
       status: 'OPEN',
       bannerUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
     };
   });
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [deviceImageNotice, setDeviceImageNotice] = useState<string | null>(null);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
+
+  const handleDeviceImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setDeviceImageNotice('Please choose an image file (JPG, PNG, WebP).');
+      return;
+    }
+
+    setIsProcessingImage(true);
+    setDeviceImageNotice(null);
+
+    const reader = new FileReader();
+    reader.onload = (readerEvent) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const maxDim = 1400;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.86);
+          setFormState(prev => ({ ...prev, bannerUrl: optimizedDataUrl }));
+          setDeviceImageNotice(`Photo loaded from device (${file.name})`);
+        } else {
+          setFormState(prev => ({ ...prev, bannerUrl: readerEvent.target?.result as string }));
+          setDeviceImageNotice(`Photo loaded: ${file.name}`);
+        }
+        setIsProcessingImage(false);
+      };
+      img.onerror = () => {
+        setFormState(prev => ({ ...prev, bannerUrl: readerEvent.target?.result as string }));
+        setDeviceImageNotice(`Photo loaded: ${file.name}`);
+        setIsProcessingImage(false);
+      };
+      img.src = readerEvent.target?.result as string;
+    };
+    reader.onerror = () => {
+      setDeviceImageNotice('Error reading image from device.');
+      setIsProcessingImage(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleOpenEdit = (ev: CampusEvent) => {
     setCurrentEditId(ev.id);
+    setDeviceImageNotice(null);
     setFormState({ ...ev });
     setViewMode('EDIT_FORM');
   };
 
   const handleOpenCreate = () => {
     setCurrentEditId(null);
+    setDeviceImageNotice(null);
     setFormState({
       title: '',
       summary: '',
@@ -835,7 +914,7 @@ export const EditEventRegistryModal: React.FC<EditEventRegistryModalProps> = ({
                 />
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-5" style={{ padding: '10px 14px', background: '#1c1c1f', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 flex-wrap" style={{ padding: '10px 14px', background: '#1c1c1f', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#ffffff', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
@@ -852,6 +931,193 @@ export const EditEventRegistryModal: React.FC<EditEventRegistryModalProps> = ({
                   />
                   <span>Include Meal / Lunch Voucher</span>
                 </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#38bdf8', cursor: 'pointer', fontWeight: 600 }}>
+                  <input
+                    type="checkbox"
+                    checked={formState.allowConcurrentRegistration ?? false}
+                    onChange={(e) => setFormState({ ...formState, allowConcurrentRegistration: e.target.checked })}
+                  />
+                  <span>Allow Multiple / Concurrent Entries at Same Time</span>
+                </label>
+              </div>
+
+              {/* ── Event Card Image & Cover Section ── */}
+              <div style={{
+                background: '#18181b',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ background: '#0369a1', color: '#bae6fd', padding: '5px', borderRadius: '6px' }}>
+                      <ImageIcon size={14} />
+                    </div>
+                    <div>
+                      <strong style={{ color: '#ffffff', fontSize: '13px', display: 'block' }}>
+                        Event Card Banner Image
+                      </strong>
+                      <span style={{ fontSize: '11px', color: '#a1a1aa' }}>
+                        Visual cover image displayed on student discovery cards &amp; passes
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Device Image Locator Button */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '6px 12px',
+                        background: '#0284c7',
+                        color: '#ffffff',
+                        border: '1px solid #38bdf8',
+                        borderRadius: '8px',
+                        fontSize: '11.5px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 6px rgba(2, 132, 199, 0.3)',
+                        transition: 'all 0.15s ease'
+                      }}
+                      title="Choose photo from your Desktop, iPhone, or Android"
+                    >
+                      <FolderOpen size={13} />
+                      <span>Locate Image on Device</span>
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleDeviceImageSelect}
+                      style={{ display: 'none' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'start', flexWrap: 'wrap' }}>
+                  {/* Clickable Live Thumbnail Preview */}
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    title="Click to browse image from device (desktop or mobile)"
+                    style={{
+                      position: 'relative',
+                      width: '104px',
+                      height: '70px',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      background: '#09090b',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <img
+                      src={formState.bannerUrl || QUICK_PRESETS[0].url}
+                      alt="Banner Preview"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = QUICK_PRESETS[0].url;
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'rgba(0,0,0,0.55)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '2px',
+                        opacity: 0,
+                        transition: 'opacity 0.15s ease',
+                        color: '#ffffff',
+                        fontSize: '9.5px',
+                        fontWeight: 600
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                      onMouseLeave={(e) => (e.currentTarget.style.opacity = '0')}
+                    >
+                      <Camera size={14} />
+                      <span>Browse File</span>
+                    </div>
+                  </div>
+
+                  {/* Input & Quick Options */}
+                  <div style={{ flex: 1, minWidth: '240px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <label className="cp-label" style={{ margin: 0, fontSize: '11px' }}>Image URL / Device Photo</label>
+                        {deviceImageNotice && (
+                          <span style={{ fontSize: '10.5px', color: '#86efac', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <CheckCircle2 size={11} /> {deviceImageNotice}
+                          </span>
+                        )}
+                        {isProcessingImage && (
+                          <span style={{ fontSize: '10.5px', color: '#38bdf8', fontWeight: 600 }}>
+                            Optimizing device photo...
+                          </span>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        className="cp-input"
+                        value={formState.bannerUrl?.startsWith('data:') ? 'Local Device Photo Loaded (Optimized Image Data)' : (formState.bannerUrl || '')}
+                        onChange={(e) => {
+                          setFormState({ ...formState, bannerUrl: e.target.value });
+                          setDeviceImageNotice(null);
+                        }}
+                        placeholder="Paste web URL or click 'Locate Image on Device'..."
+                        style={{ fontSize: '11.5px' }}
+                      />
+                    </div>
+
+                    {/* Presets and Device Quick Buttons */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 600 }}>Presets:</span>
+                      {QUICK_PRESETS.map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => {
+                            setFormState({ ...formState, bannerUrl: preset.url });
+                            setDeviceImageNotice(null);
+                          }}
+                          style={{
+                            padding: '2px 8px',
+                            background: formState.bannerUrl === preset.url ? '#0284c7' : 'rgba(255,255,255,0.06)',
+                            border: formState.bannerUrl === preset.url ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '4px',
+                            fontSize: '10.5px',
+                            color: formState.bannerUrl === preset.url ? '#ffffff' : '#cbd5e1',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div style={{ fontSize: '10.5px', color: '#71717a', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <Laptop size={11} /> Desktop files
+                      </span>
+                      <span>•</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <Smartphone size={11} /> Mobile gallery &amp; camera
+                      </span>
+                      <span>•</span>
+                      <span>Automatic high-DPI canvas compression</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* ── Multi-Round Competition Configuration ── */}

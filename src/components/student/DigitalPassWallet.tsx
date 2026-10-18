@@ -36,7 +36,8 @@ interface DigitalPassWalletProps {
 }
 
 export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEvents }) => {
-  const { passes, currentUser, institutionProfile } = useCampusPass();
+  const { passes, currentUser, institutionProfile, theme } = useCampusPass();
+  const isDark = theme === 'dark';
   const [qrImages, setQrImages] = useState<Record<string, string>>({});
   const [enlargedPass, setEnlargedPass] = useState<DigitalEventPass | null>(null);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
@@ -134,19 +135,19 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
             width: '64px',
             height: '64px',
             borderRadius: '20px',
-            background: '#f1f5f9',
+            background: isDark ? '#18181b' : '#f1f5f9',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 16px auto',
-            color: '#64748b'
+            color: isDark ? '#94a3b8' : '#64748b'
           }}>
             <Ticket size={32} />
           </div>
-          <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: '0 0 6px 0' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 6px 0' }}>
             No Gate Passes Issued Yet
           </h3>
-          <p style={{ color: '#64748b', fontSize: '13.5px', maxWidth: '440px', margin: '0 auto 20px auto', lineHeight: 1.5 }}>
+          <p style={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '13.5px', maxWidth: '440px', margin: '0 auto 20px auto', lineHeight: 1.5 }}>
             You haven't registered for any events or your applications are awaiting approval. Discover exciting fests, hackathons, and workshops to unlock your pass.
           </p>
           <button
@@ -364,21 +365,21 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                     flexDirection: 'column',
                     gap: '6px',
                     padding: '10px 12px',
-                    background: '#f8fafc',
+                    background: isDark ? '#141416' : '#f8fafc',
                     borderRadius: '10px',
-                    border: '1px solid #f1f5f9',
+                    border: isDark ? '1px solid #27272a' : '1px solid #f1f5f9',
                     fontSize: '12px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isDark ? '#a1a1aa' : '#475569' }}>
                       <Calendar size={13} style={{ color: '#166534', flexShrink: 0 }} />
-                      <span>Date: <strong style={{ color: '#0f172a' }}>{pass.eventDate}</strong></span>
-                      <span style={{ color: '#cbd5e1' }}>•</span>
+                      <span>Date: <strong style={{ color: isDark ? '#f4f4f5' : '#0f172a' }}>{pass.eventDate}</strong></span>
+                      <span style={{ color: isDark ? '#475569' : '#cbd5e1' }}>•</span>
                       <Clock size={13} style={{ color: '#166534', flexShrink: 0 }} />
-                      <span>Time: <strong style={{ color: '#0f172a' }}>{pass.eventTime}</strong></span>
+                      <span>Time: <strong style={{ color: isDark ? '#f4f4f5' : '#0f172a' }}>{pass.eventTime}</strong></span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isDark ? '#a1a1aa' : '#475569' }}>
                       <MapPin size={13} style={{ color: '#166534', flexShrink: 0 }} />
-                      <span className="truncate">Venue: <strong style={{ color: '#0f172a' }}>{pass.venue}</strong></span>
+                      <span className="truncate">Venue: <strong style={{ color: isDark ? '#f4f4f5' : '#0f172a' }}>{pass.venue}</strong></span>
                     </div>
                   </div>
 
@@ -389,11 +390,11 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                     justifyContent: 'space-between',
                     padding: '8px 12px',
                     borderRadius: '8px',
-                    background: '#f8fafc',
-                    border: '1px solid #e2e8f0',
+                    background: isDark ? '#141416' : '#f8fafc',
+                    border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
                     fontSize: '11px'
                   }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '190px' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: isDark ? '#a1a1aa' : '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '190px' }}>
                       Token: {pass.qrToken.substring(0, 16)}...
                     </span>
                     <button
@@ -447,7 +448,15 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
         <div className="cp-modal-overlay" onClick={() => setEnlargedPass(null)}>
           <div
             className="cp-modal"
-            style={{ maxWidth: '440px', padding: '28px', textAlign: 'center', position: 'relative' }}
+            style={{
+              maxWidth: '440px',
+              padding: '28px',
+              textAlign: 'center',
+              position: 'relative',
+              background: isDark ? '#141416' : '#ffffff',
+              border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+              color: isDark ? '#f4f4f5' : '#0f172a'
+            }}
             onClick={e => e.stopPropagation()}
           >
             <button
@@ -460,7 +469,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                color: '#64748b'
+                color: isDark ? '#a1a1aa' : '#64748b'
               }}
             >
               <X size={20} />
@@ -468,12 +477,12 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '8px' }}>
               <Ticket size={14} style={{ color: '#166534' }} />
-              <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#166534' }}>
+              <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: isDark ? '#86efac' : '#166534' }}>
                 Official Event Pass Verification Mode
               </span>
             </div>
 
-            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: '0 0 16px 0', letterSpacing: '-0.01em' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: isDark ? '#f4f4f5' : '#0f172a', margin: '0 0 16px 0', letterSpacing: '-0.01em' }}>
               {enlargedPass.eventTitle}
             </h3>
 
@@ -482,7 +491,7 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
               padding: '24px',
               backgroundColor: '#ffffff',
               borderRadius: '20px',
-              border: '2px solid #e2e8f0',
+              border: isDark ? '2px solid #27272a' : '2px solid #e2e8f0',
               display: 'inline-block',
               boxShadow: '0 10px 25px rgba(0,0,0,0.06)',
               marginBottom: '16px',
@@ -502,14 +511,14 @@ export const DigitalPassWallet: React.FC<DigitalPassWalletProps> = ({ onBrowseEv
               )}
             </div>
 
-            <div style={{ fontSize: '14px', color: '#0f172a', fontWeight: 800, marginBottom: '2px' }}>
+            <div style={{ fontSize: '14px', color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 800, marginBottom: '2px' }}>
               {enlargedPass.studentName}
             </div>
-            <div style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: '#64748b', marginBottom: '12px' }}>
+            <div style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: isDark ? '#94a3b8' : '#64748b', marginBottom: '12px' }}>
               Roll: {enlargedPass.studentId} • Ref: {enlargedPass.id}
             </div>
 
-            <p style={{ fontSize: '12px', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: 0, lineHeight: 1.5 }}>
               Present this verified digital QR pass at {enlargedPass.venue} for event admission.
             </p>
           </div>

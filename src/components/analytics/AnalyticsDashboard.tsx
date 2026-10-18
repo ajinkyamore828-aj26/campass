@@ -15,11 +15,14 @@ import {
   Download,
   ArrowUpRight,
   ShieldCheck,
-  Award
+  Award,
+  MoreHorizontal,
+  ArrowUp
 } from 'lucide-react';
 
 export const AnalyticsDashboard: React.FC = () => {
-  const { events, registrations, passes, lunchPasses, institutionProfile } = useCampusPass();
+  const { events, registrations, passes, lunchPasses, institutionProfile, theme } = useCampusPass();
+  const isDark = theme === 'dark';
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
 
   // Computed Metrics
@@ -164,48 +167,84 @@ export const AnalyticsDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 4 Core Operational KPI Cards */}
+      {/* 4 Core Operational KPI Cards (1:1 with Image 1 UI) */}
       <div className="cp-stats-grid">
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#166534' }}>
-            <Users size={16} />
+        {/* Card 1: Pitch Black Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#09090b', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.92)' }}>Approved Attendees</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{approvedRegistrations}</div>
-          <div className="cp-stat-label">Approved Attendees</div>
-          <div style={{ fontSize: '11px', color: '#64748b' }}>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{approvedRegistrations}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(34, 197, 94, 0.22)', color: '#4ade80' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              {approvalRate}%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
             {approvalRate}% overall approval rate
           </div>
         </div>
 
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
-            <Clock size={16} />
+        {/* Card 2: Deep Vibrant Purple Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#8b5cf6', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>Pending Reviews</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{pendingRegistrations}</div>
-          <div className="cp-stat-label">Pending Reviews</div>
-          <div style={{ fontSize: '11px', color: '#64748b' }}>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{pendingRegistrations}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(255, 255, 255, 0.22)', color: '#ffffff' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              8.2%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
             {waitlistedRegistrations} on waitlist roster
           </div>
         </div>
 
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#14532d' }}>
-            <Ticket size={16} />
+        {/* Card 3: Royal Blue Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#2563eb', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>Active Digital Passes</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{passes.length}</div>
-          <div className="cp-stat-label">Active Digital Passes</div>
-          <div style={{ fontSize: '11px', color: '#64748b' }}>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{passes.length}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(255, 255, 255, 0.22)', color: '#ffffff' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              14.5%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
             Cryptographically signed
           </div>
         </div>
 
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#166534' }}>
-            <Utensils size={16} />
+        {/* Card 4: Clinical Teal Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#0d9488', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>Meal Vouchers Redeemed</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{redeemedMealPasses} / {totalMealPasses}</div>
-          <div className="cp-stat-label">Meal Vouchers Redeemed</div>
-          <div style={{ fontSize: '11px', color: '#64748b' }}>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{redeemedMealPasses} / {totalMealPasses}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(255, 255, 255, 0.22)', color: '#ffffff' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              {mealClaimRate}%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
             {mealClaimRate}% dining claim rate
           </div>
         </div>
@@ -217,19 +256,19 @@ export const AnalyticsDashboard: React.FC = () => {
         <div className="cp-section-card" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div className="cp-icon-box" style={{ background: '#dcfce7', color: '#166534' }}>
+              <div className="cp-icon-box" style={{ background: isDark ? 'rgba(22, 101, 52, 0.25)' : '#dcfce7', color: isDark ? '#86efac' : '#166534' }}>
                 <Building size={16} />
               </div>
               <div>
-                <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: isDark ? '#f8fafc' : '#0f172a' }}>
                   Department Participation
                 </h3>
-                <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>
+                <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
                   Registrations categorized by academic branch
                 </p>
               </div>
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#166534', background: '#dcfce7', padding: '2px 8px', borderRadius: '4px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#86efac' : '#166534', background: isDark ? 'rgba(22, 101, 52, 0.25)' : '#dcfce7', padding: '2px 8px', borderRadius: '4px' }}>
               {sortedDepts.length} Branches
             </span>
           </div>
@@ -245,8 +284,8 @@ export const AnalyticsDashboard: React.FC = () => {
                 return (
                   <div key={dept}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', marginBottom: '5px' }}>
-                      <span style={{ fontWeight: 600, color: '#334155' }}>{dept}</span>
-                      <span style={{ fontWeight: 700, color: '#0f172a' }}>
+                      <span style={{ fontWeight: 600, color: isDark ? '#cbd5e1' : '#334155' }}>{dept}</span>
+                      <span style={{ fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>
                         {count} students <span style={{ color: '#94a3b8', fontWeight: 500 }}>({pct}%)</span>
                       </span>
                     </div>
@@ -264,49 +303,49 @@ export const AnalyticsDashboard: React.FC = () => {
         <div className="cp-section-card" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div className="cp-icon-box" style={{ background: '#dcfce7', color: '#166534' }}>
+              <div className="cp-icon-box" style={{ background: isDark ? 'rgba(22, 101, 52, 0.25)' : '#dcfce7', color: isDark ? '#86efac' : '#166534' }}>
                 <Utensils size={16} />
               </div>
               <div>
-                <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: isDark ? '#f8fafc' : '#0f172a' }}>
                   Dining Allocation & Demand
                 </h3>
-                <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>
+                <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
                   Kitchen catering procurement distribution
                 </p>
               </div>
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#166534', background: '#dcfce7', padding: '2px 8px', borderRadius: '4px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#86efac' : '#166534', background: isDark ? 'rgba(22, 101, 52, 0.25)' : '#dcfce7', padding: '2px 8px', borderRadius: '4px' }}>
               {totalMealPasses} Coupons
             </span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '18px' }}>
-            <div style={{ padding: '12px', borderRadius: '10px', background: '#f0fdf4', border: '1px solid #bbf7d0', textAlign: 'center' }}>
-              <span style={{ fontSize: '11px', color: '#166534', fontWeight: 700, textTransform: 'uppercase' }}>Veg Diet</span>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#14532d', marginTop: '4px' }}>{dietCounts.VEG || 0}</div>
-              <span style={{ fontSize: '10.5px', color: '#64748b' }}>
+            <div style={{ padding: '12px', borderRadius: '10px', background: isDark ? 'rgba(22, 101, 52, 0.15)' : '#f0fdf4', border: isDark ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid #bbf7d0', textAlign: 'center' }}>
+              <span style={{ fontSize: '11px', color: isDark ? '#86efac' : '#166534', fontWeight: 700, textTransform: 'uppercase' }}>Veg Diet</span>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: isDark ? '#4ade80' : '#14532d', marginTop: '4px' }}>{dietCounts.VEG || 0}</div>
+              <span style={{ fontSize: '10.5px', color: isDark ? '#94a3b8' : '#64748b' }}>
                 {totalMealPasses > 0 ? Math.round(((dietCounts.VEG || 0) / totalMealPasses) * 100) : 0}% share
               </span>
             </div>
-            <div style={{ padding: '12px', borderRadius: '10px', background: '#fef2f2', border: '1px solid #fecaca', textAlign: 'center' }}>
-              <span style={{ fontSize: '11px', color: '#b91c1c', fontWeight: 700, textTransform: 'uppercase' }}>Non-Veg</span>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#991b1b', marginTop: '4px' }}>{dietCounts.NON_VEG || 0}</div>
-              <span style={{ fontSize: '10.5px', color: '#64748b' }}>
+            <div style={{ padding: '12px', borderRadius: '10px', background: isDark ? 'rgba(220, 38, 38, 0.15)' : '#fef2f2', border: isDark ? '1px solid rgba(220, 38, 38, 0.3)' : '1px solid #fecaca', textAlign: 'center' }}>
+              <span style={{ fontSize: '11px', color: isDark ? '#fca5a5' : '#b91c1c', fontWeight: 700, textTransform: 'uppercase' }}>Non-Veg</span>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: isDark ? '#f87171' : '#991b1b', marginTop: '4px' }}>{dietCounts.NON_VEG || 0}</div>
+              <span style={{ fontSize: '10.5px', color: isDark ? '#94a3b8' : '#64748b' }}>
                 {totalMealPasses > 0 ? Math.round(((dietCounts.NON_VEG || 0) / totalMealPasses) * 100) : 0}% share
               </span>
             </div>
-            <div style={{ padding: '12px', borderRadius: '10px', background: '#fffbeb', border: '1px solid #fde68a', textAlign: 'center' }}>
-              <span style={{ fontSize: '11px', color: '#b45309', fontWeight: 700, textTransform: 'uppercase' }}>Jain Diet</span>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#92400e', marginTop: '4px' }}>{dietCounts.JAIN || 0}</div>
-              <span style={{ fontSize: '10.5px', color: '#64748b' }}>
+            <div style={{ padding: '12px', borderRadius: '10px', background: isDark ? 'rgba(180, 83, 9, 0.15)' : '#fffbeb', border: isDark ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid #fde68a', textAlign: 'center' }}>
+              <span style={{ fontSize: '11px', color: isDark ? '#fde047' : '#b45309', fontWeight: 700, textTransform: 'uppercase' }}>Jain Diet</span>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: isDark ? '#fbbf24' : '#92400e', marginTop: '4px' }}>{dietCounts.JAIN || 0}</div>
+              <span style={{ fontSize: '10.5px', color: isDark ? '#94a3b8' : '#64748b' }}>
                 {totalMealPasses > 0 ? Math.round(((dietCounts.JAIN || 0) / totalMealPasses) * 100) : 0}% share
               </span>
             </div>
           </div>
 
-          <div style={{ padding: '12px 14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '12px', color: '#475569' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>
+          <div style={{ padding: '12px 14px', borderRadius: '10px', background: isDark ? '#141416' : '#f8fafc', border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0', fontSize: '12px', color: isDark ? '#d4d4d8' : '#475569' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: isDark ? '#f4f4f5' : '#0f172a', marginBottom: '4px' }}>
               <ShieldCheck size={14} style={{ color: '#166534' }} />
               <span>Zero-Wastage Kitchen Forecast</span>
             </div>
@@ -319,7 +358,7 @@ export const AnalyticsDashboard: React.FC = () => {
       <div className="cp-section-card" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
           <div>
-            <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: isDark ? '#f8fafc' : '#0f172a' }}>
               Event Category Capacity & Occupancy Matrix
             </h3>
             <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>
@@ -358,19 +397,19 @@ export const AnalyticsDashboard: React.FC = () => {
                 return (
                   <tr key={event.id}>
                     <td>
-                      <div style={{ fontWeight: 700, color: '#0f172a' }}>{event.title}</div>
-                      <div style={{ fontSize: '11px', color: '#64748b' }}>{event.department}</div>
+                      <div style={{ fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>{event.title}</div>
+                      <div style={{ fontSize: '11px', color: isDark ? '#94a3b8' : '#64748b' }}>{event.department}</div>
                     </td>
                     <td>
-                      <span className="cp-badge cp-badge-open" style={{ background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0' }}>
+                      <span className="cp-badge cp-badge-open" style={{ background: isDark ? 'rgba(22, 101, 52, 0.2)' : '#f0fdf4', color: isDark ? '#86efac' : '#166534', border: isDark ? '1px solid rgba(34, 197, 94, 0.35)' : '1px solid #bbf7d0' }}>
                         {event.category}
                       </span>
                     </td>
                     <td>
-                      <span style={{ fontSize: '12px', color: '#475569' }}>{event.venue}</span>
+                      <span style={{ fontSize: '12px', color: isDark ? '#cbd5e1' : '#475569' }}>{event.venue}</span>
                     </td>
                     <td>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>
                         {event.registeredCount} / {event.capacity}
                       </span>
                     </td>
@@ -385,7 +424,7 @@ export const AnalyticsDashboard: React.FC = () => {
                             }}
                           />
                         </div>
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a', width: '32px', textAlign: 'right' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a', width: '32px', textAlign: 'right' }}>
                           {fillPct}%
                         </span>
                       </div>

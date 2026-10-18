@@ -30,7 +30,9 @@ import {
   X,
   ShieldCheck,
   QrCode,
-  Tag
+  Tag,
+  MoreHorizontal,
+  ArrowUp
 } from 'lucide-react';
 
 interface MyApplicationsListProps {
@@ -44,7 +46,8 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
   onBrowseEvents,
   onOpenPassWallet
 }) => {
-  const { registrations, events, passes, currentUser, cancelRegistration, resendEmailPass, institutionProfile } = useCampusPass();
+  const { registrations, events, passes, currentUser, cancelRegistration, resendEmailPass, institutionProfile, theme } = useCampusPass();
+  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<FilterTab>('ALL');
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
@@ -196,39 +199,86 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
         </div>
       </div>
 
-      {/* KPI Stats */}
+      {/* KPI Stats (1:1 with Image 1 UI) */}
       <div className="cp-stats-grid">
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#f1f5f9', color: '#0f172a' }}>
-            <FileText size={15} />
+        {/* Card 1: Pitch Black Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#09090b', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.92)' }}>Total Registrations</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{studentRegistrations.length}</div>
-          <div className="cp-stat-label">Total Registrations</div>
-          <div style={{ fontSize: '11px', color: '#94a3b8' }}>Submitted by your account</div>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{studentRegistrations.length}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(34, 197, 94, 0.22)', color: '#4ade80' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              11.4%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            Submitted by your account
+          </div>
         </div>
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
-            <Hourglass size={15} />
+
+        {/* Card 2: Deep Vibrant Purple Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#8b5cf6', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>Under Review</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{pendingCount}</div>
-          <div className="cp-stat-label">Under Review</div>
-          <div style={{ fontSize: '11px', color: '#94a3b8' }}>Awaiting organizer review</div>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{pendingCount}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(255, 255, 255, 0.22)', color: '#ffffff' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              8.2%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+            Awaiting organizer review
+          </div>
         </div>
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#15803d' }}>
-            <CheckCircle size={15} />
+
+        {/* Card 3: Royal Blue Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#2563eb', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>Approved &amp; Confirmed</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{approvedCount}</div>
-          <div className="cp-stat-label">Approved & Confirmed</div>
-          <div style={{ fontSize: '11px', color: '#94a3b8' }}>Pass emailed or open entry</div>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{approvedCount}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(255, 255, 255, 0.22)', color: '#ffffff' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              14.5%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+            Pass emailed or open entry
+          </div>
         </div>
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#166534' }}>
-            <Clock size={15} />
+
+        {/* Card 4: Clinical Teal Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#0d9488', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>Waitlisted</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{waitlistCount}</div>
-          <div className="cp-stat-label">Waitlisted</div>
-          <div style={{ fontSize: '11px', color: '#94a3b8' }}>Priority queue allocation</div>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{waitlistCount}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(255, 255, 255, 0.22)', color: '#ffffff' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              3.5%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+            Priority queue allocation
+          </div>
         </div>
       </div>
 
@@ -262,7 +312,7 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
       <div className="cp-section-card">
         <div className="cp-section-card-header">
           <div>
-            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>Application Records</h3>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: isDark ? '#f4f4f5' : '#09090b' }}>Application Records</h3>
             <p style={{ fontSize: '12px', color: '#64748b' }}>
               Showing {filteredRegistrations.length} record{filteredRegistrations.length !== 1 ? 's' : ''}
             </p>
@@ -284,9 +334,9 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
 
         <div style={{ padding: '20px' }}>
           {filteredRegistrations.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '48px 24px', color: '#94a3b8' }}>
-              <FileText size={40} style={{ color: '#94a3b8', margin: '0 auto 12px auto', opacity: 0.5 }} />
-              <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 6px 0', color: '#0f172a' }}>
+            <div style={{ textAlign: 'center', padding: '48px 24px', color: '#a1a1aa' }}>
+              <FileText size={40} style={{ color: '#a1a1aa', margin: '0 auto 12px auto', opacity: 0.5 }} />
+              <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 6px 0', color: isDark ? '#f4f4f5' : '#09090b' }}>
                 No Applications in this Category
               </h3>
               <p style={{ color: '#64748b', fontSize: '13px', maxWidth: '400px', margin: '0 auto 16px auto', lineHeight: 1.5 }}>
@@ -308,7 +358,7 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
                     case 'APPROVED':
                       return requiresPass
                         ? { cls: 'cp-badge cp-badge-open', label: 'Approved & Pass Emailed', icon: CheckCircle }
-                        : { cls: 'cp-badge', label: 'Confirmed (No Pass Required)', icon: CheckCircle, customStyle: { backgroundColor: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1' } };
+                        : { cls: 'cp-badge', label: 'Confirmed (No Pass Required)', icon: CheckCircle, customStyle: { backgroundColor: isDark ? '#18181b' : '#f1f5f9', color: isDark ? '#d4d4d8' : '#334155', border: isDark ? '1px solid #27272a' : '1px solid #cbd5e1' } };
                     case 'PENDING':
                       return { cls: 'cp-badge cp-badge-closing', label: 'Under Review', icon: Hourglass };
                     case 'WAITLISTED':
@@ -327,14 +377,14 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
                   <div
                     key={reg.id}
                     style={{
-                      background: '#ffffff',
-                      border: reg.status === 'APPROVED' ? (requiresPass ? '1px solid #bbf7d0' : '1px solid #cbd5e1') : '1px solid #e2e8f0',
+                      background: isDark ? '#141416' : '#ffffff',
+                      border: reg.status === 'APPROVED' ? (requiresPass ? (isDark ? '1px solid #166534' : '1px solid #bbf7d0') : (isDark ? '1px solid #27272a' : '1px solid #cbd5e1')) : (isDark ? '1px solid #27272a' : '1px solid #e2e8f0'),
                       borderRadius: '14px',
                       padding: '18px 20px',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '14px',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                      boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.5)' : '0 1px 3px rgba(0,0,0,0.03)',
                       transition: 'border-color 0.15s, box-shadow 0.15s'
                     }}
                   >
@@ -351,7 +401,7 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
                           </span>
                         </div>
 
-                        <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>
+                        <h3 style={{ fontSize: '17px', fontWeight: 800, color: isDark ? '#f4f4f5' : '#09090b', margin: '0 0 4px 0' }}>
                           {reg.eventTitle}
                         </h3>
 
@@ -424,10 +474,10 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
                           gap: '10px',
                           padding: '10px 14px',
                           borderRadius: '10px',
-                          backgroundColor: '#f8fafc',
-                          border: '1px solid #e2e8f0',
+                          backgroundColor: isDark ? '#18181b' : '#f8fafc',
+                          border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
                           fontSize: '12px',
-                          color: '#475569'
+                          color: isDark ? '#d4d4d8' : '#475569'
                         }}>
                           <CheckCircle size={15} style={{ color: '#166534', flexShrink: 0 }} />
                           <div>
@@ -442,11 +492,11 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
                       <div style={{
                         padding: '10px 14px',
                         borderRadius: '10px',
-                        background: '#f8fafc',
-                        border: '1px solid #f1f5f9',
+                        background: isDark ? '#18181b' : '#f8fafc',
+                        border: isDark ? '1px solid #27272a' : '1px solid #f1f5f9',
                         fontSize: '12px'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: isDark ? '#f4f4f5' : '#09090b', marginBottom: '6px' }}>
                           <Users size={14} style={{ color: '#166534' }} />
                           <span>Team Roster: {reg.teamName}</span>
                         </div>
@@ -458,10 +508,10 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
                               style={{
                                 padding: '3px 8px',
                                 borderRadius: '6px',
-                                background: '#ffffff',
-                                border: '1px solid #e2e8f0',
+                                background: isDark ? '#141416' : '#ffffff',
+                                border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
                                 fontSize: '11px',
-                                color: '#374151'
+                                color: isDark ? '#f4f4f5' : '#374151'
                               }}
                             >
                               <strong>{m.name}</strong> ({m.role || 'Member'})

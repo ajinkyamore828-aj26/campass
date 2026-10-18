@@ -50,11 +50,11 @@ export default function Footer3Demo() {
     <div className="w-full">
       <Footer3
         logo={<LogoIcon className="size-8" />}
-        brandName="Watermelon"
-        description="Accelerate your digital transformation with our cutting-edge cloud infrastructure and tools."
+        brandName="CampusPass"
+        description="Accelerate campus life and discover college hackathons, technical workshops, and premier student passes."
         socialLinks={socialLinks}
         linkGroups={linkGroups}
-        copyright="© 2026 Watermelon. All rights reserved."
+        copyright="© 2026 CampusPass. All rights reserved."
         legalLinks={legalLinks}
       />
     </div>

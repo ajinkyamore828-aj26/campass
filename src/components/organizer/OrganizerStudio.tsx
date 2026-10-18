@@ -27,7 +27,9 @@ import {
   Activity,
   Award,
   Layers,
-  Building
+  Building,
+  MoreHorizontal,
+  ArrowUp
 } from 'lucide-react';
 
 export const OrganizerStudio: React.FC = () => {
@@ -41,8 +43,10 @@ export const OrganizerStudio: React.FC = () => {
     createEvent,
     updateEvent,
     approveRegistration,
-    rejectRegistration
+    rejectRegistration,
+    theme
   } = useCampusPass();
+  const isDark = theme === 'dark';
 
   const [activeTab, setActiveTab] = useState<'APPLICATIONS' | 'EVENTS' | 'TELEMETRY'>('APPLICATIONS');
 
@@ -284,39 +288,86 @@ export const OrganizerStudio: React.FC = () => {
         </div>
       </div>
 
-      {/* KPI Stats Row */}
+      {/* KPI Stats Row (1:1 with Image 1 UI) */}
       <div className="cp-stats-grid">
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
-            <UserCheck size={15} />
+        {/* Card 1: Pitch Black Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#09090b', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.92)' }}>Pending Reviews</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{pendingCount}</div>
-          <div className="cp-stat-label">Pending Reviews</div>
-          <div style={{ fontSize: '11px', color: '#94a3b8' }}>Awaiting decision</div>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{pendingCount}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(34, 197, 94, 0.22)', color: '#4ade80' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              6.4%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            Awaiting decision
+          </div>
         </div>
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#15803d' }}>
-            <CheckCircle size={15} />
+
+        {/* Card 2: Deep Vibrant Purple Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#8b5cf6', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>Approved Attendees</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{approvedCount}</div>
-          <div className="cp-stat-label">Approved Attendees</div>
-          <div style={{ fontSize: '11px', color: '#94a3b8' }}>Digital passes issued</div>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{approvedCount}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(255, 255, 255, 0.22)', color: '#ffffff' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              12.8%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+            Digital passes issued
+          </div>
         </div>
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#f1f5f9', color: '#0f172a' }}>
-            <Calendar size={15} />
+
+        {/* Card 3: Royal Blue Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#2563eb', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>Managed Events</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{events.length}</div>
-          <div className="cp-stat-label">Managed Events</div>
-          <div style={{ fontSize: '11px', color: '#94a3b8' }}>Published on platform</div>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{events.length}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(255, 255, 255, 0.22)', color: '#ffffff' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              8.3%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+            Published on platform
+          </div>
         </div>
-        <div className="cp-stat-card">
-          <div className="cp-stat-icon" style={{ background: '#dcfce7', color: '#166534' }}>
-            <BarChart3 size={15} />
+
+        {/* Card 4: Clinical Teal Surface */}
+        <div className="cp-kpi-card-v1" style={{ background: '#0d9488', color: '#ffffff' }}>
+          <div className="cp-kpi-top">
+            <span className="cp-kpi-title" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>Gate Check-Ins</span>
+            <button className="cp-kpi-more-btn" title="Options" aria-label="More options">
+              <MoreHorizontal size={16} />
+            </button>
           </div>
-          <div className="cp-stat-value">{verifiedCheckIns}</div>
-          <div className="cp-stat-label">Gate Check-Ins</div>
-          <div style={{ fontSize: '11px', color: '#94a3b8' }}>Verified attendance</div>
+          <div className="cp-kpi-mid">
+            <span className="cp-kpi-big-value">{verifiedCheckIns}</span>
+            <span className="cp-kpi-badge" style={{ background: 'rgba(255, 255, 255, 0.22)', color: '#ffffff' }}>
+              <ArrowUp size={11} strokeWidth={2.5} />
+              14.5%
+            </span>
+          </div>
+          <div className="cp-kpi-bot" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+            Verified attendance
+          </div>
         </div>
       </div>
 
@@ -450,14 +501,14 @@ export const OrganizerStudio: React.FC = () => {
                     filteredRegistrations.map((reg) => (
                       <tr key={reg.id}>
                         <td>
-                          <strong style={{ color: '#0f172a', display: 'block', fontSize: '13px' }}>{reg.studentName}</strong>
+                          <strong style={{ color: isDark ? '#f8fafc' : '#0f172a', display: 'block', fontSize: '13px' }}>{reg.studentName}</strong>
                           <span style={{ fontSize: '11px', color: '#64748b' }}>
                             {reg.studentId} • {reg.department}
                           </span>
                         </td>
 
                         <td>
-                          <span style={{ fontWeight: 600, color: '#0f172a', display: 'block' }}>{reg.eventTitle}</span>
+                          <span style={{ fontWeight: 600, color: isDark ? '#f8fafc' : '#0f172a', display: 'block' }}>{reg.eventTitle}</span>
                           <span style={{ fontSize: '11px', color: '#64748b' }}>
                             {(reg.registrationType || reg.participationType) === 'TEAM'
                               ? `Team: ${reg.teamName} (${reg.teamMembers?.length || 0} pax)`
@@ -537,7 +588,7 @@ export const OrganizerStudio: React.FC = () => {
 
                 return (
                   <div key={ev.id} className="cp-event-card">
-                    <div style={{ height: '140px', position: 'relative', background: '#0f172a' }}>
+                    <div style={{ height: '140px', position: 'relative', background: '#141416' }}>
                       <img
                         src={ev.bannerUrl}
                         alt={ev.title}
@@ -546,7 +597,7 @@ export const OrganizerStudio: React.FC = () => {
                       <div style={{
                         position: 'absolute',
                         inset: 0,
-                        background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, transparent 40%, rgba(15, 23, 42, 0.75) 100%)'
+                        background: 'linear-gradient(180deg, rgba(9, 9, 11, 0.4) 0%, transparent 40%, rgba(9, 9, 11, 0.8) 100%)'
                       }} />
                       <span style={{
                         position: 'absolute',
@@ -556,7 +607,7 @@ export const OrganizerStudio: React.FC = () => {
                         borderRadius: '5px',
                         fontSize: '10px',
                         fontWeight: 700,
-                        backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                        backgroundColor: 'rgba(9, 9, 11, 0.85)',
                         color: '#ffffff'
                       }}>
                         {ev.category}
@@ -567,7 +618,7 @@ export const OrganizerStudio: React.FC = () => {
                     </div>
 
                     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, gap: '12px' }}>
-                      <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                      <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: isDark ? '#f8fafc' : '#0f172a' }}>
                         {ev.title}
                       </h3>
 
@@ -586,13 +637,13 @@ export const OrganizerStudio: React.FC = () => {
                       <div style={{
                         padding: '10px 12px',
                         borderRadius: '10px',
-                        background: '#f8fafc',
-                        border: '1px solid #f1f5f9',
+                        background: isDark ? '#141416' : '#f8fafc',
+                        border: isDark ? '1px solid #27272a' : '1px solid #f1f5f9',
                         fontSize: '12px'
                       }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                           <span style={{ color: '#64748b' }}>Registration Fill:</span>
-                          <strong style={{ color: '#0f172a' }}>{ev.registeredCount} / {ev.capacity} ({percentFilled}%)</strong>
+                          <strong style={{ color: isDark ? '#f8fafc' : '#0f172a' }}>{ev.registeredCount} / {ev.capacity} ({percentFilled}%)</strong>
                         </div>
                         <div className="cp-progress" style={{ marginBottom: '6px' }}>
                           <div className="cp-progress-fill" style={{ width: `${percentFilled}%` }} />
@@ -661,10 +712,10 @@ export const OrganizerStudio: React.FC = () => {
                           {new Date(log.timestamp || log.scannedAt || Date.now()).toLocaleTimeString()}
                         </td>
                         <td>
-                          <strong style={{ display: 'block', fontSize: '13px', color: '#0f172a' }}>{log.studentName}</strong>
+                          <strong style={{ display: 'block', fontSize: '13px', color: isDark ? '#f8fafc' : '#0f172a' }}>{log.studentName}</strong>
                           <span style={{ fontSize: '11px', color: '#64748b' }}>{log.studentId}</span>
                         </td>
-                        <td style={{ fontWeight: 600, color: '#0f172a' }}>{log.eventTitle}</td>
+                        <td style={{ fontWeight: 600, color: isDark ? '#f8fafc' : '#0f172a' }}>{log.eventTitle}</td>
                         <td>
                           <span style={{ fontSize: '12px', color: '#475569' }}>
                             {log.gateOrStation || log.gate}

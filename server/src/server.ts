@@ -55,8 +55,91 @@ const addAudit = (actorName: string, actorRole: string, action: string, resource
   auditLogs.unshift(newLog);
 };
 
+// ── Schedule Collision & Conflict Helpers ──────────────────
+function parseTimeToMinutes(timeStr?: string): number {
+  if (!timeStr) return 9 * 60;
+  const clean = timeStr.replace(/\(.*?\)/g, '').trim().toUpperCase();
+  const isPM = clean.includes('PM');
+  const isAM = clean.includes('AM');
+  const timeOnly = clean.replace(/[AP]M/, '').trim();
+  const parts = timeOnly.split(':');
+  let hours = parseInt(parts[0], 10) || 0;
+  const minutes = parseInt(parts[1], 10) || 0;
+
+  if (isPM && hours < 12) hours += 12;
+  if (isAM && hours === 12) hours = 0;
+  return hours * 60 + minutes;
+}
+
+function normalizeDate(dateStr?: string): string {
+  if (!dateStr) return '';
+  const match = dateStr.match(/\d{4}-\d{2}-\d{2}/);
+  return match ? match[0] : dateStr.trim();
+}
+
+function checkScheduleCollision(
+  eventA: Partial<CampusEvent>,
+  eventB: Partial<CampusEvent>
+): { hasCollision: boolean; reason?: string } {
+  const dateA = normalizeDate(eventA.date || eventA.startDate);
+  const dateB = normalizeDate(eventB.date || eventB.startDate);
+
+  // 1. Check round-level collision if both events define competition rounds
+  if (eventA.rounds && eventA.rounds.length > 0 && eventB.rounds && eventB.rounds.length > 0) {
+    for (const rA of eventA.rounds) {
+      const rDateA = normalizeDate(rA.date);
+      for (const rB of eventB.rounds) {
+        const rDateB = normalizeDate(rB.date);
+        if (rDateA && rDateB && rDateA === rDateB) {
+          const startA = parseTimeToMinutes(rA.startTime);
+          let endA = parseTimeToMinutes(rA.endTime);
+          if (endA <= startA) endA = startA + 120;
+
+          const startB = parseTimeToMinutes(rB.startTime);
+          let endB = parseTimeToMinutes(rB.endTime);
+          if (endB <= startB) endB = startB + 120;
+
+          if (Math.max(startA, startB) < Math.min(endA, endB)) {
+            return {
+              hasCollision: true,
+              reason: `Round "${rA.name}" clashes with "${rB.name}" of "${eventB.title}" on ${rDateA}`
+            };
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Check main event date & time collision
+  if (dateA && dateB && dateA === dateB) {
+    const startA = parseTimeToMinutes(eventA.startTime);
+    let endA = parseTimeToMinutes(eventA.endTime);
+    if (endA <= startA || (eventA.endTime && eventA.endTime.includes('Next Day'))) {
+      endA = startA + 24 * 60;
+    }
+
+    const startB = parseTimeToMinutes(eventB.startTime);
+    let endB = parseTimeToMinutes(eventB.endTime);
+    if (endB <= startB || (eventB.endTime && eventB.endTime.includes('Next Day'))) {
+      endB = startB + 24 * 60;
+    }
+
+    if (Math.max(startA, startB) < Math.min(endA, endB)) {
+      return {
+        hasCollision: true,
+        reason: `Overlaps with "${eventB.title}" on ${dateA} (${eventB.startTime} – ${eventB.endTime})`
+      };
+    }
+  }
+
+  return { hasCollision: false };
+}
+
+// ── Global System Settings & Concurrent Registrations Policy ──
+let allowConcurrentRegistrations = false;
+
 // ==========================================
-// 0. SYSTEM HEALTH API
+// 0. SYSTEM HEALTH API & SETTINGS
 // ==========================================
 app.get('/api/health', (req, res) => {
   res.json({
@@ -71,6 +154,38 @@ app.get('/api/health', (req, res) => {
       passes: passes.length,
       lunchPasses: lunchPasses.length,
       auditLogs: auditLogs.length,
+    },
+    settings: {
+      allowConcurrentRegistrations
+    }
+  });
+});
+
+app.get('/api/settings', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      allowConcurrentRegistrations
+    }
+  });
+});
+
+app.patch('/api/settings', (req, res) => {
+  if (typeof req.body.allowConcurrentRegistrations === 'boolean') {
+    allowConcurrentRegistrations = req.body.allowConcurrentRegistrations;
+    addAudit(
+      'System Admin',
+      'ADMIN',
+      'SETTINGS_UPDATED',
+      'SYSTEM',
+      'SYS-SETTINGS',
+      `Concurrent registrations policy changed to: ${allowConcurrentRegistrations ? 'ALLOWED (Multiple Entries Permitted)' : 'RESTRICTED (Time Conflict Enforced)'}`
+    );
+  }
+  res.json({
+    success: true,
+    data: {
+      allowConcurrentRegistrations
     }
   });
 });
@@ -173,6 +288,42 @@ app.post('/api/registrations', (req, res) => {
   );
   if (existing) {
     return res.status(409).json({ success: false, message: 'You already have an active registration for this event.' });
+  }
+
+  // Registration closed or deadline validation
+  if (event.status === 'CLOSED' || event.status === 'COMPLETED') {
+    return res.status(400).json({ success: false, message: 'Registration for this event is closed.' });
+  }
+  if (event.registrationDeadline) {
+    const deadlineTime = new Date(event.registrationDeadline).getTime();
+    if (!isNaN(deadlineTime) && deadlineTime < Date.now()) {
+      return res.status(400).json({ success: false, message: 'The registration deadline for this event has expired.' });
+    }
+  }
+
+  // Schedule collision check: student cannot register for another event at the same date and overlapping time
+  // Unless multiple/concurrent entries are permitted by admin globally or for this specific event
+  const isConcurrentAllowed = allowConcurrentRegistrations || Boolean(event.allowConcurrentRegistration);
+
+  if (!isConcurrentAllowed) {
+    const activeStudentRegs = registrations.filter(r =>
+      (r.studentId === studentId || r.studentEmail === studentEmail) &&
+      r.status !== 'REJECTED' && r.status !== 'CANCELLED' &&
+      r.eventId !== eventId
+    );
+
+    for (const reg of activeStudentRegs) {
+      const existingEv = events.find(e => e.id === reg.eventId);
+      if (existingEv) {
+        const collision = checkScheduleCollision(event, existingEv);
+        if (collision.hasCollision) {
+          return res.status(409).json({
+            success: false,
+            message: `Schedule Conflict: You are already registered for "${existingEv.title}" on ${event.date} (${existingEv.startTime} – ${existingEv.endTime}). A student cannot be present at two events scheduled at the same time.`
+          });
+        }
+      }
+    }
   }
 
   const isWaitlist = event.registeredCount >= event.capacity;

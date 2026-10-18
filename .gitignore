@@ -53,3 +53,7 @@ server/dist/
 *.njsproj
 *.sln
 *.sw?
+
+# Media & Videos
+*.mp4
+campuspass_commercial_1080p.mp4

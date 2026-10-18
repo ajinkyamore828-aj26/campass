@@ -99,59 +99,59 @@ export const CampusEventFilters: React.FC<CampusEventFiltersProps> = ({
   const dimensionMetadata = useMemo(() => {
     return {
       Status: {
-        icon: <CircleDashed className="size-[24px] text-muted-foreground shrink-0" />,
+        icon: <CircleDashed className="size-[18px] text-muted-foreground shrink-0" />,
         options: [
-          { id: "OPEN", label: "Open for Registration", icon: <Check className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "CLOSING_SOON", label: "Closing Soon", icon: <Clock className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "FULL", label: "Full / Waitlist Only", icon: <AlertCircle className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "CLOSED", label: "Closed", icon: <Lock className="size-[22px] text-muted-foreground shrink-0" /> },
+          { id: "OPEN", label: "Open for Registration", icon: <Check className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "CLOSING_SOON", label: "Closing Soon", icon: <Clock className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "FULL", label: "Full / Waitlist Only", icon: <AlertCircle className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "CLOSED", label: "Closed", icon: <Lock className="size-[16px] text-muted-foreground shrink-0" /> },
         ] as DimensionOption[],
       },
       Category: {
-        icon: <Tag className="size-[24px] text-muted-foreground shrink-0" />,
+        icon: <Tag className="size-[18px] text-muted-foreground shrink-0" />,
         options: [
-          { id: "HACKATHON", label: "Hackathons", icon: <Cpu className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "IDEATHON", label: "Ideathons", icon: <Lightbulb className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "CODING_COMPETITION", label: "Coding Contests", icon: <Code className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "APTITUDE", label: "Aptitude Tests", icon: <Award className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "CULTURAL", label: "Cultural Events", icon: <Palette className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "FRESHER_PARTY", label: "Fresher Parties", icon: <PartyPopper className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "BOOTCAMP", label: "Bootcamps", icon: <BookOpen className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "CAMPUS_DRIVE", label: "Campus Drives", icon: <Briefcase className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "SEMINAR", label: "Seminars", icon: <GraduationCap className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "TECHNICAL", label: "Technical", icon: <Compass className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "SPORTS", label: "Sports", icon: <Trophy className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "WORKSHOP", label: "Workshops", icon: <Cpu className="size-[22px] text-muted-foreground shrink-0" /> },
+          { id: "HACKATHON", label: "Hackathons", icon: <Cpu className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "IDEATHON", label: "Ideathons", icon: <Lightbulb className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "CODING_COMPETITION", label: "Coding Contests", icon: <Code className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "APTITUDE", label: "Aptitude Tests", icon: <Award className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "CULTURAL", label: "Cultural Events", icon: <Palette className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "FRESHER_PARTY", label: "Fresher Parties", icon: <PartyPopper className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "BOOTCAMP", label: "Bootcamps", icon: <BookOpen className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "CAMPUS_DRIVE", label: "Campus Drives", icon: <Briefcase className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "SEMINAR", label: "Seminars", icon: <GraduationCap className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "TECHNICAL", label: "Technical", icon: <Compass className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "SPORTS", label: "Sports", icon: <Trophy className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "WORKSHOP", label: "Workshops", icon: <Cpu className="size-[16px] text-muted-foreground shrink-0" /> },
         ] as DimensionOption[],
       },
       Participation: {
-        icon: <Users className="size-[24px] text-muted-foreground shrink-0" />,
+        icon: <Users className="size-[18px] text-muted-foreground shrink-0" />,
         options: [
-          { id: "INDIVIDUAL", label: "Individual Only", icon: <Users className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "TEAM", label: "Team Participation", icon: <Users className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "BOTH", label: "Both (Solo or Team)", icon: <Users className="size-[22px] text-muted-foreground shrink-0" /> },
+          { id: "INDIVIDUAL", label: "Individual Only", icon: <Users className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "TEAM", label: "Team Participation", icon: <Users className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "BOTH", label: "Both (Solo or Team)", icon: <Users className="size-[16px] text-muted-foreground shrink-0" /> },
         ] as DimensionOption[],
       },
       Department: {
-        icon: <Building2 className="size-[24px] text-muted-foreground shrink-0" />,
+        icon: <Building2 className="size-[18px] text-muted-foreground shrink-0" />,
         options: availableDepartments.map((dept) => ({
           id: dept,
           label: dept,
-          icon: <Building2 className="size-[22px] text-muted-foreground shrink-0" />,
+          icon: <Building2 className="size-[16px] text-muted-foreground shrink-0" />,
         })) as DimensionOption[],
       },
       Fee: {
-        icon: <Ticket className="size-[24px] text-muted-foreground shrink-0" />,
+        icon: <Ticket className="size-[18px] text-muted-foreground shrink-0" />,
         options: [
-          { id: "FREE", label: "Free Entry (₹0)", icon: <Check className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "PAID", label: "Paid Ticket Required", icon: <Ticket className="size-[22px] text-muted-foreground shrink-0" /> },
+          { id: "FREE", label: "Free Entry (₹0)", icon: <Check className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "PAID", label: "Paid Ticket Required", icon: <Ticket className="size-[16px] text-muted-foreground shrink-0" /> },
         ] as DimensionOption[],
       },
       "Meal Pass": {
-        icon: <Utensils className="size-[24px] text-muted-foreground shrink-0" />,
+        icon: <Utensils className="size-[18px] text-muted-foreground shrink-0" />,
         options: [
-          { id: "YES", label: "Lunch Voucher Included", icon: <Utensils className="size-[22px] text-muted-foreground shrink-0" /> },
-          { id: "NO", label: "No Meal Pass", icon: <X className="size-[22px] text-muted-foreground shrink-0" /> },
+          { id: "YES", label: "Lunch Voucher Included", icon: <Utensils className="size-[16px] text-muted-foreground shrink-0" /> },
+          { id: "NO", label: "No Meal Pass", icon: <X className="size-[16px] text-muted-foreground shrink-0" /> },
         ] as DimensionOption[],
       },
     };
@@ -313,16 +313,16 @@ export const CampusEventFilters: React.FC<CampusEventFiltersProps> = ({
                       : `${filter.values.length} selected`}
                   </span>
                 </PopoverTrigger>
-                <PopoverContent className="w-[320px] p-1.5 border border-slate-200/90 shadow-2xl rounded-xl bg-white overflow-hidden" align="start">
+                <PopoverContent className="cp-filter-popover w-[280px] p-0 border border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden" align="start">
                   <AnimateChangeInHeight>
-                    <Command className="rounded-xl">
+                    <Command className="rounded-none bg-transparent">
                       <CommandInput
                         placeholder={`Filter ${filter.type}...`}
-                        className="h-11 text-sm"
+                        className="h-10 text-[14px]"
                       />
-                      <CommandList>
+                      <CommandList className="cp-filter-list max-h-[280px] overflow-y-auto">
                         <CommandEmpty className="py-4 text-center text-sm text-muted-foreground">No matching options.</CommandEmpty>
-                        <CommandGroup>
+                        <CommandGroup className="p-0">
                           {dimMeta?.options.map((opt) => {
                             const isChecked = filter.values.includes(opt.id);
                             return (
@@ -332,11 +332,11 @@ export const CampusEventFilters: React.FC<CampusEventFiltersProps> = ({
                                 onSelect={() =>
                                   handleAddOrToggleFilterValue(filter.type, opt.id)
                                 }
-                                className="group flex items-center gap-3 py-2 px-3 text-sm text-muted-foreground hover:text-foreground cursor-pointer data-[selected=true]:bg-muted/70 data-[selected=true]:text-foreground rounded-md"
+                                className="cp-filter-item text-[14px] text-slate-700 dark:text-zinc-300"
                               >
-                                <Checkbox checked={isChecked} className="size-4.5 rounded-sm" />
+                                <Checkbox checked={isChecked} className="size-4 rounded-sm" />
                                 {opt.icon}
-                                <span className="flex-1 truncate text-foreground font-medium text-sm">{opt.label}</span>
+                                <span className="flex-1 truncate font-medium text-[14px]">{opt.label}</span>
                               </CommandItem>
                             );
                           })}
@@ -395,35 +395,35 @@ export const CampusEventFilters: React.FC<CampusEventFiltersProps> = ({
             aria-expanded={open}
             size="sm"
             className={cn(
-              "transition group h-11 text-[16px] items-center rounded-lg flex gap-3 text-slate-800 hover:text-slate-950 hover:bg-slate-100 font-bold px-4 cursor-pointer",
-              filters.length > 0 && "w-11 px-0 justify-center"
+              "transition group h-10 text-[15px] items-center rounded-md flex gap-2.5 text-slate-800 dark:text-zinc-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 font-bold px-3.5 cursor-pointer",
+              filters.length > 0 && "w-10 px-0 justify-center"
             )}
           >
-            <ListFilter className="size-[28px] shrink-0 text-slate-800 group-hover:text-slate-950" />
-            {!filters.length && <span className="font-bold text-[16px]">Filter</span>}
+            <ListFilter className="size-[20px] shrink-0 text-slate-800 dark:text-zinc-200 group-hover:text-slate-950 dark:group-hover:text-white" />
+            {!filters.length && <span className="font-bold text-[15px]">Filter</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[320px] p-1.5 border border-slate-200/90 shadow-2xl rounded-xl bg-white overflow-hidden"
+          className="cp-filter-popover w-[270px] p-0 border border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden"
           align="start"
         >
           <AnimateChangeInHeight>
-            <Command className="rounded-xl">
+            <Command className="rounded-none bg-transparent">
               <CommandInput
-                placeholder={selectedDimension ? selectedDimension : "Filter..."}
-                className="h-12 text-[15.5px]"
+                placeholder={selectedDimension ? `Filter ${selectedDimension}...` : "Filter..."}
+                className="h-10 text-[14px]"
                 value={commandInput}
                 onInputCapture={(e) => setCommandInput(e.currentTarget.value)}
                 ref={commandInputRef}
               />
-              <CommandList>
+              <CommandList className="cp-filter-list max-h-[300px] overflow-y-auto">
                 <CommandEmpty className="py-4 text-center text-sm text-muted-foreground">
                   No results found.
                 </CommandEmpty>
 
                 {selectedDimension ? (
                   // Step 2: Show items for the selected dimension (with checkboxes & monochrome icons)
-                  <CommandGroup>
+                  <CommandGroup className="p-0">
                     {dimensionMetadata[selectedDimension]?.options.map((opt) => {
                       const existing = filters.find((f) => f.type === selectedDimension);
                       const isChecked = existing?.values.includes(opt.id) ?? false;
@@ -439,11 +439,11 @@ export const CampusEventFilters: React.FC<CampusEventFiltersProps> = ({
                             }, 150);
                             setOpen(false);
                           }}
-                          className="group flex items-center gap-3.5 py-2.5 px-3.5 text-[15px] text-muted-foreground hover:text-foreground cursor-pointer data-[selected=true]:bg-muted/70 data-[selected=true]:text-foreground rounded-lg"
+                          className="cp-filter-item text-[14px] text-slate-700 dark:text-zinc-300"
                         >
-                          <Checkbox checked={isChecked} className="size-5 rounded-md" />
+                          <Checkbox checked={isChecked} className="size-4 rounded-sm" />
                           {opt.icon}
-                          <span className="flex-1 truncate text-foreground font-semibold text-[15px]">
+                          <span className="flex-1 truncate font-medium text-[14px]">
                             {opt.label}
                           </span>
                         </CommandItem>
@@ -454,7 +454,7 @@ export const CampusEventFilters: React.FC<CampusEventFiltersProps> = ({
                   // Step 1: Show available dimensions in two groups with thin divider (1:1 with Reference Image 1)
                   dimensionGroups.map((group, gIdx) => (
                     <React.Fragment key={gIdx}>
-                      <CommandGroup>
+                      <CommandGroup className="p-0">
                         {group.map((dim) => (
                           <CommandItem
                             key={dim.name}
@@ -464,17 +464,17 @@ export const CampusEventFilters: React.FC<CampusEventFiltersProps> = ({
                               setCommandInput("");
                               commandInputRef.current?.focus();
                             }}
-                            className="group flex items-center gap-3.5 py-3 px-4 text-[16px] text-muted-foreground hover:text-foreground cursor-pointer data-[selected=true]:bg-muted/70 data-[selected=true]:text-foreground rounded-lg"
+                            className="cp-filter-item text-[14.5px] text-slate-700 dark:text-zinc-300"
                           >
                             {dim.icon}
-                            <span className="text-foreground font-semibold text-[16px]">
+                            <span className="font-medium text-[14.5px]">
                               {dim.name}
                             </span>
                           </CommandItem>
                         ))}
                       </CommandGroup>
                       {gIdx < dimensionGroups.length - 1 && (
-                        <CommandSeparator className="my-1.5 bg-slate-100" />
+                        <CommandSeparator className="my-1.5 mx-1 bg-slate-100 dark:bg-zinc-800" />
                       )}
                     </React.Fragment>
                   ))

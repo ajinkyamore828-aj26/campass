@@ -50,18 +50,22 @@ import {
   ShieldCheck,
   Type,
   LayoutGrid,
-  Sliders
+  Sliders,
+  Lock,
+  Unlock
 } from 'lucide-react';
 import { EventDetailModal } from './EventDetailModal';
 import { FaqPro, type FaqProItem } from '@/components/ui/faq-pro';
 import { EventRegistrationModal } from './EventRegistrationModal';
 import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
 import { EditFeaturedEventModal } from './EditFeaturedEventModal';
 import { EditEventRegistryModal } from './EditEventRegistryModal';
 import { EditHeroTextModal } from './EditHeroTextModal';
 import { EditBentoCardsModal } from './EditBentoCardsModal';
+import { getEventStudentActionState } from '../../lib/scheduleCollision';
 
 interface EventDiscoveryProps {
   onSelectEvent?: (event: CampusEvent) => void;
@@ -170,8 +174,12 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
     bentoCards,
     updateBentoCard,
     updateAllBentoCards,
-    resetBentoCards
+    resetBentoCards,
+    allowConcurrentRegistrations,
+    toggleAllowConcurrentRegistrations,
+    theme
   } = useCampusPass();
+  const isDark = theme === 'dark';
 
   const isManager = activePortal === 'ADMIN' || activePortal === 'ORGANIZER' || currentUser.role === 'ADMIN' || currentUser.role === 'ORGANIZER';
 
@@ -310,6 +318,11 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
     return events.find(e => e.status === 'OPEN') || events[0];
   }, [events, pinnedFeaturedId]);
 
+  const featuredActionState = useMemo(() => {
+    if (!featuredEvent) return null;
+    return getEventStudentActionState(featuredEvent, currentUser?.studentId, currentUser?.email, registrations, events, allowConcurrentRegistrations);
+  }, [featuredEvent, currentUser?.studentId, currentUser?.email, registrations, events, allowConcurrentRegistrations]);
+
   // Platform stats
   const openCount = events.filter(e => e.status === 'OPEN').length;
   const totalRegs = registrations.length;
@@ -368,6 +381,30 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
             >
               <Star size={14} />
               <span>Edit Featured</span>
+            </button>
+            <button
+              className="cp-hero-btn-secondary"
+              onClick={async () => {
+                const next = await toggleAllowConcurrentRegistrations(!allowConcurrentRegistrations);
+                showToast(next ? 'Policy Updated: Multiple event entries at same time are now ALLOWED.' : 'Policy Updated: Multiple event entries at same time are now RESTRICTED.');
+              }}
+              style={{
+                fontSize: '12.5px',
+                padding: '7px 14px',
+                borderRadius: '8px',
+                color: allowConcurrentRegistrations ? '#86efac' : '#fca5a5',
+                background: allowConcurrentRegistrations ? 'rgba(22, 101, 52, 0.45)' : 'rgba(239, 68, 68, 0.2)',
+                borderColor: allowConcurrentRegistrations ? 'rgba(74, 222, 128, 0.4)' : 'rgba(239, 68, 68, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+              title="Click to toggle whether students can apply for multiple events at the same day & time"
+            >
+              {allowConcurrentRegistrations ? <Unlock size={14} /> : <Lock size={14} />}
+              <span>Multiple Entries: {allowConcurrentRegistrations ? 'Allowed' : 'Restricted'}</span>
             </button>
             <button
               className="cp-hero-btn-secondary"
@@ -566,7 +603,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
         </div>
       </div>
 
-      {/* ── Watermelon: Featured Event (Marketing Block) ── */}
+      {/* ── CampusPass: Featured Event (Marketing Block) ── */}
       {featuredEvent && (
         <div className="cp-featured-card">
           <DynamicNeuroNoise speed={0.7} scale={0.8} />
@@ -604,14 +641,132 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
               ))}
             </div>
 
+            {featuredActionState?.status === 'TIME_CONFLICT' && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '12px',
+                color: '#fca5a5',
+                background: 'rgba(239, 68, 68, 0.22)',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                marginBottom: '14px',
+                maxWidth: '560px'
+              }}>
+                <AlertTriangle size={15} style={{ color: '#ef4444', flexShrink: 0 }} />
+                <span><strong>Schedule Clash:</strong> {featuredActionState.reason}</span>
+              </div>
+            )}
+
+            {featuredActionState?.hasConcurrentOverlap && featuredActionState.status === 'AVAILABLE' && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '12px',
+                color: '#38bdf8',
+                background: 'rgba(56, 189, 248, 0.16)',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                border: '1px solid rgba(56, 189, 248, 0.35)',
+                marginBottom: '14px',
+                maxWidth: '560px'
+              }}>
+                <CheckCircle size={15} style={{ color: '#38bdf8', flexShrink: 0 }} />
+                <span><strong>Multiple Entries Permitted:</strong> Clashes with "{featuredActionState.conflictingEvent?.title}", allowed by administration.</span>
+              </div>
+            )}
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              <button
-                className="cp-hero-pill-btn cp-hero-pill-btn-solid"
-                onClick={() => handleRegisterEvent(featuredEvent)}
-              >
-                <span>Register Now</span>
-                <ArrowUpRight size={14} />
-              </button>
+              {featuredActionState?.status === 'APPLIED' ? (
+                <div
+                  className="cp-hero-pill-btn"
+                  style={{
+                    background: 'rgba(22, 101, 52, 0.45)',
+                    color: '#86efac',
+                    border: '1px solid rgba(74, 222, 128, 0.4)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: 700,
+                    cursor: 'default'
+                  }}
+                >
+                  <CheckCircle size={14} />
+                  <span>Applied</span>
+                </div>
+              ) : featuredActionState?.status === 'TIME_CONFLICT' ? (
+                <button
+                  type="button"
+                  className="cp-hero-pill-btn"
+                  disabled
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.25)',
+                    color: '#fca5a5',
+                    border: '1px solid rgba(239, 68, 68, 0.45)',
+                    cursor: 'not-allowed',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: 700
+                  }}
+                  title={featuredActionState.reason}
+                >
+                  <AlertTriangle size={14} style={{ color: '#f87171' }} />
+                  <span>Time Conflict</span>
+                </button>
+              ) : featuredActionState?.status === 'NO_SEATS' ? (
+                <button
+                  type="button"
+                  className="cp-hero-pill-btn"
+                  disabled
+                  style={{
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    color: '#a1a1aa',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    cursor: 'not-allowed',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: 700
+                  }}
+                  title="All seats are completely filled"
+                >
+                  <Lock size={14} />
+                  <span>No Seats Available</span>
+                </button>
+              ) : featuredActionState?.status === 'EXPIRED' ? (
+                <button
+                  type="button"
+                  className="cp-hero-pill-btn"
+                  disabled
+                  style={{
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    color: '#71717a',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    cursor: 'not-allowed',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: 700
+                  }}
+                  title="Registration deadline has expired"
+                >
+                  <Clock size={14} />
+                  <span>Registration Closed</span>
+                </button>
+              ) : (
+                <button
+                  className="cp-hero-pill-btn cp-hero-pill-btn-solid"
+                  onClick={() => handleRegisterEvent(featuredEvent)}
+                >
+                  <span>{featuredActionState?.status === 'WAITLIST' ? 'Join Waitlist' : 'Register Now'}</span>
+                  <ArrowUpRight size={14} />
+                </button>
+              )}
+
               <button
                 className="cp-hero-pill-btn"
                 onClick={() => handleSelectEvent(featuredEvent)}
@@ -801,7 +956,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
         })}
       </div>
 
-      {/* ── Watermelon: Navigation / Search + Filters ── */}
+      {/* ── CampusPass: Navigation / Search + Filters ── */}
       <div className="cp-section-card">
         <div className="cp-section-card-header">
           <div>
@@ -810,11 +965,11 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
               {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''} found
             </p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div className="cp-search-wrap" style={{ width: '220px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} className="w-full sm:w-auto flex-wrap">
+            <div className="cp-search-wrap w-full sm:w-[220px]">
               <span className="cp-search-icon"><Search size={14} /></span>
               <input
-                className="cp-search-input"
+                className="cp-search-input w-full"
                 placeholder="Search events..."
                 value={searchQuery}
                 onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
@@ -850,7 +1005,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
         </div>
 
         {/* ── Linear-Style Interactive Segmented Filter Bar (Height Animation & Flow) ── */}
-        <div style={{ padding: '12px 20px', borderBottom: '1px solid #f1f5f9', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+        <div style={{ padding: '12px 20px', borderBottom: isDark ? '1px solid #27272a' : '1px solid #f1f5f9', background: isDark ? '#141416' : '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
           <CampusEventFilters
             filters={activeCampusFilters}
             setFilters={setActiveCampusFilters}
@@ -860,7 +1015,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
         </div>
 
         {/* Choice Chips — Category Tabs (1:1 with Reference Image 4) */}
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9' }}>
+        <div style={{ padding: '16px 20px', borderBottom: isDark ? '1px solid #27272a' : '1px solid #f1f5f9' }}>
           <div className="cp-chips-card-container" style={{ margin: 0 }}>
             <div className="cp-chips-row">
               {CATEGORY_CHIPS.map(chip => (
@@ -877,8 +1032,8 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
           </div>
         </div>
 
-        {/* Event Cards Grid — Watermelon Cards */}
-        <div style={{ padding: '20px' }}>
+        {/* Event Cards Grid — White Theme matching user reference layout */}
+        <div style={{ padding: '24px 20px' }}>
           {paginated.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px 24px', color: '#94a3b8' }}>
               <Compass size={36} style={{ margin: '0 auto 12px auto', opacity: 0.4 }} />
@@ -890,249 +1045,175 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
           ) : (
             <div className="cp-event-grid">
               {paginated.map(event => {
-                const isRegistered = registeredEventIds.has(event.id);
-                const isFull = event.status === 'FULL';
-                const isWaitlist = event.status === 'WAITLIST_ONLY';
-                const pct = event.capacity > 0 ? Math.min(100, Math.round((event.registeredCount / event.capacity) * 100)) : 0;
+                const actionState = getEventStudentActionState(
+                  event,
+                  currentUser?.studentId,
+                  currentUser?.email,
+                  registrations,
+                  events,
+                  allowConcurrentRegistrations
+                );
                 const feeValue = event.registrationFee ?? event.fee ?? 0;
                 const statusMeta = STATUS_BADGE[event.status] || STATUS_BADGE['CLOSED'];
                 const bannerBg = CATEGORY_COLORS[event.category] || CATEGORY_COLORS['GENERAL'];
+                const pct = event.capacity > 0 ? Math.min(100, Math.round((event.registeredCount / event.capacity) * 100)) : 0;
 
                 return (
-                  <div key={event.id} className="cp-event-card">
-                    {/* Card Banner with Photo */}
-                    <div className="cp-event-banner">
+                  <div
+                    key={event.id}
+                    onClick={() => handleSelectEvent(event)}
+                    className="cp-event-card cursor-pointer group"
+                    style={{
+                      background: isDark ? '#141416' : '#ffffff',
+                      border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+                      borderRadius: '20px',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '100%',
+                      maxWidth: '310px',
+                      width: '100%',
+                      boxShadow: isDark ? '0 4px 16px -2px rgba(0, 0, 0, 0.6)' : '0 4px 16px -2px rgba(0, 0, 0, 0.05)',
+                      transition: 'all 0.25s ease',
+                    }}
+                  >
+                    {/* ── Top Photo Banner (Slim 180px Clean Image) ── */}
+                    <div
+                      className="cp-event-banner"
+                      style={{
+                        position: 'relative',
+                        height: '180px',
+                        background: isDark ? '#18181b' : '#f1f5f9',
+                        overflow: 'hidden',
+                        flexShrink: 0,
+                      }}
+                    >
                       {event.bannerUrl ? (
-                        <img src={event.bannerUrl} alt={event.title} />
+                        <img
+                          src={event.bannerUrl}
+                          alt={event.title}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            transition: 'transform 0.4s ease',
+                          }}
+                          className="group-hover:scale-105"
+                        />
                       ) : (
                         <div style={{ width: '100%', height: '100%', background: bannerBg }} />
                       )}
-                      <div style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background: 'linear-gradient(to top, rgba(20, 20, 22, 0.85) 0%, rgba(20, 20, 22, 0.15) 50%, rgba(20, 20, 22, 0.4) 100%)',
-                        pointerEvents: 'none'
-                      }} />
-
-                      {/* Category badge */}
-                      <span style={{
-                        position: 'absolute', top: '10px', left: '10px',
-                        padding: '3px 8px', borderRadius: '8px',
-                        fontSize: '10px', fontWeight: 700,
-                        background: 'rgba(0, 0, 0, 0.65)',
-                        color: '#ffffff',
-                        backdropFilter: 'blur(8px)',
-                        border: '1px solid rgba(255, 255, 255, 0.16)',
-                      }}>
-                        {event.category}
-                      </span>
-                      {/* Status badge */}
-                      <span className={statusMeta.cls} style={{ position: 'absolute', top: '10px', right: '10px' }}>
-                        {statusMeta.label}
-                      </span>
-                      {/* Rescheduled warning pill */}
-                      {event.scheduleUpdate?.isRescheduled && (
-                        <span style={{
-                          position: 'absolute', top: '38px', right: '10px',
-                          padding: '2px 7px', borderRadius: '6px',
-                          fontSize: '9.5px', fontWeight: 800,
-                          background: 'rgba(120, 53, 15, 0.92)',
-                          color: '#fef08a',
-                          border: '1px solid rgba(253, 224, 71, 0.4)',
-                          display: 'flex', alignItems: 'center', gap: '3px',
-                          backdropFilter: 'blur(6px)'
-                        }}>
-                          <AlertTriangle size={9} /> Rescheduled
-                        </span>
-                      )}
-                      {/* Banner Bottom Badges Row */}
-                      <div style={{
-                        position: 'absolute', bottom: '10px', left: '10px', right: '10px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                        gap: '6px', pointerEvents: 'none'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                          {/* Multi-round badge */}
-                          {event.rounds && event.rounds.length > 1 && (
-                            <div style={{
-                              display: 'flex', alignItems: 'center', gap: '4px',
-                              padding: '3px 8px', borderRadius: '8px',
-                              background: 'rgba(20, 83, 45, 0.88)', color: '#86efac',
-                              fontSize: '10px', fontWeight: 700,
-                              backdropFilter: 'blur(6px)',
-                              border: '1px solid rgba(74, 222, 128, 0.3)',
-                            }}>
-                              <Trophy size={10} />
-                              {event.rounds.length} Rounds
-                            </div>
-                          )}
-                          {/* Meal badge */}
-                          {(event.includesLunch || event.lunchProvided) && (
-                            <div style={{
-                              display: 'flex', alignItems: 'center', gap: '4px',
-                              padding: '3px 8px', borderRadius: '8px',
-                              background: 'rgba(0, 0, 0, 0.75)', color: '#86efac',
-                              fontSize: '10px', fontWeight: 700,
-                              backdropFilter: 'blur(6px)',
-                              border: '1px solid rgba(74, 222, 128, 0.25)',
-                            }}>
-                              <Utensils size={10} />
-                              Meal Included
-                            </div>
-                          )}
-                          {/* Pass policy badge */}
-                          <div style={{
-                            display: 'flex', alignItems: 'center', gap: '4px',
-                            padding: '3px 8px', borderRadius: '8px',
-                            background: event.requiresPass !== false ? 'rgba(0, 0, 0, 0.8)' : 'rgba(30, 41, 59, 0.85)',
-                            color: event.requiresPass !== false ? '#86efac' : '#cbd5e1',
-                            fontSize: '10px', fontWeight: 700,
-                            backdropFilter: 'blur(6px)',
-                            border: event.requiresPass !== false ? '1px solid rgba(74, 222, 128, 0.25)' : '1px solid rgba(148, 163, 184, 0.25)',
-                          }}>
-                            {event.requiresPass !== false ? <Mail size={10} /> : <CheckCircle size={10} />}
-                            {event.requiresPass !== false ? 'Pass via Email' : 'No Pass Needed'}
-                          </div>
-                        </div>
-
-                        {/* Fee badge */}
-                        <div style={{
-                          padding: '3px 8px', borderRadius: '8px',
-                          background: 'rgba(0, 0, 0, 0.75)', color: '#ffffff',
-                          fontSize: '10px', fontWeight: 800,
-                          backdropFilter: 'blur(6px)',
-                          border: '1px solid rgba(255, 255, 255, 0.16)',
-                          flexShrink: 0
-                        }}>
-                          {feeValue === 0 ? 'FREE' : `₹${feeValue}`}
-                        </div>
-                      </div>
                     </div>
 
-                    {/* Card Body */}
-                    <div className="cp-event-body">
-                      {/* Dept */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11.5px', color: '#a1a1aa', fontWeight: 500, height: '18px' }}>
-                        <Building size={12} style={{ color: '#86efac', flexShrink: 0 }} />
-                        <span className="truncate">{event.department}</span>
-                      </div>
-
-                      {/* Title — Strict 42px height so 1-line and 2-line titles occupy identical space */}
-                      <h3 style={{
-                        fontSize: '16px', fontWeight: 700, color: '#ffffff',
-                        lineHeight: 1.3, margin: 0, height: '42px',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        letterSpacing: '-0.015em'
-                      }}>
+                    {/* ── Card Body (Slim Proportions) ── */}
+                    <div
+                      className="cp-event-body"
+                      style={{
+                        padding: '16px 18px 18px 18px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flex: 1,
+                        gap: '12px',
+                        background: isDark ? '#141416' : '#ffffff',
+                      }}
+                    >
+                      {/* Event Name */}
+                      <h3
+                        style={{
+                          fontSize: '15.5px',
+                          fontWeight: 800,
+                          color: isDark ? '#f4f4f5' : '#09090b',
+                          lineHeight: 1.35,
+                          margin: 0,
+                          minHeight: '42px',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          letterSpacing: '-0.015em',
+                        }}
+                      >
                         {event.title}
                       </h3>
 
-                      {/* Summary — Strict 36px height */}
-                      <p style={{
-                        fontSize: '12px', color: '#a1a1aa', lineHeight: 1.45, margin: 0, height: '36px',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                      }}>
-                        {event.summary || event.shortDescription || event.description}
-                      </p>
-
-                      {/* Logistics Box — Dark card container */}
-                      <div style={{
-                        background: '#1c1c1f', border: '1px solid rgba(255, 255, 255, 0.08)',
-                        borderRadius: '12px', padding: '10px 12px',
-                        display: 'flex', flexDirection: 'column', gap: '6px',
-                        minHeight: '86px', justifyContent: 'center'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#e4e4e7', minWidth: 0 }}>
-                          <Calendar size={12} style={{ color: '#86efac', flexShrink: 0 }} />
-                          <strong className="truncate">{event.date || event.startDate}</strong>
-                          <span style={{ color: '#52525b' }}>•</span>
-                          <Clock size={12} style={{ color: '#a1a1aa', flexShrink: 0 }} />
-                          <span className="truncate" style={{ color: '#a1a1aa' }}>{event.startTime}</span>
+                      {/* Time, Date & Venue */}
+                      <div
+                        style={{
+                          background: isDark ? '#18181b' : '#f8fafc',
+                          border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+                          borderRadius: '12px',
+                          padding: '10px 12px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: isDark ? '#f4f4f5' : '#09090b', minWidth: 0 }}>
+                          <Calendar size={12} style={{ color: '#166534', flexShrink: 0 }} />
+                          <span style={{ fontWeight: 700 }}>{event.date || event.startDate}</span>
+                          <span style={{ color: isDark ? '#3f3f46' : '#cbd5e1' }}>•</span>
+                          <Clock size={12} style={{ color: isDark ? '#a1a1aa' : '#64748b', flexShrink: 0 }} />
+                          <span className="truncate" style={{ color: isDark ? '#a1a1aa' : '#64748b', fontWeight: 500 }}>{event.startTime}</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#e4e4e7', minWidth: 0 }}>
-                          <MapPin size={12} style={{ color: '#86efac', flexShrink: 0 }} />
-                          <span className="truncate" style={{ flex: 1 }}>{event.venue}</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#e4e4e7', minWidth: 0 }}>
-                          <Users size={12} style={{ color: '#86efac', flexShrink: 0 }} />
-                          <span className="truncate">
-                            {(event.registrationMode || event.participationType) === 'INDIVIDUAL'
-                              ? 'Individual Entry'
-                              : (event.registrationMode || event.participationType) === 'TEAM'
-                              ? `Teams of ${event.minTeamSize}–${event.maxTeamSize}`
-                              : `Solo or Team (${event.minTeamSize}–${event.maxTeamSize})`}
-                          </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: isDark ? '#d4d4d8' : '#334155', minWidth: 0 }}>
+                          <MapPin size={12} style={{ color: '#166534', flexShrink: 0 }} />
+                          <span className="truncate" style={{ flex: 1, fontWeight: 600 }}>{event.venue}</span>
                         </div>
                       </div>
 
-                      {/* Capacity Progress Bar */}
-                      <div style={{ minHeight: '30px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#a1a1aa', marginBottom: '4px' }}>
-                          <span>Seats filled</span>
-                          <span style={{ fontWeight: 700, color: pct > 90 ? '#f87171' : pct > 75 ? '#fbbf24' : '#ffffff' }}>
-                            {event.registeredCount}/{event.capacity} ({pct}%)
-                          </span>
-                        </div>
-                        <div className="cp-progress" style={{ background: '#27272a' }}>
-                          <div
-                            className={`cp-progress-fill${pct > 90 ? ' danger' : pct > 75 ? ' warning' : ''}`}
-                            style={{
-                              width: `${pct}%`,
-                              background: pct > 90 ? '#ef4444' : pct > 75 ? '#f59e0b' : '#166534'
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Action Buttons: '+' inspect button on left + Edit button (for manager) + Primary Action Button */}
-                      <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        {/* Plus button for details */}
+                      {/* Action Buttons: '+' inspect button on left + Primary Action Button */}
+                      <div
+                        style={{
+                          marginTop: 'auto',
+                          paddingTop: '6px',
+                          display: 'flex',
+                          gap: '8px',
+                          alignItems: 'center',
+                        }}
+                      >
+                        {/* Plus button for quick inspection */}
                         <button
+                          type="button"
                           className="cp-btn cp-btn-icon"
                           style={{
-                            background: '#27272a',
-                            border: '1px solid rgba(255, 255, 255, 0.12)',
-                            color: '#e4e4e7',
-                            borderRadius: '12px',
-                            width: '38px',
-                            height: '38px',
+                            background: isDark ? '#18181b' : '#f8fafc',
+                            border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+                            color: isDark ? '#f4f4f5' : '#334155',
+                            borderRadius: '10px',
+                            width: '36px',
+                            height: '36px',
                             flexShrink: 0,
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            transition: 'background-color 0.12s'
+                            transition: 'all 0.12s',
                           }}
                           onClick={() => handleSelectEvent(event)}
                           title="View Event Details"
                           aria-label="View Event Details"
                         >
-                          <Plus size={16} />
+                          <Plus size={15} />
                         </button>
 
                         {/* Direct Edit Button for Organizers & Admins */}
                         {isManager && (
                           <button
+                            type="button"
                             className="cp-btn cp-btn-icon"
                             style={{
-                              background: '#1c1c1f',
-                              border: '1px solid rgba(56, 189, 248, 0.4)',
-                              color: '#38bdf8',
-                              borderRadius: '12px',
-                              width: '38px',
-                              height: '38px',
+                              background: '#f0f9ff',
+                              border: '1px solid #bae6fd',
+                              color: '#0284c7',
+                              borderRadius: '10px',
+                              width: '36px',
+                              height: '36px',
                               flexShrink: 0,
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              transition: 'all 0.12s'
+                              transition: 'all 0.12s',
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1142,39 +1223,79 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
                             title="Edit Event in Registry"
                             aria-label="Edit Event in Registry"
                           >
-                            <Edit3 size={15} />
+                            <Edit3 size={14} />
                           </button>
                         )}
 
-                        {isRegistered ? (
-                          <div style={{
-                            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            gap: '6px', height: '38px', borderRadius: '12px',
-                            background: 'rgba(22, 101, 52, 0.3)', color: '#86efac', border: '1px solid rgba(74, 222, 128, 0.3)',
-                            fontSize: '12.5px', fontWeight: 700,
-                          }}>
-                            <CheckCircle size={14} />
-                            Applied
-                          </div>
-                        ) : isFull && !isWaitlist ? (
-                          <button
-                            className="cp-btn"
-                            style={{ flex: 1, justifyContent: 'center', height: '38px', opacity: 0.5, background: '#27272a', border: '1px solid rgba(255,255,255,0.08)', color: '#71717a', borderRadius: '12px' }}
-                            disabled
+                        {actionState.status === 'APPLIED' ? (
+                          <div
+                            style={{
+                              flex: 1,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              height: '36px',
+                              borderRadius: '10px',
+                              background: '#f0fdf4',
+                              color: '#166534',
+                              border: '1.5px solid #86efac',
+                              fontSize: '12px',
+                              fontWeight: 700,
+                              boxShadow: '0 1px 2px rgba(22, 101, 52, 0.05)',
+                              cursor: 'default',
+                            }}
                           >
-                            Full
+                            <CheckCircle size={14} style={{ color: '#16a34a' }} />
+                            <span>Applied</span>
+                          </div>
+                        ) : actionState.status === 'TIME_CONFLICT' || actionState.status === 'NO_SEATS' || actionState.status === 'EXPIRED' ? (
+                          <button
+                            type="button"
+                            disabled
+                            style={{
+                              flex: 1,
+                              height: '36px',
+                              borderRadius: '10px',
+                              background: '#fff1f2',
+                              color: '#be123c',
+                              border: '1px solid #fecdd3',
+                              fontSize: '11.5px',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '5px',
+                              cursor: 'not-allowed',
+                            }}
+                            title={actionState.reason || 'Not Eligible'}
+                          >
+                            <AlertTriangle size={13} style={{ color: '#e11d48' }} />
+                            <span>Not Eligible</span>
                           </button>
                         ) : (
                           <button
+                            type="button"
                             className="cp-btn cp-btn-primary"
                             style={{
-                              flex: 1, justifyContent: 'center', height: '38px', borderRadius: '12px', fontSize: '12.5px', fontWeight: 700,
-                              background: '#166534', color: '#ffffff', border: '1px solid #166534',
-                              boxShadow: '0 2px 10px rgba(22, 101, 52, 0.3)'
+                              flex: 1,
+                              justifyContent: 'center',
+                              height: '36px',
+                              borderRadius: '10px',
+                              fontSize: '12px',
+                              fontWeight: 700,
+                              background: actionState.status === 'WAITLIST' ? '#d97706' : '#166534',
+                              color: '#ffffff',
+                              border: `1px solid ${actionState.status === 'WAITLIST' ? '#b45309' : '#15803d'}`,
+                              boxShadow: actionState.status === 'WAITLIST' ? '0 2px 8px rgba(217, 119, 6, 0.25)' : '0 2px 8px rgba(22, 101, 52, 0.25)',
+                              cursor: 'pointer',
                             }}
-                            onClick={() => handleRegisterEvent(event)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRegisterEvent(event);
+                            }}
                           >
-                            <span>{isWaitlist ? 'Join Waitlist' : 'Apply Now'}</span>
+                            <span>{actionState.status === 'WAITLIST' ? 'Join Waitlist' : 'Register'}</span>
                             <ArrowRight size={13} />
                           </button>
                         )}
@@ -1187,7 +1308,7 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
           )}
         </div>
 
-        {/* ── Watermelon: Pagination ── */}
+        {/* ── CampusPass: Pagination ── */}
         {totalPages > 1 && (
           <div style={{ padding: '14px 20px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontSize: '12.5px', color: '#64748b' }}>
