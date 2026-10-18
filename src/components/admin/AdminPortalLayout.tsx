@@ -124,7 +124,7 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
         <SidebarBody hideMobileTrigger className="justify-between gap-4 h-full">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {/* Header: Brand & Security Badge */}
-            {isSidebarOpen ? (
+            {(isSidebarOpen || mobileMenuOpen) ? (
               <div className="flex items-center gap-3 py-1.5 px-1 min-w-0">
                 <div
                   className="size-9 rounded-lg flex items-center justify-center flex-shrink-0 text-sky-400 bg-zinc-900 border border-zinc-800 shadow-xs"
@@ -152,14 +152,14 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
             )}
 
             {/* Section Label (Visible when expanded) */}
-            {isSidebarOpen && (
+            {(isSidebarOpen || mobileMenuOpen) && (
               <p className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider px-2 pt-5 pb-1">
                 Management Modules
               </p>
             )}
 
             {/* Navigation Links */}
-            <div className={cn("flex flex-col gap-1.5", !isSidebarOpen && "mt-5")}>
+            <div className={cn("flex flex-col gap-1.5", !(isSidebarOpen || mobileMenuOpen) && "mt-5")}>
               {adminNavItems.map((item) => (
                 <SidebarLink
                   key={item.id}
@@ -170,14 +170,17 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
                     active: currentView === item.id,
                     badge: item.badge,
                     badgeColor: item.badgeColor,
-                    onClick: () => onNavigate(item.id, item.path),
+                    onClick: () => {
+                      setMobileMenuOpen(false);
+                      onNavigate(item.id, item.path);
+                    },
                   }}
                 />
               ))}
             </div>
 
             {/* System Status Pill (when open) */}
-            {isSidebarOpen && (
+            {(isSidebarOpen || mobileMenuOpen) && (
               <div className="mt-4 p-2.5 rounded-lg border border-slate-200/90 dark:border-zinc-800 bg-slate-200/50 dark:bg-zinc-800/50">
                 <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
                   <span className="size-2 rounded-full bg-emerald-500 inline-block" />
@@ -202,7 +205,7 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
               <div className="size-7 rounded-full bg-zinc-900 border border-zinc-800 text-sky-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
                 A
               </div>
-              {isSidebarOpen && (
+              {(isSidebarOpen || mobileMenuOpen) && (
                 <div className="flex-1 min-w-0 overflow-hidden">
                   <p className="text-xs font-bold text-slate-800 dark:text-zinc-200 truncate leading-tight">
                     System Administrator
@@ -215,11 +218,14 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
             </div>
 
             {/* Quick Navigation Outlets */}
-            {isSidebarOpen ? (
+            {(isSidebarOpen || mobileMenuOpen) ? (
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => onNavigate('LANDING', '/')}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onNavigate('LANDING', '/');
+                  }}
                   className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 text-[11px] font-semibold border border-slate-200 dark:border-zinc-700 transition cursor-pointer shadow-2xs"
                   title="Return to CampusPass Home"
                 >
@@ -228,7 +234,10 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onNavigate('DISCOVER', '/students')}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onNavigate('DISCOVER', '/students');
+                  }}
                   className="flex items-center justify-center gap-1 py-1.5 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 text-[11px] font-semibold border border-slate-200 dark:border-zinc-700 transition cursor-pointer shadow-2xs"
                   title="Switch to Student Portal (/students)"
                 >
@@ -240,7 +249,10 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
               <div className="flex flex-col items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => onNavigate('LANDING', '/')}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onNavigate('LANDING', '/');
+                  }}
                   className="size-8 flex items-center justify-center rounded-md bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 transition cursor-pointer"
                   title="Return to CampusPass Home"
                 >
@@ -248,7 +260,10 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onNavigate('DISCOVER', '/students')}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onNavigate('DISCOVER', '/students');
+                  }}
                   className="size-8 flex items-center justify-center rounded-md bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-emerald-500 border border-slate-200 dark:border-zinc-700 transition cursor-pointer"
                   title="Switch to Student Portal (/students)"
                 >

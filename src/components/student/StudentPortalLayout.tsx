@@ -97,7 +97,7 @@ export const StudentPortalLayout: React.FC<StudentPortalLayoutProps> = ({
         <SidebarBody hideMobileTrigger className="justify-between gap-4 h-full">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {/* Header: Institution Brand */}
-            {isSidebarOpen ? (
+            {(isSidebarOpen || mobileMenuOpen) ? (
               <div className="flex items-center gap-3 py-1.5 px-1 min-w-0">
                 <div
                   className="size-9 rounded-lg flex items-center justify-center flex-shrink-0 text-white shadow-xs"
@@ -127,14 +127,14 @@ export const StudentPortalLayout: React.FC<StudentPortalLayoutProps> = ({
             )}
 
             {/* Section Label (Visible when expanded) */}
-            {isSidebarOpen && (
+            {(isSidebarOpen || mobileMenuOpen) && (
               <p className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider px-2 pt-5 pb-1">
                 Student Services
               </p>
             )}
 
             {/* Navigation Links */}
-            <div className={cn("flex flex-col gap-1.5", !isSidebarOpen && "mt-5")}>
+            <div className={cn("flex flex-col gap-1.5", !(isSidebarOpen || mobileMenuOpen) && "mt-5")}>
               {studentNavItems.map((item) => (
                 <SidebarLink
                   key={item.id}
@@ -144,7 +144,10 @@ export const StudentPortalLayout: React.FC<StudentPortalLayoutProps> = ({
                     icon: <item.icon className="size-4.5 flex-shrink-0" />,
                     active: currentView === item.id,
                     badge: item.badge,
-                    onClick: () => onNavigate(item.id, item.path),
+                    onClick: () => {
+                      setMobileMenuOpen(false);
+                      onNavigate(item.id, item.path);
+                    },
                   }}
                 />
               ))}
@@ -163,7 +166,7 @@ export const StudentPortalLayout: React.FC<StudentPortalLayoutProps> = ({
               <div className="size-7 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
                 {(currentUser.fullName || 'S').charAt(0)}
               </div>
-              {isSidebarOpen && (
+              {(isSidebarOpen || mobileMenuOpen) && (
                 <div className="flex-1 min-w-0 overflow-hidden">
                   <p className="text-xs font-bold text-slate-800 dark:text-zinc-200 truncate leading-tight">
                     {currentUser.fullName}
@@ -176,11 +179,14 @@ export const StudentPortalLayout: React.FC<StudentPortalLayoutProps> = ({
             </div>
 
             {/* Quick Navigation Outlets */}
-            {isSidebarOpen ? (
+            {(isSidebarOpen || mobileMenuOpen) ? (
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => onNavigate('LANDING', '/')}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onNavigate('LANDING', '/');
+                  }}
                   className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 text-[11px] font-semibold border border-slate-200 dark:border-zinc-700 transition cursor-pointer shadow-2xs"
                   title="Return to CampusPass Home"
                 >
@@ -189,7 +195,10 @@ export const StudentPortalLayout: React.FC<StudentPortalLayoutProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onNavigate('ADMIN', '/admin')}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onNavigate('ADMIN', '/admin');
+                  }}
                   className="flex items-center justify-center gap-1 py-1.5 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 text-[11px] font-semibold border border-slate-200 dark:border-zinc-700 transition cursor-pointer shadow-2xs"
                   title="Switch to Admin Portal (/admin)"
                 >
@@ -201,7 +210,10 @@ export const StudentPortalLayout: React.FC<StudentPortalLayoutProps> = ({
               <div className="flex flex-col items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => onNavigate('LANDING', '/')}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onNavigate('LANDING', '/');
+                  }}
                   className="size-8 flex items-center justify-center rounded-md bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 transition cursor-pointer"
                   title="Return to CampusPass Home"
                 >
@@ -209,7 +221,10 @@ export const StudentPortalLayout: React.FC<StudentPortalLayoutProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onNavigate('ADMIN', '/admin')}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onNavigate('ADMIN', '/admin');
+                  }}
                   className="size-8 flex items-center justify-center rounded-md bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-sky-500 border border-slate-200 dark:border-zinc-700 transition cursor-pointer"
                   title="Switch to Admin Portal (/admin)"
                 >

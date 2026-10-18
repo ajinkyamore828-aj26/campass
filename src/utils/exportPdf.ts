@@ -27,7 +27,7 @@ export async function downloadPassPdf(pass: DigitalEventPass): Promise<void> {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(148, 163, 184); // #94a3b8
-  doc.text('Apex Institute of Science & Technology • Official Credential', pageWidth / 2, 18, { align: 'center' });
+  doc.text('Team Axiogen • Official Credential', pageWidth / 2, 18, { align: 'center' });
 
   // Pass Type Pill
   doc.setFillColor(22, 101, 52); // #166534

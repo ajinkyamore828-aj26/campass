@@ -15,10 +15,10 @@ export interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({
   onNavigate,
   companyName = 'CampusPass',
-  addressLine1 = 'Apex Knowledge City',
+  addressLine1 = 'Axiogen Innovation Hub',
   addressLine2 = 'Sector 4, University Enclave',
   phone = '+91 98765 01001',
-  emailContact = 'events@apex.edu',
+  emailContact = 'events@axiogen.in',
 }) => {
   const socialLinks = [
     { icon: <FaLinkedinIn className="w-4 h-4" />, href: "https://linkedin.com", label: "LinkedIn" },

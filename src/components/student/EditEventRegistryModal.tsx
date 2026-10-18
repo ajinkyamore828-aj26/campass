@@ -745,7 +745,7 @@ export const EditEventRegistryModal: React.FC<EditEventRegistryModalProps> = ({
                   className="cp-input"
                   value={formState.title || ''}
                   onChange={(e) => setFormState({ ...formState, title: e.target.value })}
-                  placeholder="e.g. Apex National Hackathon 2026"
+                  placeholder="e.g. Axiogen National Hackathon 2026"
                   required
                 />
               </div>

@@ -114,7 +114,7 @@ export default function Hero37({
         />
       </motion.div>
 
-      <div style={{ position: 'relative', zIndex: 10, display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', zIndex: 20, display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
         <motion.nav
           variants={navVariants}
           initial="hidden"
@@ -205,10 +205,11 @@ export default function Hero37({
               variants={ctaVariants}
               initial="hidden"
               animate="show"
-              className="hero-cta-container"
-              style={{ marginTop: '28px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}
+              className="hero-cta-container relative z-30"
+              style={{ marginTop: '28px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center', position: 'relative', zIndex: 30 }}
             >
-              <Button31
+              <button
+                type="button"
                 onClick={() => onNavigate ? onNavigate('DISCOVER', '/students') : onExploreEvents?.()}
                 style={{
                   paddingLeft: '28px',
@@ -223,17 +224,25 @@ export default function Hero37({
                   backgroundColor: '#ffffff',
                   color: '#09090b',
                 }}
-                className="group min-h-[44px] text-[14.5px] font-semibold tracking-[-0.005em] shadow-[0_1px_3px_rgba(0,0,0,0.25),0_4px_16px_rgba(0,0,0,0.18)] active:scale-[0.96]"
+                className="hero-cta-btn group min-h-[44px] text-[14.5px] font-bold tracking-[-0.005em] shadow-[0_1px_3px_rgba(0,0,0,0.25),0_4px_16px_rgba(0,0,0,0.18)] active:scale-[0.96] cursor-pointer hover:bg-zinc-100 transition-all"
               >
-                <span>Enter Student Portal</span>
+                <span style={{ color: '#09090b', fontWeight: 700 }}>Enter Student Portal</span>
                 <ArrowRight
                   className="h-4 w-4 transition-transform duration-150 ease-out group-hover:translate-x-1"
+                  style={{ color: '#09090b' }}
                   aria-hidden="true"
                 />
-              </Button31>
+              </button>
 
-              <Button31
-                onClick={() => onNavigate?.('ADMIN', '/admin')}
+              <button
+                type="button"
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('ADMIN', '/admin');
+                  } else {
+                    window.location.href = '/admin';
+                  }
+                }}
                 style={{
                   paddingLeft: '28px',
                   paddingRight: '28px',
@@ -247,14 +256,15 @@ export default function Hero37({
                   backgroundColor: '#ffffff',
                   color: '#09090b',
                 }}
-                className="group min-h-[44px] text-[14.5px] font-semibold tracking-[-0.005em] shadow-[0_1px_3px_rgba(0,0,0,0.25),0_4px_16px_rgba(0,0,0,0.18)] active:scale-[0.96]"
+                className="hero-cta-btn group min-h-[44px] text-[14.5px] font-bold tracking-[-0.005em] shadow-[0_1px_3px_rgba(0,0,0,0.25),0_4px_16px_rgba(0,0,0,0.18)] active:scale-[0.96] cursor-pointer hover:bg-zinc-100 transition-all"
               >
-                <span>Admin &amp; Faculty Portal</span>
+                <span style={{ color: '#09090b', fontWeight: 700 }}>Admin &amp; Faculty Portal</span>
                 <ArrowRight
                   className="h-4 w-4 transition-transform duration-150 ease-out group-hover:translate-x-1"
+                  style={{ color: '#09090b' }}
                   aria-hidden="true"
                 />
-              </Button31>
+              </button>
             </motion.div>
           </div>
         </main>
@@ -279,11 +289,26 @@ export default function Hero37({
             width: 100% !important;
             flex-direction: column !important;
             align-items: stretch !important;
+            position: relative !important;
+            z-index: 40 !important;
           }
-          .hero-cta-container > * {
+          .hero-cta-container > *,
+          .hero-cta-btn {
             width: 100% !important;
             justify-content: center !important;
             min-height: 48px !important;
+            background-color: #ffffff !important;
+            opacity: 1 !important;
+            color: #09090b !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid #ffffff !important;
+            position: relative !important;
+            z-index: 40 !important;
+          }
+          .hero-cta-btn span,
+          .hero-cta-btn svg {
+            color: #09090b !important;
+            opacity: 1 !important;
           }
         }
       `}</style>

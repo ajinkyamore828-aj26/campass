@@ -52,12 +52,14 @@ import {
   LayoutGrid,
   Sliders,
   Lock,
-  Unlock
+  Unlock,
+  Grid3X3
 } from 'lucide-react';
 import { EventDetailModal } from './EventDetailModal';
 import { FaqPro, type FaqProItem } from '@/components/ui/faq-pro';
 import { EventRegistrationModal } from './EventRegistrationModal';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence, LayoutGroup, type PanInfo } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
@@ -193,8 +195,24 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Mobile Layout Mode for Event Registry: only 'grid' and 'stack', default 'stack' on mobile
+  const [mobileLayoutMode, setMobileLayoutMode] = useState<'grid' | 'stack'>('stack');
+  const [activeStackIndex, setActiveStackIndex] = useState(0);
+  const [, setIsStackDragging] = useState(false);
+  const [isMobileScreen, setIsMobileScreen] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobileScreen(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   useEffect(() => {
     setCurrentPage(1);
+    setActiveStackIndex(0);
   }, [activeCampusFilters, selectedCategory, searchQuery]);
 
   // Modals for Student Discovery
@@ -342,6 +360,339 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  const handleStackDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const { offset, velocity } = info;
+    const swipe = Math.abs(offset.x) * velocity.x;
+
+    if (offset.x < -50 || swipe < -1000) {
+      setActiveStackIndex((prev) => (prev + 1) % Math.max(1, paginated.length));
+    } else if (offset.x > 50 || swipe > 1000) {
+      setActiveStackIndex((prev) => (prev - 1 + paginated.length) % Math.max(1, paginated.length));
+    }
+    setIsStackDragging(false);
+  };
+
+  const getEventStackOrder = () => {
+    const reordered = [];
+    for (let i = 0; i < paginated.length; i++) {
+      const index = (activeStackIndex + i) % paginated.length;
+      reordered.push({ event: paginated[index], stackPosition: i });
+    }
+    return reordered.reverse();
+  };
+
+  const getEventLayoutStyles = (stackPosition: number) => {
+    return {
+      y: stackPosition * 12,
+      scale: 1 - stackPosition * 0.04,
+      rotate: stackPosition === 0 ? 0 : (stackPosition % 2 === 0 ? 1.5 : -1.5) * Math.min(stackPosition, 2),
+      zIndex: paginated.length - stackPosition,
+      opacity: stackPosition > 3 ? 0 : 1,
+    };
+  };
+
+  const renderCardContent = (event: CampusEvent) => {
+    const actionState = getEventStudentActionState(
+      event,
+      currentUser?.studentId,
+      currentUser?.email,
+      registrations,
+      events,
+      allowConcurrentRegistrations
+    );
+    const statusMeta = STATUS_BADGE[event.status] || STATUS_BADGE['CLOSED'];
+    const bannerBg = CATEGORY_COLORS[event.category] || CATEGORY_COLORS['GENERAL'];
+    const pct = event.capacity > 0 ? Math.min(100, Math.round((event.registeredCount / event.capacity) * 100)) : 0;
+
+    return (
+      <>
+        {/* Top Photo Banner */}
+        <div
+          className="cp-event-banner"
+          style={{
+            position: 'relative',
+            height: '180px',
+            background: isDark ? '#18181b' : '#f1f5f9',
+            overflow: 'hidden',
+            flexShrink: 0,
+          }}
+        >
+          {event.bannerUrl ? (
+            <img
+              src={event.bannerUrl}
+              alt={event.title}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                transition: 'transform 0.4s ease',
+              }}
+              className="group-hover:scale-105"
+            />
+          ) : (
+            <div style={{ width: '100%', height: '100%', background: bannerBg }} />
+          )}
+
+          {/* Category Pill Tag */}
+          <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 2 }}>
+            <span
+              style={{
+                fontSize: '10.5px',
+                fontWeight: 700,
+                padding: '3px 9px',
+                borderRadius: '9999px',
+                backgroundColor: isDark ? 'rgba(20, 20, 22, 0.92)' : 'rgba(255, 255, 255, 0.94)',
+                color: isDark ? '#86efac' : '#166534',
+                backdropFilter: 'blur(6px)',
+                letterSpacing: '0.04em',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+              }}
+            >
+              {event.category}
+            </span>
+          </div>
+
+          {/* Status Badge */}
+          <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 2 }}>
+            <span
+              className={statusMeta.cls}
+              style={{
+                fontSize: '10.5px',
+                fontWeight: 700,
+                padding: '3px 9px',
+                borderRadius: '9999px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+              }}
+            >
+              {statusMeta.label}
+            </span>
+          </div>
+        </div>
+
+        {/* Card Body */}
+        <div
+          className="cp-event-body"
+          style={{
+            padding: '16px 18px 18px 18px',
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            gap: '12px',
+            background: isDark ? '#141416' : '#ffffff',
+          }}
+        >
+          {/* Event Name */}
+          <h3
+            style={{
+              fontSize: '15.5px',
+              fontWeight: 800,
+              color: isDark ? '#f4f4f5' : '#09090b',
+              lineHeight: 1.35,
+              margin: 0,
+              minHeight: '42px',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              letterSpacing: '-0.015em',
+            }}
+          >
+            {event.title}
+          </h3>
+
+          {/* Time, Date & Venue */}
+          <div
+            style={{
+              background: isDark ? '#18181b' : '#f8fafc',
+              border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '10px 12px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: isDark ? '#f4f4f5' : '#09090b', minWidth: 0 }}>
+              <Calendar size={12} style={{ color: '#166534', flexShrink: 0 }} />
+              <span style={{ fontWeight: 700 }}>{event.date || event.startDate}</span>
+              <span style={{ color: isDark ? '#3f3f46' : '#cbd5e1' }}>•</span>
+              <Clock size={12} style={{ color: isDark ? '#a1a1aa' : '#64748b', flexShrink: 0 }} />
+              <span className="truncate" style={{ color: isDark ? '#a1a1aa' : '#64748b', fontWeight: 500 }}>{event.startTime}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: isDark ? '#d4d4d8' : '#334155', minWidth: 0 }}>
+              <MapPin size={12} style={{ color: '#166534', flexShrink: 0 }} />
+              <span className="truncate" style={{ flex: 1, fontWeight: 600 }}>{event.venue}</span>
+            </div>
+          </div>
+
+          {/* Capacity Progress Bar */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', fontSize: '11px' }}>
+              <span style={{ color: isDark ? '#a1a1aa' : '#64748b', fontWeight: 500 }}>Seats Filled</span>
+              <span style={{ fontWeight: 700, color: pct >= 90 ? '#dc2626' : (isDark ? '#86efac' : '#166534') }}>
+                {event.registeredCount} / {event.capacity} ({pct}%)
+              </span>
+            </div>
+            <div style={{ height: '5px', background: isDark ? '#27272a' : '#e2e8f0', borderRadius: '9999px', overflow: 'hidden' }}>
+              <div
+                style={{
+                  height: '100%',
+                  width: `${pct}%`,
+                  background: pct >= 90 ? '#ef4444' : '#166534',
+                  borderRadius: '9999px',
+                  transition: 'width 0.3s ease',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Action Buttons: '+' inspect button on left + Primary Action Button */}
+          <div
+            style={{
+              marginTop: 'auto',
+              paddingTop: '6px',
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'center',
+            }}
+          >
+            {/* Plus button for quick inspection */}
+            <button
+              type="button"
+              className="cp-btn cp-btn-icon"
+              style={{
+                background: isDark ? '#18181b' : '#f8fafc',
+                border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+                color: isDark ? '#f4f4f5' : '#334155',
+                borderRadius: '10px',
+                width: '36px',
+                height: '36px',
+                flexShrink: 0,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.12s',
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSelectEvent(event);
+              }}
+              title="View Event Details"
+              aria-label="View Event Details"
+            >
+              <Plus size={15} />
+            </button>
+
+            {/* Direct Edit Button for Organizers & Admins */}
+            {isManager && (
+              <button
+                type="button"
+                className="cp-btn cp-btn-icon"
+                style={{
+                  background: '#f0f9ff',
+                  border: '1px solid #bae6fd',
+                  color: '#0284c7',
+                  borderRadius: '10px',
+                  width: '36px',
+                  height: '36px',
+                  flexShrink: 0,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.12s',
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingEventForRegistry(event);
+                  setIsRegistryModalOpen(true);
+                }}
+                title="Edit Event in Registry"
+                aria-label="Edit Event in Registry"
+              >
+                <Edit3 size={14} />
+              </button>
+            )}
+
+            {actionState.status === 'APPLIED' ? (
+              <div
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: '#f0fdf4',
+                  color: '#166534',
+                  border: '1.5px solid #86efac',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  boxShadow: '0 1px 2px rgba(22, 101, 52, 0.05)',
+                  cursor: 'default',
+                }}
+              >
+                <CheckCircle size={14} style={{ color: '#16a34a' }} />
+                <span>Applied</span>
+              </div>
+            ) : actionState.status === 'TIME_CONFLICT' || actionState.status === 'NO_SEATS' || actionState.status === 'EXPIRED' ? (
+              <button
+                type="button"
+                disabled
+                style={{
+                  flex: 1,
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: '#fff1f2',
+                  color: '#be123c',
+                  border: '1px solid #fecdd3',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '5px',
+                  cursor: 'not-allowed',
+                }}
+                title={actionState.reason || 'Not Eligible'}
+              >
+                <AlertTriangle size={13} style={{ color: '#e11d48' }} />
+                <span>Not Eligible</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="cp-btn cp-btn-primary"
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  height: '36px',
+                  borderRadius: '10px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  background: actionState.status === 'WAITLIST' ? '#d97706' : '#166534',
+                  color: '#ffffff',
+                  border: `1px solid ${actionState.status === 'WAITLIST' ? '#b45309' : '#15803d'}`,
+                  boxShadow: actionState.status === 'WAITLIST' ? '0 2px 8px rgba(217, 119, 6, 0.25)' : '0 2px 8px rgba(22, 101, 52, 0.25)',
+                  cursor: 'pointer',
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRegisterEvent(event);
+                }}
+              >
+                <span>{actionState.status === 'WAITLIST' ? 'Join Waitlist' : 'Register'}</span>
+                <ArrowRight size={13} />
+              </button>
+            )}
+          </div>
+        </div>
+      </>
+    );
   };
 
   return (
@@ -958,12 +1309,46 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
 
       {/* ── CampusPass: Navigation / Search + Filters ── */}
       <div className="cp-section-card">
-        <div className="cp-section-card-header">
-          <div>
-            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>Event Registry</h3>
-            <p style={{ fontSize: '12px', color: '#64748b' }}>
-              {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''} found
-            </p>
+        <div className="cp-section-card-header flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center justify-between w-full sm:w-auto">
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 700, color: isDark ? '#f4f4f5' : '#0f172a' }}>Event Registry</h3>
+              <p style={{ fontSize: '12px', color: '#64748b' }}>
+                {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''} found
+              </p>
+            </div>
+
+            {/* Mobile-Only Layout Switcher: Grid and Stack (Image match) */}
+            <div className="flex md:hidden items-center gap-1 p-1 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-800/60 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setMobileLayoutMode('grid')}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
+                  mobileLayoutMode === 'grid'
+                    ? "bg-white dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 shadow-sm border border-slate-200/80 dark:border-zinc-700/80"
+                    : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200"
+                )}
+                title="Grid View"
+              >
+                <Grid3X3 size={14} />
+                <span>Grid</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileLayoutMode('stack')}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
+                  mobileLayoutMode === 'stack'
+                    ? "bg-white dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 shadow-sm border border-slate-200/80 dark:border-zinc-700/80"
+                    : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200"
+                )}
+                title="Stack Mode (Swipeable 3D Deck)"
+              >
+                <Layers size={14} />
+                <span>Stack</span>
+              </button>
+            </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} className="w-full sm:w-auto flex-wrap">
             <div className="cp-search-wrap w-full sm:w-[220px]">
@@ -1042,268 +1427,116 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({
               </p>
               <p style={{ fontSize: '13px' }}>Try adjusting your filters or search query</p>
             </div>
-          ) : (
-            <div className="cp-event-grid">
-              {paginated.map(event => {
-                const actionState = getEventStudentActionState(
-                  event,
-                  currentUser?.studentId,
-                  currentUser?.email,
-                  registrations,
-                  events,
-                  allowConcurrentRegistrations
-                );
-                const feeValue = event.registrationFee ?? event.fee ?? 0;
-                const statusMeta = STATUS_BADGE[event.status] || STATUS_BADGE['CLOSED'];
-                const bannerBg = CATEGORY_COLORS[event.category] || CATEGORY_COLORS['GENERAL'];
-                const pct = event.capacity > 0 ? Math.min(100, Math.round((event.registeredCount / event.capacity) * 100)) : 0;
+          ) : isMobileScreen && mobileLayoutMode === 'stack' ? (
+            /* ── Swipeable 3D Deck for Mobile View (Stack Mode) ── */
+            <div className="relative min-h-[580px] max-w-[340px] mx-auto w-full pt-2 pb-6">
+              <LayoutGroup id="event-registry-mobile-stack">
+                <motion.div layout className="relative w-full h-[520px]">
+                  <AnimatePresence mode="popLayout">
+                    {getEventStackOrder().map(({ event, stackPosition }) => {
+                      const isTopCard = stackPosition === 0;
+                      const animStyles = getEventLayoutStyles(stackPosition);
 
-                return (
-                  <div
-                    key={event.id}
-                    onClick={() => handleSelectEvent(event)}
-                    className="cp-event-card cursor-pointer group"
-                    style={{
-                      background: isDark ? '#141416' : '#ffffff',
-                      border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
-                      borderRadius: '20px',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      height: '100%',
-                      maxWidth: '310px',
-                      width: '100%',
-                      boxShadow: isDark ? '0 4px 16px -2px rgba(0, 0, 0, 0.6)' : '0 4px 16px -2px rgba(0, 0, 0, 0.05)',
-                      transition: 'all 0.25s ease',
-                    }}
-                  >
-                    {/* ── Top Photo Banner (Slim 180px Clean Image) ── */}
-                    <div
-                      className="cp-event-banner"
-                      style={{
-                        position: 'relative',
-                        height: '180px',
-                        background: isDark ? '#18181b' : '#f1f5f9',
-                        overflow: 'hidden',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {event.bannerUrl ? (
-                        <img
-                          src={event.bannerUrl}
-                          alt={event.title}
+                      return (
+                        <motion.div
+                          key={event.id}
+                          layoutId={`event-${event.id}`}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={animStyles}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+                          drag={isTopCard ? 'x' : false}
+                          dragConstraints={{ left: 0, right: 0 }}
+                          dragElastic={0.6}
+                          onDragStart={() => setIsStackDragging(true)}
+                          onDragEnd={handleStackDragEnd}
+                          onClick={() => {
+                            if (!isTopCard) {
+                              const foundIdx = paginated.findIndex(e => e.id === event.id);
+                              if (foundIdx !== -1) setActiveStackIndex(foundIdx);
+                            }
+                          }}
+                          className={cn(
+                            "cp-event-card group",
+                            isTopCard ? "cursor-grab active:cursor-grabbing shadow-2xl" : "shadow-md"
+                          )}
                           style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            margin: '0 auto',
                             width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            transition: 'transform 0.4s ease',
-                          }}
-                          className="group-hover:scale-105"
-                        />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', background: bannerBg }} />
-                      )}
-                    </div>
-
-                    {/* ── Card Body (Slim Proportions) ── */}
-                    <div
-                      className="cp-event-body"
-                      style={{
-                        padding: '16px 18px 18px 18px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        flex: 1,
-                        gap: '12px',
-                        background: isDark ? '#141416' : '#ffffff',
-                      }}
-                    >
-                      {/* Event Name */}
-                      <h3
-                        style={{
-                          fontSize: '15.5px',
-                          fontWeight: 800,
-                          color: isDark ? '#f4f4f5' : '#09090b',
-                          lineHeight: 1.35,
-                          margin: 0,
-                          minHeight: '42px',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          letterSpacing: '-0.015em',
-                        }}
-                      >
-                        {event.title}
-                      </h3>
-
-                      {/* Time, Date & Venue */}
-                      <div
-                        style={{
-                          background: isDark ? '#18181b' : '#f8fafc',
-                          border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
-                          borderRadius: '12px',
-                          padding: '10px 12px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '6px',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: isDark ? '#f4f4f5' : '#09090b', minWidth: 0 }}>
-                          <Calendar size={12} style={{ color: '#166534', flexShrink: 0 }} />
-                          <span style={{ fontWeight: 700 }}>{event.date || event.startDate}</span>
-                          <span style={{ color: isDark ? '#3f3f46' : '#cbd5e1' }}>•</span>
-                          <Clock size={12} style={{ color: isDark ? '#a1a1aa' : '#64748b', flexShrink: 0 }} />
-                          <span className="truncate" style={{ color: isDark ? '#a1a1aa' : '#64748b', fontWeight: 500 }}>{event.startTime}</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: isDark ? '#d4d4d8' : '#334155', minWidth: 0 }}>
-                          <MapPin size={12} style={{ color: '#166534', flexShrink: 0 }} />
-                          <span className="truncate" style={{ flex: 1, fontWeight: 600 }}>{event.venue}</span>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons: '+' inspect button on left + Primary Action Button */}
-                      <div
-                        style={{
-                          marginTop: 'auto',
-                          paddingTop: '6px',
-                          display: 'flex',
-                          gap: '8px',
-                          alignItems: 'center',
-                        }}
-                      >
-                        {/* Plus button for quick inspection */}
-                        <button
-                          type="button"
-                          className="cp-btn cp-btn-icon"
-                          style={{
-                            background: isDark ? '#18181b' : '#f8fafc',
+                            maxWidth: '330px',
+                            height: '520px',
+                            background: isDark ? '#141416' : '#ffffff',
                             border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
-                            color: isDark ? '#f4f4f5' : '#334155',
-                            borderRadius: '10px',
-                            width: '36px',
-                            height: '36px',
-                            flexShrink: 0,
-                            cursor: 'pointer',
+                            borderRadius: '20px',
+                            overflow: 'hidden',
                             display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'all 0.12s',
+                            flexDirection: 'column',
+                            transformOrigin: 'top center',
                           }}
-                          onClick={() => handleSelectEvent(event)}
-                          title="View Event Details"
-                          aria-label="View Event Details"
                         >
-                          <Plus size={15} />
-                        </button>
+                          {renderCardContent(event)}
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </motion.div>
+              </LayoutGroup>
 
-                        {/* Direct Edit Button for Organizers & Admins */}
-                        {isManager && (
-                          <button
-                            type="button"
-                            className="cp-btn cp-btn-icon"
-                            style={{
-                              background: '#f0f9ff',
-                              border: '1px solid #bae6fd',
-                              color: '#0284c7',
-                              borderRadius: '10px',
-                              width: '36px',
-                              height: '36px',
-                              flexShrink: 0,
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              transition: 'all 0.12s',
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingEventForRegistry(event);
-                              setIsRegistryModalOpen(true);
-                            }}
-                            title="Edit Event in Registry"
-                            aria-label="Edit Event in Registry"
-                          >
-                            <Edit3 size={14} />
-                          </button>
-                        )}
-
-                        {actionState.status === 'APPLIED' ? (
-                          <div
-                            style={{
-                              flex: 1,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '6px',
-                              height: '36px',
-                              borderRadius: '10px',
-                              background: '#f0fdf4',
-                              color: '#166534',
-                              border: '1.5px solid #86efac',
-                              fontSize: '12px',
-                              fontWeight: 700,
-                              boxShadow: '0 1px 2px rgba(22, 101, 52, 0.05)',
-                              cursor: 'default',
-                            }}
-                          >
-                            <CheckCircle size={14} style={{ color: '#16a34a' }} />
-                            <span>Applied</span>
-                          </div>
-                        ) : actionState.status === 'TIME_CONFLICT' || actionState.status === 'NO_SEATS' || actionState.status === 'EXPIRED' ? (
-                          <button
-                            type="button"
-                            disabled
-                            style={{
-                              flex: 1,
-                              height: '36px',
-                              borderRadius: '10px',
-                              background: '#fff1f2',
-                              color: '#be123c',
-                              border: '1px solid #fecdd3',
-                              fontSize: '11.5px',
-                              fontWeight: 700,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '5px',
-                              cursor: 'not-allowed',
-                            }}
-                            title={actionState.reason || 'Not Eligible'}
-                          >
-                            <AlertTriangle size={13} style={{ color: '#e11d48' }} />
-                            <span>Not Eligible</span>
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="cp-btn cp-btn-primary"
-                            style={{
-                              flex: 1,
-                              justifyContent: 'center',
-                              height: '36px',
-                              borderRadius: '10px',
-                              fontSize: '12px',
-                              fontWeight: 700,
-                              background: actionState.status === 'WAITLIST' ? '#d97706' : '#166534',
-                              color: '#ffffff',
-                              border: `1px solid ${actionState.status === 'WAITLIST' ? '#b45309' : '#15803d'}`,
-                              boxShadow: actionState.status === 'WAITLIST' ? '0 2px 8px rgba(217, 119, 6, 0.25)' : '0 2px 8px rgba(22, 101, 52, 0.25)',
-                              cursor: 'pointer',
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRegisterEvent(event);
-                            }}
-                          >
-                            <span>{actionState.status === 'WAITLIST' ? 'Join Waitlist' : 'Register'}</span>
-                            <ArrowRight size={13} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {/* Mobile Stack Swipe Controls & Progress */}
+              <div className="flex items-center justify-between mt-3 px-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveStackIndex((prev) => (prev - 1 + paginated.length) % Math.max(1, paginated.length))}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition cursor-pointer shadow-xs"
+                >
+                  <ChevronLeft size={14} />
+                  <span>Prev</span>
+                </button>
+                <div className="flex flex-col items-center">
+                  <span className="text-xs font-bold text-slate-800 dark:text-zinc-200">
+                    {activeStackIndex + 1} of {paginated.length}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">Swipe card to flip</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveStackIndex((prev) => (prev + 1) % Math.max(1, paginated.length))}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition cursor-pointer shadow-xs"
+                >
+                  <span>Next</span>
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* ── Default Grid Layout (Desktop & Mobile Grid Mode) ── */
+            <div className="cp-event-grid">
+              {paginated.map(event => (
+                <div
+                  key={event.id}
+                  onClick={() => handleSelectEvent(event)}
+                  className="cp-event-card cursor-pointer group"
+                  style={{
+                    background: isDark ? '#141416' : '#ffffff',
+                    border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+                    borderRadius: '20px',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    maxWidth: '310px',
+                    width: '100%',
+                    boxShadow: isDark ? '0 4px 16px -2px rgba(0, 0, 0, 0.6)' : '0 4px 16px -2px rgba(0, 0, 0, 0.05)',
+                    transition: 'all 0.25s ease',
+                  }}
+                >
+                  {renderCardContent(event)}
+                </div>
+              ))}
             </div>
           )}
         </div>

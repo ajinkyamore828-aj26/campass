@@ -173,7 +173,7 @@ export const EditFeaturedEventModal: React.FC<EditFeaturedEventModalProps> = ({
                   className="cp-input"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Apex National Hackathon 2026"
+                  placeholder="e.g. Axiogen National Hackathon 2026"
                   required
                 />
               </div>

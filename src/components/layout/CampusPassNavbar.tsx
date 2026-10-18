@@ -82,7 +82,7 @@ export const CampusPassNavbar: React.FC = () => {
               </span>
             </div>
             <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 500 }}>
-              Apex Institute of Science & Technology • Digital Credential Engine
+              Team Axiogen • Digital Credential Engine
             </div>
           </div>
         </div>

@@ -112,13 +112,13 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const institutionProfile: InstitutionProfile = {
-    collegeName: 'Apex Institute of Science & Technology',
-    collegeCode: 'AIST-CAMPUS',
+    collegeName: 'Team Axiogen',
+    collegeCode: 'AXIOGEN',
     tagline: 'College Event Registration & Digital Pass Management System',
-    supportEmail: 'events@apex.edu',
+    supportEmail: 'events@axiogen.in',
     supportPhone: '+91 98765 01001',
     timezone: 'Asia/Kolkata',
-    address: 'Apex Knowledge City, Sector 4, University Enclave',
+    address: 'Axiogen HQ, Innovation & Event Operations Enclave',
     departments: [
       'Computer Science & Engineering',
       'Information Technology',
@@ -151,7 +151,7 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [currentUser, setCurrentUser] = useState<CampusUser>({
     id: 'USR-STU-01',
     fullName: 'Ajinkya More',
-    email: 'ajinkya.more@apex.edu',
+    email: 'ajinkya.more@axiogen.in',
     studentId: 'STU-2023-CS-041',
     department: 'Computer Science & Engineering',
     academicYear: '3rd Year',

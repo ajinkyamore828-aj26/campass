@@ -68,7 +68,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
   // Primary Applicant Interactive Form States
   const [studentName, setStudentName] = useState(currentUser.fullName || '');
   const [studentId, setStudentId] = useState(currentUser.studentId || '');
-  const [collegeName, setCollegeName] = useState('Apex Institute of Technology');
+  const [collegeName, setCollegeName] = useState('Team Axiogen');
   const [department, setDepartment] = useState(currentUser.department || DEPARTMENTS[0]);
   const [academicYear, setAcademicYear] = useState('Third Year (TY)');
   const [studentEmail, setStudentEmail] = useState(currentUser.email || '');
@@ -82,7 +82,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
       studentId: currentUser.studentId || 'STU-LEADER',
       name: currentUser.fullName || 'Team Leader',
       email: currentUser.email || '',
-      collegeName: 'Apex Institute of Technology',
+      collegeName: 'Team Axiogen',
       department: currentUser.department || DEPARTMENTS[0],
       academicYear: 'Third Year (TY)',
       role: 'LEADER'
@@ -92,7 +92,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
   // New member draft inputs
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberStudentId, setNewMemberStudentId] = useState('');
-  const [newMemberCollege, setNewMemberCollege] = useState('Apex Institute of Technology');
+  const [newMemberCollege, setNewMemberCollege] = useState('Team Axiogen');
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [newMemberDepartment, setNewMemberDepartment] = useState(DEPARTMENTS[0]);
   const [newMemberYear, setNewMemberYear] = useState(ACADEMIC_YEARS[2]);
@@ -573,7 +573,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Apex Institute of Technology, PICT, COEP, VIT Pune"
+                  placeholder="e.g. Team Axiogen, PICT, COEP, VIT Pune"
                   value={collegeName}
                   onChange={(e) => setCollegeName(e.target.value)}
                   style={inputStyle}
@@ -629,7 +629,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                   <input
                     type="email"
                     required
-                    placeholder="e.g. ajinkya.more@apex.edu"
+                    placeholder="e.g. ajinkya.more@axiogen.in"
                     value={studentEmail}
                     onChange={(e) => setStudentEmail(e.target.value)}
                     style={inputStyle}
@@ -686,7 +686,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Apex CyberKnights, Neural Forge"
+                    placeholder="e.g. Axiogen CyberKnights, Neural Forge"
                     value={teamName}
                     onChange={(e) => setTeamName(e.target.value)}
                     style={inputStyle}

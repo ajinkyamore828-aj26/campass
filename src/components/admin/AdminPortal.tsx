@@ -1520,7 +1520,7 @@ export const AdminPortal: React.FC = () => {
                   <input
                     type="email"
                     required
-                    placeholder="e.g. rajesh.sharma@apex.edu"
+                    placeholder="e.g. rajesh.sharma@axiogen.in"
                     className="cp-input"
                     value={newUserForm.email}
                     onChange={e => setNewUserForm({ ...newUserForm, email: e.target.value })}

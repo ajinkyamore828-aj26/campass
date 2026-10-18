@@ -4,6 +4,16 @@ import { useCampusPass } from '../../context/CampusPassContext';
 import { exportToCsv } from '../../utils/exportCsv';
 import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
 import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import {
   Plus,
   Calendar,
   MapPin,
@@ -29,7 +39,12 @@ import {
   Layers,
   Building,
   MoreHorizontal,
-  ArrowUp
+  ArrowUp,
+  ChevronFirst,
+  ChevronLast,
+  ChevronLeft,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 export const OrganizerStudio: React.FC = () => {
@@ -86,6 +101,76 @@ export const OrganizerStudio: React.FC = () => {
   const pendingCount = registrations.filter(r => r.status === 'PENDING').length;
   const approvedCount = registrations.filter(r => r.status === 'APPROVED').length;
   const verifiedCheckIns = passes.filter(p => p.status === 'USED').length;
+
+  // Sorting, selection & pagination states for Application Review Desk
+  const [sortField, setSortField] = useState<'studentName' | 'eventTitle' | 'referenceNumber' | 'dietaryPreference' | 'status' | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [selectedRegistrations, setSelectedRegistrations] = useState<Record<string, boolean>>({});
+  const [pageSize, setPageSize] = useState<number>(5);
+  const [pageIndex, setPageIndex] = useState<number>(0);
+
+  const sortedRegistrations = useMemo(() => {
+    if (!sortField) return filteredRegistrations;
+    return [...filteredRegistrations].sort((a, b) => {
+      let valA: any = (a as any)[sortField] || '';
+      let valB: any = (b as any)[sortField] || '';
+      if (typeof valA === 'string') valA = valA.toLowerCase();
+      if (typeof valB === 'string') valB = valB.toLowerCase();
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filteredRegistrations, sortField, sortDirection]);
+
+  const paginatedRegistrations = useMemo(() => {
+    const start = pageIndex * pageSize;
+    return sortedRegistrations.slice(start, start + pageSize);
+  }, [sortedRegistrations, pageIndex, pageSize]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedRegistrations.length / pageSize));
+
+  const allCurrentPageSelected = paginatedRegistrations.length > 0 && paginatedRegistrations.every(r => selectedRegistrations[r.id]);
+  const someCurrentPageSelected = paginatedRegistrations.some(r => selectedRegistrations[r.id]) && !allCurrentPageSelected;
+
+  const toggleSelectAll = (checked: boolean) => {
+    setSelectedRegistrations(prev => {
+      const next = { ...prev };
+      paginatedRegistrations.forEach(r => {
+        if (checked) {
+          next[r.id] = true;
+        } else {
+          delete next[r.id];
+        }
+      });
+      return next;
+    });
+  };
+
+  const toggleSelectRow = (id: string, checked: boolean) => {
+    setSelectedRegistrations(prev => {
+      const next = { ...prev };
+      if (checked) {
+        next[id] = true;
+      } else {
+        delete next[id];
+      }
+      return next;
+    });
+  };
+
+  const handleSort = (field: 'studentName' | 'eventTitle' | 'referenceNumber' | 'dietaryPreference' | 'status') => {
+    if (sortField === field) {
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else {
+        setSortField(null);
+        setSortDirection('asc');
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
 
   // Handle Approve
   const handleApprove = async (reg: CampusRegistration) => {
@@ -477,75 +562,149 @@ export const OrganizerStudio: React.FC = () => {
               </div>
             </div>
 
-            {/* Applications Table */}
-            <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
-              <table className="cp-table">
-                <thead>
-                  <tr>
-                    <th>Applicant Details</th>
-                    <th>Event & Mode</th>
-                    <th>Reference</th>
-                    <th>Meal Pref</th>
-                    <th>Status</th>
-                    <th style={{ textAlign: 'right' }}>Review Decision</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRegistrations.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} style={{ padding: '48px 18px', textAlign: 'center', color: '#64748b' }}>
+            {/* Applications Table (shadcn Table Architecture) */}
+            <div className="overflow-hidden rounded-lg border border-border bg-card shadow-xs">
+              <Table className="w-full">
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent border-b border-border">
+                    <TableHead style={{ width: '40px' }} className="h-11 px-3">
+                      <Checkbox
+                        checked={allCurrentPageSelected || (someCurrentPageSelected && "indeterminate")}
+                        onCheckedChange={(val) => toggleSelectAll(!!val)}
+                        aria-label="Select all current page"
+                      />
+                    </TableHead>
+                    <TableHead
+                      className="h-11 cursor-pointer select-none font-semibold text-xs tracking-wider"
+                      onClick={() => handleSort('studentName')}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span>Applicant Details</span>
+                        {sortField === 'studentName' && (
+                          sortDirection === 'asc' ? <ChevronUp size={14} className="opacity-70" /> : <ChevronDown size={14} className="opacity-70" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="h-11 cursor-pointer select-none font-semibold text-xs tracking-wider"
+                      onClick={() => handleSort('eventTitle')}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span>Event &amp; Mode</span>
+                        {sortField === 'eventTitle' && (
+                          sortDirection === 'asc' ? <ChevronUp size={14} className="opacity-70" /> : <ChevronDown size={14} className="opacity-70" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="h-11 cursor-pointer select-none font-semibold text-xs tracking-wider"
+                      style={{ width: '150px' }}
+                      onClick={() => handleSort('referenceNumber')}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span>Reference</span>
+                        {sortField === 'referenceNumber' && (
+                          sortDirection === 'asc' ? <ChevronUp size={14} className="opacity-70" /> : <ChevronDown size={14} className="opacity-70" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="h-11 cursor-pointer select-none font-semibold text-xs tracking-wider"
+                      style={{ width: '100px' }}
+                      onClick={() => handleSort('dietaryPreference')}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span>Meal Pref</span>
+                        {sortField === 'dietaryPreference' && (
+                          sortDirection === 'asc' ? <ChevronUp size={14} className="opacity-70" /> : <ChevronDown size={14} className="opacity-70" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="h-11 cursor-pointer select-none font-semibold text-xs tracking-wider"
+                      style={{ width: '120px' }}
+                      onClick={() => handleSort('status')}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span>Status</span>
+                        {sortField === 'status' && (
+                          sortDirection === 'asc' ? <ChevronUp size={14} className="opacity-70" /> : <ChevronDown size={14} className="opacity-70" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead className="h-11 text-right font-semibold text-xs tracking-wider" style={{ width: '160px' }}>
+                      Review Decision
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedRegistrations.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
                         No applications found matching the selected criteria.
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ) : (
-                    filteredRegistrations.map((reg) => (
-                      <tr key={reg.id}>
-                        <td>
-                          <strong style={{ color: isDark ? '#f8fafc' : '#0f172a', display: 'block', fontSize: '13px' }}>{reg.studentName}</strong>
-                          <span style={{ fontSize: '11px', color: '#64748b' }}>
+                    paginatedRegistrations.map((reg) => (
+                      <TableRow
+                        key={reg.id}
+                        data-state={selectedRegistrations[reg.id] && "selected"}
+                        className="transition-colors border-b border-border"
+                      >
+                        <TableCell className="px-3" style={{ width: '40px' }}>
+                          <Checkbox
+                            checked={!!selectedRegistrations[reg.id]}
+                            onCheckedChange={(val) => toggleSelectRow(reg.id, !!val)}
+                            aria-label={`Select ${reg.studentName}`}
+                          />
+                        </TableCell>
+
+                        <TableCell>
+                          <strong className="block text-sm font-semibold text-foreground">{reg.studentName}</strong>
+                          <span className="text-xs text-muted-foreground">
                             {reg.studentId} • {reg.department}
                           </span>
-                        </td>
+                        </TableCell>
 
-                        <td>
-                          <span style={{ fontWeight: 600, color: isDark ? '#f8fafc' : '#0f172a', display: 'block' }}>{reg.eventTitle}</span>
-                          <span style={{ fontSize: '11px', color: '#64748b' }}>
+                        <TableCell>
+                          <span className="block font-medium text-foreground text-sm">{reg.eventTitle}</span>
+                          <span className="text-xs text-muted-foreground">
                             {(reg.registrationType || reg.participationType) === 'TEAM'
                               ? `Team: ${reg.teamName} (${reg.teamMembers?.length || 0} pax)`
                               : 'Individual Entry'}
                           </span>
-                        </td>
+                        </TableCell>
 
-                        <td>
-                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#64748b' }}>
+                        <TableCell>
+                          <span className="font-mono text-xs text-muted-foreground">
                             {reg.referenceNumber || reg.id}
                           </span>
-                        </td>
+                        </TableCell>
 
-                        <td>
+                        <TableCell>
                           {reg.dietaryPreference ? (
-                            <span className="cp-badge cp-badge-wait">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                               {reg.dietaryPreference}
                             </span>
                           ) : (
-                            <span style={{ color: '#94a3b8', fontSize: '11px' }}>None</span>
+                            <span className="text-xs text-muted-foreground">None</span>
                           )}
-                        </td>
+                        </TableCell>
 
-                        <td>
+                        <TableCell>
                           <span className={
-                            reg.status === 'APPROVED' ? 'cp-badge cp-badge-open' :
-                            reg.status === 'PENDING' ? 'cp-badge cp-badge-closing' :
-                            reg.status === 'REJECTED' ? 'cp-badge cp-badge-full' :
-                            'cp-badge cp-badge-closed'
+                            reg.status === 'APPROVED' ? 'inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30' :
+                            reg.status === 'PENDING' ? 'inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30' :
+                            reg.status === 'REJECTED' ? 'inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-red-500/15 text-red-700 dark:text-red-300 border border-red-500/30' :
+                            'inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 border border-zinc-500/30'
                           }>
                             {reg.status}
                           </span>
-                        </td>
+                        </TableCell>
 
-                        <td style={{ textAlign: 'right' }}>
+                        <TableCell className="text-right">
                           {reg.status === 'PENDING' ? (
-                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                            <div className="inline-flex items-center gap-1.5 justify-end">
                               <button
                                 className="cp-btn cp-btn-primary cp-btn-sm"
                                 onClick={() => handleApprove(reg)}
@@ -553,7 +712,6 @@ export const OrganizerStudio: React.FC = () => {
                                 <Check size={12} />
                                 Approve
                               </button>
-
                               <button
                                 className="cp-btn cp-btn-danger cp-btn-sm"
                                 onClick={() => setRejectingReg(reg)}
@@ -563,16 +721,93 @@ export const OrganizerStudio: React.FC = () => {
                               </button>
                             </div>
                           ) : (
-                            <span style={{ fontSize: '11px', color: '#64748b' }}>
+                            <span className="text-xs text-muted-foreground">
                               {reg.reviewedBy ? `Reviewed by ${reg.reviewedBy}` : 'Processed'}
                             </span>
                           )}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))
                   )}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-between gap-4 pt-4 px-1 flex-wrap">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-muted-foreground whitespace-nowrap">
+                  Rows per page
+                </label>
+                <select
+                  className="text-xs py-1 px-2 h-8 rounded border border-border bg-background text-foreground cursor-pointer focus:outline-none"
+                  value={pageSize.toString()}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPageIndex(0);
+                  }}
+                >
+                  {[5, 10, 25, 50].map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="text-xs text-muted-foreground">
+                <span className="font-semibold text-foreground">
+                  {sortedRegistrations.length === 0 ? 0 : pageIndex * pageSize + 1}-
+                  {Math.min((pageIndex + 1) * pageSize, sortedRegistrations.length)}
+                </span>{" "}
+                of <span className="font-semibold text-foreground">{sortedRegistrations.length}</span>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-8 w-8 disabled:opacity-40"
+                  onClick={() => setPageIndex(0)}
+                  disabled={pageIndex === 0}
+                  title="First page"
+                >
+                  <ChevronFirst size={14} />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-8 w-8 disabled:opacity-40"
+                  onClick={() => setPageIndex(p => Math.max(0, p - 1))}
+                  disabled={pageIndex === 0}
+                  title="Previous page"
+                >
+                  <ChevronLeft size={14} />
+                </Button>
+                <span className="text-xs font-medium px-2 text-foreground">
+                  Page {pageIndex + 1} of {totalPages}
+                </span>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-8 w-8 disabled:opacity-40"
+                  onClick={() => setPageIndex(p => Math.min(totalPages - 1, p + 1))}
+                  disabled={pageIndex >= totalPages - 1}
+                  title="Next page"
+                >
+                  <ChevronRight size={14} />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-8 w-8 disabled:opacity-40"
+                  onClick={() => setPageIndex(totalPages - 1)}
+                  disabled={pageIndex >= totalPages - 1}
+                  title="Last page"
+                >
+                  <ChevronLast size={14} />
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -686,56 +921,52 @@ export const OrganizerStudio: React.FC = () => {
         {/* TAB 3: TURNSTILE TELEMETRY */}
         {activeTab === 'TELEMETRY' && (
           <div style={{ padding: '20px' }}>
-            <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
-              <table className="cp-table">
-                <thead>
-                  <tr>
-                    <th>Timestamp</th>
-                    <th>Attendee</th>
-                    <th>Event</th>
-                    <th>Gate Station</th>
-                    <th>Operator</th>
-                    <th>Verdict</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div className="overflow-hidden rounded-lg border border-border bg-card shadow-xs">
+              <Table className="w-full">
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent border-b border-border">
+                    <TableHead className="h-11 font-semibold text-xs tracking-wider">Timestamp</TableHead>
+                    <TableHead className="h-11 font-semibold text-xs tracking-wider">Attendee</TableHead>
+                    <TableHead className="h-11 font-semibold text-xs tracking-wider">Event</TableHead>
+                    <TableHead className="h-11 font-semibold text-xs tracking-wider">Gate Station</TableHead>
+                    <TableHead className="h-11 font-semibold text-xs tracking-wider">Operator</TableHead>
+                    <TableHead className="h-11 font-semibold text-xs tracking-wider">Verdict</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {scanLogs.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} style={{ padding: '36px 14px', textAlign: 'center', color: '#64748b' }}>
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
                         No check-in activity recorded yet. Check-ins will appear here once attendees are verified.
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ) : (
                     scanLogs.map((log) => (
-                      <tr key={log.id}>
-                        <td style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#64748b' }}>
+                      <TableRow key={log.id} className="transition-colors border-b border-border">
+                        <TableCell className="font-mono text-xs text-muted-foreground">
                           {new Date(log.timestamp || log.scannedAt || Date.now()).toLocaleTimeString()}
-                        </td>
-                        <td>
-                          <strong style={{ display: 'block', fontSize: '13px', color: isDark ? '#f8fafc' : '#0f172a' }}>{log.studentName}</strong>
-                          <span style={{ fontSize: '11px', color: '#64748b' }}>{log.studentId}</span>
-                        </td>
-                        <td style={{ fontWeight: 600, color: isDark ? '#f8fafc' : '#0f172a' }}>{log.eventTitle}</td>
-                        <td>
-                          <span style={{ fontSize: '12px', color: '#475569' }}>
-                            {log.gateOrStation || log.gate}
-                          </span>
-                        </td>
-                        <td>
-                          <span style={{ fontSize: '12px', color: '#64748b' }}>
-                            {log.operatorName || log.scannedBy}
-                          </span>
-                        </td>
-                        <td>
-                          <span className={log.result === 'VALID' ? 'cp-badge cp-badge-open' : 'cp-badge cp-badge-full'}>
+                        </TableCell>
+                        <TableCell>
+                          <strong className="block text-sm font-semibold text-foreground">{log.studentName}</strong>
+                          <span className="text-xs text-muted-foreground font-mono">{log.studentId}</span>
+                        </TableCell>
+                        <TableCell className="font-medium text-foreground text-sm">{log.eventTitle}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {log.gateOrStation || log.gate}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {log.operatorName || log.scannedBy}
+                        </TableCell>
+                        <TableCell>
+                          <span className={log.result === 'VALID' ? 'inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30' : 'inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-red-500/15 text-red-700 dark:text-red-300 border border-red-500/30'}>
                             {log.result}
                           </span>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))
                   )}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           </div>
         )}
@@ -886,7 +1117,7 @@ export const OrganizerStudio: React.FC = () => {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Apex HackSprint 2026: 24–Hour National Hackathon"
+                    placeholder="e.g. Axiogen HackSprint 2026: 24–Hour National Hackathon"
                     className="cp-input"
                     value={eventForm.title}
                     onChange={e => setEventForm({ ...eventForm, title: e.target.value })}

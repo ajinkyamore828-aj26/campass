@@ -171,9 +171,9 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
 
   return (
     <>
-      <header className="ds-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', height: '56px' }}>
+      <header className="ds-topbar flex items-center justify-between gap-2 sm:gap-4">
         {/* Left Section: Mobile Hamburger Menu (Mobile Only) + Desktop Sidebar Reopen + Institution Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {/* Animated Hamburger Icon Button - ONLY VISIBLE ON MOBILE PHONES */}
           <div className="ds-mobile-hamburger" style={{ position: 'relative' }} ref={navMenuRef}>
             <button
@@ -340,7 +340,7 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
             >
               <GraduationCap size={17} />
             </div>
-            <div style={{ minWidth: 0, maxWidth: '200px' }}>
+            <div className="min-w-0 max-w-[110px] sm:max-w-[180px] md:max-w-[220px]">
               <p className="truncate" style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>
                 {institutionProfile.collegeName}
               </p>
@@ -352,7 +352,7 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
         </div>
 
         {/* Right Section: Portal Switcher (Shifted left of bell) + Notifications + Status + User */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Switch Portal Dropdown (attached image 4) */}
           <div style={{ position: 'relative' }} ref={portalRef}>
             <button
@@ -627,8 +627,8 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
 
           {/* User Profile Mini Pill */}
           <div
+            className="hidden sm:flex"
             style={{
-              display: 'flex',
               alignItems: 'center',
               gap: '7px',
               padding: '3px 8px 3px 4px',

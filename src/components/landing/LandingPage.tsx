@@ -1,5 +1,6 @@
 import React from 'react';
 import Hero37 from '../ui/hero-37';
+import { CrowdCanvas } from '../ui/skiper39';
 import { Footer2 } from '../ui/footer2';
 import LogoIcon, { CampusPassWatermark } from '@/assets/logo-icon';
 import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from 'react-icons/fa6';
@@ -91,21 +92,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onExploreEvents, onNav
 
   return (
     <div className="dark bg-[#110d0a] text-white selection:bg-white/20 selection:text-white min-h-screen w-full flex flex-col justify-between overflow-x-hidden">
-      {/* ── Hero Section (Hero37 Pattern) ────────────────────────── */}
-      <Hero37
-        onExploreEvents={handleExplore}
-        onNavigate={onNavigate}
-        brandName="CampusPass"
-        headlineLine1="Where Innovation"
-        headlineLine2="Meets Impact."
-        subtitle="Empowering students to build, compete, and lead in premier hackathons, workshops, and cultural fests with instant cryptographic gate passes."
-        ctaText="Explore"
-        stat1Value={`${openEventsCount} Live Events`}
-        stat1Label="Hackathons & Cultural Fests"
-        stat2Value={`${totalPassesIssued} Passes Issued`}
-        stat2Label="Atomic Turnstile Verification"
-        tagline="Centralized College Event & Digital Pass Infrastructure"
-      />
+      {/* ── Hero Section with Animated Crowd Canvas Overlay at Bottom ── */}
+      <div className="relative w-full">
+        <Hero37
+          onExploreEvents={handleExplore}
+          onNavigate={onNavigate}
+          brandName="CampusPass"
+          headlineLine1="Where Innovation"
+          headlineLine2="Meets Impact."
+          subtitle="Empowering students to build, compete, and lead in premier hackathons, workshops, and cultural fests with instant cryptographic gate passes."
+          ctaText="Explore"
+          stat1Value={`${openEventsCount} Live Events`}
+          stat1Label="Hackathons & Cultural Fests"
+          stat2Value={`${totalPassesIssued} Passes Issued`}
+          stat2Label="Atomic Turnstile Verification"
+          tagline="Centralized College Event & Digital Pass Infrastructure"
+        />
+
+        {/* ── Crowd Canvas Overlay directly at end of landing page & above footer ── */}
+        <div className="pointer-events-none absolute bottom-0 left-0 w-full h-[380px] md:h-[450px] overflow-hidden z-10 opacity-35">
+          <CrowdCanvas
+            src="/images/peeps/all-peeps.png"
+            rows={15}
+            cols={7}
+            className="absolute bottom-0 left-0 w-full h-full pointer-events-none"
+          />
+        </div>
+      </div>
 
       {/* ── CampusPass Footer2 ─────── */}
       <Footer2

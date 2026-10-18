@@ -4,6 +4,8 @@ import { useCampusPass } from '../../context/CampusPassContext';
 import { generateQrDataUrl } from '../../utils/qrGenerator';
 import { downloadPassPdf } from '../../utils/exportPdf';
 import { DynamicNeuroNoise } from '@/components/ui/dynamic-neuro-noise';
+import { motion, AnimatePresence, LayoutGroup, type PanInfo } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import {
   FileText,
   Calendar,
@@ -23,6 +25,7 @@ import {
   Building,
   MapPin,
   ChevronRight,
+  ChevronLeft,
   ExternalLink,
   Mail,
   Send,
@@ -32,7 +35,9 @@ import {
   QrCode,
   Tag,
   MoreHorizontal,
-  ArrowUp
+  ArrowUp,
+  Layers,
+  Grid3X3
 } from 'lucide-react';
 
 interface MyApplicationsListProps {
@@ -69,6 +74,54 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
     if (activeTab === 'ALL') return studentRegistrations;
     return studentRegistrations.filter(r => r.status === activeTab);
   }, [studentRegistrations, activeTab]);
+
+  // Morphing Card Stack layout states: 'grid' | 'stack' (defaulting to 'stack')
+  const [layoutMode, setLayoutMode] = useState<'grid' | 'stack'>('stack');
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const { offset, velocity } = info;
+    const swipe = Math.abs(offset.x) * velocity.x;
+
+    if (offset.x < -50 || swipe < -1000) {
+      setActiveIndex((prev) => (prev + 1) % Math.max(1, filteredRegistrations.length));
+    } else if (offset.x > 50 || swipe > 1000) {
+      setActiveIndex((prev) => (prev - 1 + filteredRegistrations.length) % Math.max(1, filteredRegistrations.length));
+    }
+    setIsDragging(false);
+  };
+
+  const getStackOrder = () => {
+    const reordered = [];
+    for (let i = 0; i < filteredRegistrations.length; i++) {
+      const index = (activeIndex + i) % filteredRegistrations.length;
+      reordered.push({ reg: filteredRegistrations[index], stackPosition: i });
+    }
+    return reordered.reverse();
+  };
+
+  const getLayoutStyles = (stackPosition: number) => {
+    switch (layoutMode) {
+      case 'stack':
+        return {
+          y: stackPosition * 12,
+          scale: 1 - stackPosition * 0.04,
+          rotate: stackPosition === 0 ? 0 : (stackPosition % 2 === 0 ? 1.5 : -1.5) * Math.min(stackPosition, 2),
+          zIndex: filteredRegistrations.length - stackPosition,
+          opacity: stackPosition > 3 ? 0 : 1,
+        };
+      case 'grid':
+      default:
+        return {
+          y: 0,
+          scale: 1,
+          rotate: 0,
+          zIndex: 1,
+          opacity: 1,
+        };
+    }
+  };
 
   const handleCancel = async (id: string, eventTitle: string) => {
     if (!window.confirm(`Are you sure you want to withdraw your application for "${eventTitle}"?`)) {
@@ -310,7 +363,7 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
 
       {/* Registrations List Section */}
       <div className="cp-section-card">
-        <div className="cp-section-card-header">
+        <div className="cp-section-card-header flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h3 style={{ fontSize: '15px', fontWeight: 700, color: isDark ? '#f4f4f5' : '#09090b' }}>Application Records</h3>
             <p style={{ fontSize: '12px', color: '#64748b' }}>
@@ -318,17 +371,54 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
             </p>
           </div>
 
-          {/* Filter Tabs */}
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {(['ALL', 'PENDING', 'APPROVED', 'WAITLISTED', 'REJECTED'] as FilterTab[]).map(tab => (
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Filter Tabs */}
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {(['ALL', 'PENDING', 'APPROVED', 'WAITLISTED', 'REJECTED'] as FilterTab[]).map(tab => (
+                <button
+                  key={tab}
+                  className={`cp-chip${activeTab === tab ? ' active' : ''}`}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    setActiveIndex(0);
+                  }}
+                >
+                  {tab === 'ALL' ? 'All Registrations' : tab.charAt(0) + tab.slice(1).toLowerCase()}
+                </button>
+              ))}
+            </div>
+
+            {/* Morphing Layout Mode Switcher: Only Grid and Stack */}
+            <div className="flex items-center gap-1 p-1 rounded-lg border border-border bg-muted/40 shadow-inner">
               <button
-                key={tab}
-                className={`cp-chip${activeTab === tab ? ' active' : ''}`}
-                onClick={() => setActiveTab(tab)}
+                type="button"
+                onClick={() => setLayoutMode('grid')}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition-all",
+                  layoutMode === 'grid'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                title="Grid View"
               >
-                {tab === 'ALL' ? 'All Registrations' : tab.charAt(0) + tab.slice(1).toLowerCase()}
+                <Grid3X3 size={14} />
+                <span>Grid</span>
               </button>
-            ))}
+              <button
+                type="button"
+                onClick={() => setLayoutMode('stack')}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition-all",
+                  layoutMode === 'stack'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                title="Stack Mode (Swipeable 3D Deck)"
+              >
+                <Layers size={14} />
+                <span>Stack</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -347,262 +437,358 @@ export const MyApplicationsList: React.FC<MyApplicationsListProps> = ({
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {filteredRegistrations.map(reg => {
-                const event = events.find(e => e.id === reg.eventId);
-                const requiresPass = reg.requiresPass !== false && (event?.requiresPass !== false);
+            <div>
+              <LayoutGroup id="student-composite-applications">
+                <motion.div
+                  layout
+                  className={cn(
+                    "transition-all duration-300",
+                    layoutMode === 'stack' && "relative min-h-[540px] sm:min-h-[460px] max-w-2xl mx-auto w-full pt-2 pb-6",
+                    layoutMode === 'grid' && "grid grid-cols-1 md:grid-cols-2 gap-4 w-full"
+                  )}
+                >
+                  <AnimatePresence mode="popLayout">
+                    {(layoutMode === 'stack' ? getStackOrder() : filteredRegistrations.map((reg, idx) => ({ reg, stackPosition: idx }))).map(({ reg, stackPosition }) => {
+                      const event = events.find(e => e.id === reg.eventId);
+                      const requiresPass = reg.requiresPass !== false && (event?.requiresPass !== false);
+                      const isTopCard = layoutMode === 'stack' && stackPosition === 0;
+                      const animStyles = getLayoutStyles(stackPosition);
 
-                // Status Badge metadata
-                const getStatusMeta = () => {
-                  switch (reg.status) {
-                    case 'APPROVED':
-                      return requiresPass
-                        ? { cls: 'cp-badge cp-badge-open', label: 'Approved & Pass Emailed', icon: CheckCircle }
-                        : { cls: 'cp-badge', label: 'Confirmed (No Pass Required)', icon: CheckCircle, customStyle: { backgroundColor: isDark ? '#18181b' : '#f1f5f9', color: isDark ? '#d4d4d8' : '#334155', border: isDark ? '1px solid #27272a' : '1px solid #cbd5e1' } };
-                    case 'PENDING':
-                      return { cls: 'cp-badge cp-badge-closing', label: 'Under Review', icon: Hourglass };
-                    case 'WAITLISTED':
-                      return { cls: 'cp-badge cp-badge-wait', label: 'Waitlisted', icon: Clock };
-                    case 'REJECTED':
-                      return { cls: 'cp-badge cp-badge-full', label: 'Application Rejected', icon: XCircle };
-                    case 'CANCELLED':
-                      return { cls: 'cp-badge cp-badge-closed', label: 'Withdrawn', icon: Trash2 };
-                  }
-                };
+                      // Status Badge metadata
+                      const getStatusMeta = () => {
+                        switch (reg.status) {
+                          case 'APPROVED':
+                            return requiresPass
+                              ? { cls: 'cp-badge cp-badge-open', label: 'Approved & Pass Emailed', icon: CheckCircle }
+                              : { cls: 'cp-badge', label: 'Confirmed (No Pass Required)', icon: CheckCircle, customStyle: { backgroundColor: isDark ? '#18181b' : '#f1f5f9', color: isDark ? '#d4d4d8' : '#334155', border: isDark ? '1px solid #27272a' : '1px solid #cbd5e1' } };
+                          case 'PENDING':
+                            return { cls: 'cp-badge cp-badge-closing', label: 'Under Review', icon: Hourglass };
+                          case 'WAITLISTED':
+                            return { cls: 'cp-badge cp-badge-wait', label: 'Waitlisted', icon: Clock };
+                          case 'REJECTED':
+                            return { cls: 'cp-badge cp-badge-full', label: 'Application Rejected', icon: XCircle };
+                          case 'CANCELLED':
+                            return { cls: 'cp-badge cp-badge-closed', label: 'Withdrawn', icon: Trash2 };
+                        }
+                      };
 
-                const statusMeta = getStatusMeta();
-                const StatusIcon = statusMeta.icon;
+                      const statusMeta = getStatusMeta();
+                      const StatusIcon = statusMeta.icon;
 
-                return (
-                  <div
-                    key={reg.id}
-                    style={{
-                      background: isDark ? '#141416' : '#ffffff',
-                      border: reg.status === 'APPROVED' ? (requiresPass ? (isDark ? '1px solid #166534' : '1px solid #bbf7d0') : (isDark ? '1px solid #27272a' : '1px solid #cbd5e1')) : (isDark ? '1px solid #27272a' : '1px solid #e2e8f0'),
-                      borderRadius: '14px',
-                      padding: '18px 20px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '14px',
-                      boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.5)' : '0 1px 3px rgba(0,0,0,0.03)',
-                      transition: 'border-color 0.15s, box-shadow 0.15s'
-                    }}
-                  >
-                    {/* Top Row: Ref + Status */}
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                          <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#64748b', fontWeight: 600 }}>
-                            REF: {reg.referenceNumber || reg.id}
-                          </span>
-                          <span style={{ color: '#cbd5e1' }}>•</span>
-                          <span style={{ fontSize: '11.5px', color: '#64748b' }}>
-                            Submitted on {new Date(reg.createdAt || reg.submittedAt || Date.now()).toLocaleDateString()}
-                          </span>
-                        </div>
-
-                        <h3 style={{ fontSize: '17px', fontWeight: 800, color: isDark ? '#f4f4f5' : '#09090b', margin: '0 0 4px 0' }}>
-                          {reg.eventTitle}
-                        </h3>
-
-                        {event && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#64748b', flexWrap: 'wrap' }}>
-                            <span style={{ fontWeight: 700, color: '#166534' }}>{event.category}</span>
-                            <span style={{ color: '#cbd5e1' }}>•</span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <Calendar size={12} style={{ color: '#94a3b8' }} />
-                              <span>{event.startDate || event.date}</span>
-                            </div>
-                            <span style={{ color: '#cbd5e1' }}>•</span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <MapPin size={12} style={{ color: '#94a3b8' }} />
-                              <span>{event.venue}</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div>
-                        <span 
-                          className={statusMeta.cls} 
-                          style={{ 
-                            display: 'inline-flex', 
-                            alignItems: 'center', 
-                            gap: '4px',
-                            ...(statusMeta.customStyle || {})
+                      return (
+                        <motion.div
+                          key={reg.id}
+                          layoutId={reg.id}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{
+                            ...animStyles,
+                          }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 320,
+                            damping: 28,
+                          }}
+                          drag={layoutMode === 'stack' && isTopCard ? 'x' : false}
+                          dragConstraints={{ left: 0, right: 0 }}
+                          dragElastic={0.6}
+                          onDragStart={() => setIsDragging(true)}
+                          onDragEnd={handleDragEnd}
+                          onClick={() => {
+                            if (layoutMode === 'stack' && !isTopCard) {
+                              const foundIdx = filteredRegistrations.findIndex(r => r.id === reg.id);
+                              if (foundIdx !== -1) setActiveIndex(foundIdx);
+                            }
+                          }}
+                          className={cn(
+                            "rounded-2xl border transition-shadow duration-200 p-4 sm:p-5",
+                            layoutMode === 'stack' ? "absolute inset-x-2 top-0 cursor-grab active:cursor-grabbing shadow-xl" : "relative w-full shadow-sm hover:shadow-md",
+                            isDark ? "bg-[#141416] text-[#f4f4f5]" : "bg-white text-[#09090b]",
+                            reg.status === 'APPROVED'
+                              ? (requiresPass
+                                  ? (isDark ? "border-emerald-600/40" : "border-emerald-300")
+                                  : (isDark ? "border-zinc-800" : "border-slate-200"))
+                              : (isDark ? "border-zinc-800" : "border-slate-200")
+                          )}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '14px',
+                            transformOrigin: 'top center',
                           }}
                         >
-                          <StatusIcon size={12} />
-                          {statusMeta.label}
-                        </span>
-                      </div>
-                    </div>
+                          {/* Top Row: Ref + Status */}
+                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#64748b', fontWeight: 600 }}>
+                                  REF: {reg.referenceNumber || reg.id}
+                                </span>
+                                <span style={{ color: '#cbd5e1' }}>•</span>
+                                <span style={{ fontSize: '11.5px', color: '#64748b' }}>
+                                  Submitted on {new Date(reg.createdAt || reg.submittedAt || Date.now()).toLocaleDateString()}
+                                </span>
+                              </div>
 
-                    {/* Pass Delivery / Open Entry Notice Banner */}
-                    {reg.status === 'APPROVED' && (
-                      requiresPass ? (
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px',
-                          padding: '10px 14px',
-                          borderRadius: '10px',
-                          backgroundColor: '#f0fdf4',
-                          border: '1px solid #bbf7d0',
-                          fontSize: '12px',
-                          color: '#166534'
-                        }}>
-                          <Mail size={15} style={{ color: '#166534', flexShrink: 0 }} />
-                          <div style={{ flex: 1 }}>
-                            <span>Official Event Pass has been emailed to: <strong>{reg.passEmailAddress || reg.studentEmail}</strong></span>
-                            {reg.passId && (
-                              <span style={{ marginLeft: '8px', color: '#15803d', fontWeight: 600, fontSize: '11px' }}>
-                                (PASS ID: {reg.passId})
-                              </span>
-                            )}
-                          </div>
-                          {reg.passSentAt && (
-                            <span style={{ fontSize: '11px', color: '#15803d', fontWeight: 600 }}>
-                              Sent {new Date(reg.passSentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px',
-                          padding: '10px 14px',
-                          borderRadius: '10px',
-                          backgroundColor: isDark ? '#18181b' : '#f8fafc',
-                          border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
-                          fontSize: '12px',
-                          color: isDark ? '#d4d4d8' : '#475569'
-                        }}>
-                          <CheckCircle size={15} style={{ color: '#166534', flexShrink: 0 }} />
-                          <div>
-                            <strong>Direct Open Attendance Confirmed:</strong> No event pass is required by admin for this session. Please carry your college student ID card.
-                          </div>
-                        </div>
-                      )
-                    )}
+                              <h3 style={{ fontSize: '17px', fontWeight: 800, color: isDark ? '#f4f4f5' : '#09090b', margin: '0 0 4px 0' }}>
+                                {reg.eventTitle}
+                              </h3>
 
-                    {/* Team Preview if applicable */}
-                    {reg.registrationType === 'TEAM' && (
-                      <div style={{
-                        padding: '10px 14px',
-                        borderRadius: '10px',
-                        background: isDark ? '#18181b' : '#f8fafc',
-                        border: isDark ? '1px solid #27272a' : '1px solid #f1f5f9',
-                        fontSize: '12px'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: isDark ? '#f4f4f5' : '#09090b', marginBottom: '6px' }}>
-                          <Users size={14} style={{ color: '#166534' }} />
-                          <span>Team Roster: {reg.teamName}</span>
-                        </div>
-
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                          {reg.teamMembers?.map(m => (
-                            <div
-                              key={m.studentId}
-                              style={{
-                                padding: '3px 8px',
-                                borderRadius: '6px',
-                                background: isDark ? '#141416' : '#ffffff',
-                                border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
-                                fontSize: '11px',
-                                color: isDark ? '#f4f4f5' : '#374151'
-                              }}
-                            >
-                              <strong>{m.name}</strong> ({m.role || 'Member'})
+                              {event && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#64748b', flexWrap: 'wrap' }}>
+                                  <span style={{ fontWeight: 700, color: '#166534' }}>{event.category}</span>
+                                  <span style={{ color: '#cbd5e1' }}>•</span>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <Calendar size={12} style={{ color: '#94a3b8' }} />
+                                    <span>{event.startDate || event.date}</span>
+                                  </div>
+                                  <span style={{ color: '#cbd5e1' }}>•</span>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <MapPin size={12} style={{ color: '#94a3b8' }} />
+                                    <span>{event.venue}</span>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
 
-                    {/* Rejection notice if applicable */}
-                    {reg.status === 'REJECTED' && reg.rejectionReason && (
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '8px',
-                        padding: '10px 14px',
-                        borderRadius: '10px',
-                        backgroundColor: '#fee2e2',
-                        border: '1px solid #fecaca',
-                        color: '#b91c1c',
-                        fontSize: '12px'
-                      }}>
-                        <ShieldAlert size={15} style={{ flexShrink: 0, marginTop: '2px' }} />
-                        <div>
-                          <strong>Reviewer Feedback:</strong> {reg.rejectionReason}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Bottom Action Footer */}
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      borderTop: '1px solid #f1f5f9',
-                      paddingTop: '12px',
-                      flexWrap: 'wrap',
-                      gap: '10px'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px', color: '#64748b' }}>
-                        {reg.dietaryPreference && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <Utensils size={12} style={{ color: '#0f766e' }} />
-                            <span>Meal: <strong>{reg.dietaryPreference}</strong></span>
+                            <div>
+                              <span 
+                                className={statusMeta.cls} 
+                                style={{ 
+                                  display: 'inline-flex', 
+                                  alignItems: 'center', 
+                                  gap: '4px',
+                                  ...(statusMeta.customStyle || {})
+                                }}
+                              >
+                                <StatusIcon size={12} />
+                                {statusMeta.label}
+                              </span>
+                            </div>
                           </div>
-                        )}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Tag size={12} style={{ color: '#94a3b8' }} />
-                          <span>Format: <strong>{reg.registrationType}</strong></span>
-                        </div>
-                      </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                        {reg.status === 'APPROVED' && requiresPass && (
-                          <>
-                            <button
-                              className="cp-btn cp-btn-primary cp-btn-sm"
-                              onClick={() => handleOpenReceipt(reg)}
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                            >
-                              <Ticket size={13} />
-                              View Email Pass Receipt
-                            </button>
+                          {/* Pass Delivery / Open Entry Notice Banner */}
+                          {reg.status === 'APPROVED' && (
+                            requiresPass ? (
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                padding: '10px 14px',
+                                borderRadius: '10px',
+                                backgroundColor: isDark ? '#052e16' : '#f0fdf4',
+                                border: isDark ? '1px solid #166534' : '1px solid #bbf7d0',
+                                fontSize: '12px',
+                                color: isDark ? '#86efac' : '#166534'
+                              }}>
+                                <Mail size={15} style={{ color: isDark ? '#86efac' : '#166534', flexShrink: 0 }} />
+                                <div style={{ flex: 1 }}>
+                                  <span>Official Event Pass has been emailed to: <strong>{reg.passEmailAddress || reg.studentEmail}</strong></span>
+                                  {reg.passId && (
+                                    <span style={{ marginLeft: '8px', color: isDark ? '#4ade80' : '#15803d', fontWeight: 600, fontSize: '11px' }}>
+                                      (PASS ID: {reg.passId})
+                                    </span>
+                                  )}
+                                </div>
+                                {reg.passSentAt && (
+                                  <span style={{ fontSize: '11px', color: isDark ? '#4ade80' : '#15803d', fontWeight: 600 }}>
+                                    Sent {new Date(reg.passSentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                padding: '10px 14px',
+                                borderRadius: '10px',
+                                backgroundColor: isDark ? '#18181b' : '#f8fafc',
+                                border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+                                fontSize: '12px',
+                                color: isDark ? '#d4d4d8' : '#475569'
+                              }}>
+                                <CheckCircle size={15} style={{ color: '#166534', flexShrink: 0 }} />
+                                <div>
+                                  <strong>Direct Open Attendance Confirmed:</strong> No event pass is required by admin for this session. Please carry your college student ID card.
+                                </div>
+                              </div>
+                            )
+                          )}
 
-                            <button
-                              className="cp-btn cp-btn-outline cp-btn-sm"
-                              onClick={() => handleResendPass(reg.id, reg.passEmailAddress || reg.studentEmail)}
-                              disabled={resendingId === reg.id}
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                            >
-                              <Send size={13} />
-                              {resendingId === reg.id ? 'Resending...' : 'Resend Email Pass'}
-                            </button>
-                          </>
-                        )}
+                          {/* Team Preview if applicable */}
+                          {reg.registrationType === 'TEAM' && (
+                            <div style={{
+                              padding: '10px 14px',
+                              borderRadius: '10px',
+                              background: isDark ? '#18181b' : '#f8fafc',
+                              border: isDark ? '1px solid #27272a' : '1px solid #f1f5f9',
+                              fontSize: '12px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: isDark ? '#f4f4f5' : '#09090b', marginBottom: '6px' }}>
+                                <Users size={14} style={{ color: '#166534' }} />
+                                <span>Team Roster: {reg.teamName}</span>
+                              </div>
 
-                        {(reg.status === 'PENDING' || reg.status === 'WAITLISTED') && (
-                          <button
-                            className="cp-btn cp-btn-danger cp-btn-sm"
-                            onClick={() => handleCancel(reg.id, reg.eventTitle)}
-                            disabled={cancellingId === reg.id}
-                          >
-                            <Trash2 size={13} />
-                            {cancellingId === reg.id ? 'Withdrawing...' : 'Withdraw Application'}
-                          </button>
-                        )}
-                      </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {reg.teamMembers?.map(m => (
+                                  <div
+                                    key={m.studentId}
+                                    style={{
+                                      padding: '3px 8px',
+                                      borderRadius: '6px',
+                                      background: isDark ? '#141416' : '#ffffff',
+                                      border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+                                      fontSize: '11px',
+                                      color: isDark ? '#f4f4f5' : '#374151'
+                                    }}
+                                  >
+                                    <strong>{m.name}</strong> ({m.role || 'Member'})
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Rejection notice if applicable */}
+                          {reg.status === 'REJECTED' && reg.rejectionReason && (
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: '8px',
+                              padding: '10px 14px',
+                              borderRadius: '10px',
+                              backgroundColor: isDark ? '#450a0a' : '#fee2e2',
+                              border: isDark ? '1px solid #991b1b' : '1px solid #fecaca',
+                              color: isDark ? '#fca5a5' : '#b91c1c',
+                              fontSize: '12px'
+                            }}>
+                              <ShieldAlert size={15} style={{ flexShrink: 0, marginTop: '2px' }} />
+                              <div>
+                                <strong>Reviewer Feedback:</strong> {reg.rejectionReason}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Bottom Action Footer */}
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            borderTop: isDark ? '1px solid #27272a' : '1px solid #f1f5f9',
+                            paddingTop: '12px',
+                            flexWrap: 'wrap',
+                            gap: '10px'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px', color: '#64748b' }}>
+                              {reg.dietaryPreference && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <Utensils size={12} style={{ color: '#0f766e' }} />
+                                  <span>Meal: <strong>{reg.dietaryPreference}</strong></span>
+                                </div>
+                              )}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Tag size={12} style={{ color: '#94a3b8' }} />
+                                <span>Format: <strong>{reg.registrationType}</strong></span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto justify-start sm:justify-end">
+                              {reg.status === 'APPROVED' && requiresPass && (
+                                <>
+                                  <button
+                                    className="cp-btn cp-btn-primary cp-btn-sm w-full sm:w-auto justify-center"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleOpenReceipt(reg);
+                                    }}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                  >
+                                    <Ticket size={13} />
+                                    View Email Pass Receipt
+                                  </button>
+
+                                  <button
+                                    className="cp-btn cp-btn-outline cp-btn-sm w-full sm:w-auto justify-center"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleResendPass(reg.id, reg.passEmailAddress || reg.studentEmail);
+                                    }}
+                                    disabled={resendingId === reg.id}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                  >
+                                    <Send size={13} />
+                                    {resendingId === reg.id ? 'Resending...' : 'Resend Email Pass'}
+                                  </button>
+                                </>
+                              )}
+
+                              {(reg.status === 'PENDING' || reg.status === 'WAITLISTED') && (
+                                <button
+                                  className="cp-btn cp-btn-danger cp-btn-sm w-full sm:w-auto justify-center"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCancel(reg.id, reg.eventTitle);
+                                  }}
+                                  disabled={cancellingId === reg.id}
+                                >
+                                  <Trash2 size={13} />
+                                  {cancellingId === reg.id ? 'Withdrawing...' : 'Withdraw Application'}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </motion.div>
+              </LayoutGroup>
+
+              {/* Stack Mode Navigation Indicators */}
+              {layoutMode === 'stack' && filteredRegistrations.length > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-border mt-6">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveIndex(prev => (prev - 1 + filteredRegistrations.length) % filteredRegistrations.length)}
+                      className="p-1.5 rounded-md border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                      title="Previous Card"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <div className="flex items-center gap-1.5">
+                      {filteredRegistrations.map((_, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setActiveIndex(i)}
+                          className={cn(
+                            "h-2 rounded-full transition-all duration-200",
+                            i === activeIndex
+                              ? (isDark ? "w-6 bg-emerald-500" : "w-6 bg-emerald-600")
+                              : (isDark ? "w-2 bg-zinc-700 hover:bg-zinc-600" : "w-2 bg-zinc-300 hover:bg-zinc-400")
+                          )}
+                          aria-label={`Go to application card ${i + 1}`}
+                        />
+                      ))}
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveIndex(prev => (prev + 1) % filteredRegistrations.length)}
+                      className="p-1.5 rounded-md border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                      title="Next Card"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
                   </div>
-                );
-              })}
+
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
+                    <span>CARD {activeIndex + 1} OF {filteredRegistrations.length}</span>
+                    <span className="hidden sm:inline">• Drag left/right to swipe</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

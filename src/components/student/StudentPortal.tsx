@@ -76,27 +76,30 @@ export const StudentPortal: React.FC = () => {
       )}
 
       {/* Subtab Navigation Strip (CampusPass Segmented Control) */}
-      <div style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '6px',
-        padding: '6px',
-        borderRadius: '14px',
-        backgroundColor: '#f1f5f9',
-        border: '1px solid var(--border)',
-        boxShadow: 'var(--shadow-xs)',
-        overflowX: 'auto',
-        alignSelf: 'flex-start'
-      }}>
+      <div 
+        className="w-full sm:w-auto flex sm:inline-flex"
+        style={{
+          alignItems: 'center',
+          gap: '4px',
+          padding: '4px',
+          borderRadius: '12px',
+          backgroundColor: '#f1f5f9',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-xs)',
+          overflowX: 'auto',
+          alignSelf: 'flex-start'
+        }}
+      >
         <button
           type="button"
           onClick={() => setActiveSubTab('DISCOVER')}
+          className="flex-1 sm:flex-none justify-center"
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '8px 18px',
-            borderRadius: '10px',
+            padding: '8px 16px',
+            borderRadius: '9px',
             fontSize: '13px',
             fontWeight: activeSubTab === 'DISCOVER' ? 700 : 500,
             cursor: 'pointer',
@@ -114,12 +117,13 @@ export const StudentPortal: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveSubTab('APPLICATIONS')}
+          className="flex-1 sm:flex-none justify-center"
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '8px 18px',
-            borderRadius: '10px',
+            padding: '8px 16px',
+            borderRadius: '9px',
             fontSize: '13px',
             fontWeight: activeSubTab === 'APPLICATIONS' ? 700 : 500,
             cursor: 'pointer',

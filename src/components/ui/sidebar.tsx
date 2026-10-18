@@ -224,7 +224,17 @@ export const MobileSidebar = ({
               >
                 <X className="size-5" />
               </div>
-              {children}
+              <SidebarContext.Provider
+                value={{
+                  open: true,
+                  setOpen: () => {},
+                  mobileOpen,
+                  setMobileOpen,
+                  animate: false,
+                }}
+              >
+                {children}
+              </SidebarContext.Provider>
             </motion.div>
           </>
         )}

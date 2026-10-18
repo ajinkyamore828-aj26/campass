@@ -898,7 +898,7 @@ export const GateScannerPortal: React.FC = () => {
           </span>
         </div>
 
-        <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+        <div className="cp-table-container">
           <table className="cp-table">
             <thead>
               <tr>
