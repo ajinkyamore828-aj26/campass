@@ -210,7 +210,7 @@ export default function Hero37({
             >
               <button
                 type="button"
-                onClick={() => onNavigate ? onNavigate('DISCOVER', '/students') : onExploreEvents?.()}
+                onClick={() => onNavigate ? onNavigate('LOGIN_STUDENT', '/login/student') : (window.location.href = '/login/student')}
                 style={{
                   paddingLeft: '28px',
                   paddingRight: '28px',
@@ -238,9 +238,9 @@ export default function Hero37({
                 type="button"
                 onClick={() => {
                   if (onNavigate) {
-                    onNavigate('ADMIN', '/admin');
+                    onNavigate('LOGIN_ADMIN', '/login/admin');
                   } else {
-                    window.location.href = '/admin';
+                    window.location.href = '/login/admin';
                   }
                 }}
                 style={{

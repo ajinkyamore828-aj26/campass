@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useCampusPass } from '../../context/CampusPassContext';
 import {
   Bell,
-  ChevronDown,
   ShieldCheck,
   Calendar,
   BarChart3,
@@ -12,7 +11,6 @@ import {
   Building,
   GraduationCap,
   User,
-  Check,
 } from 'lucide-react';
 import { MenuIcon } from '@/components/ui/icons-menu';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
@@ -50,12 +48,10 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
   const isDark = theme === 'dark';
 
   const [navMenuOpen, setNavMenuOpen] = useState(false);
-  const [portalOpen, setPortalOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [selectedNotifCat, setSelectedNotifCat] = useState<string>('all');
 
   const navMenuRef = useRef<HTMLDivElement>(null);
-  const portalRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const unread = announcements.length;
@@ -64,13 +60,6 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
 
   const pendingApprovals = registrations.filter(r => r.status === 'PENDING').length;
   const openEvents = events.filter(e => e.status === 'OPEN').length;
-
-  const handleRoleSwitch = (role: 'STUDENT' | 'ADMIN') => {
-    switchUserRole(role as any);
-    setPortalOpen(false);
-    if (role === 'STUDENT') onNavigate('DISCOVER');
-    if (role === 'ADMIN') onNavigate('DISCOVER');
-  };
 
   // Filter navigation items strictly based on the user's active portal role
   const navOptions = useMemo(() => {
@@ -143,7 +132,6 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setNavMenuOpen(false);
-        setPortalOpen(false);
         setNotifOpen(false);
       }
     };
@@ -157,9 +145,6 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
       const target = e.target as Node;
       if (navMenuRef.current && !navMenuRef.current.contains(target)) {
         setNavMenuOpen(false);
-      }
-      if (portalRef.current && !portalRef.current.contains(target)) {
-        setPortalOpen(false);
       }
       if (notifRef.current && !notifRef.current.contains(target)) {
         setNotifOpen(false);
@@ -180,7 +165,6 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
               type="button"
               onClick={() => {
                 setNavMenuOpen(!navMenuOpen);
-                setPortalOpen(false);
                 setNotifOpen(false);
               }}
               title={navMenuOpen ? 'Close navigation options' : 'Open navigation options'}
@@ -353,129 +337,42 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
 
         {/* Right Section: Portal Switcher (Shifted left of bell) + Notifications + Status + User */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          {/* Switch Portal Dropdown (attached image 4) */}
-          <div style={{ position: 'relative' }} ref={portalRef}>
-            <button
-              type="button"
-              onClick={() => {
-                setPortalOpen(!portalOpen);
-                setNotifOpen(false);
-                setNavMenuOpen(false);
-              }}
-              aria-label="Switch Portal"
+          {/* Active Portal Badge (Static, no direct role switching) */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '5px 10px',
+              borderRadius: '10px',
+              backgroundColor: isDark ? '#18181b' : '#f8fafc',
+              border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+            }}
+          >
+            <div
               style={{
+                width: '26px',
+                height: '26px',
+                borderRadius: '7px',
+                backgroundColor: currentRole.value === 'ADMIN' ? '#0284c7' : '#166534',
+                color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '5px 10px',
-                borderRadius: '10px',
-                backgroundColor: portalOpen ? '#f1f5f9' : '#f8fafc',
-                border: '1px solid #e2e8f0',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                if (!portalOpen) e.currentTarget.style.backgroundColor = '#f1f5f9';
-              }}
-              onMouseLeave={(e) => {
-                if (!portalOpen) e.currentTarget.style.backgroundColor = '#f8fafc';
+                justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
-              <div
-                style={{
-                  width: '26px',
-                  height: '26px',
-                  borderRadius: '7px',
-                  backgroundColor: '#166534',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <Building size={14} />
-              </div>
-              <div style={{ textAlign: 'left', minWidth: 0 }}>
-                <p className="truncate" style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a', lineHeight: 1.15 }}>
-                  <span className="hidden sm:inline">{currentRole.label}</span>
-                  <span className="sm:hidden">{currentRole.value === 'ADMIN' ? 'Admin' : 'Student'}</span>
-                </p>
-                <p className="truncate hidden md:block" style={{ fontSize: '9.5px', color: '#64748b', marginTop: '1px', lineHeight: 1 }}>
-                  {currentRole.desc}
-                </p>
-              </div>
-              <ChevronDown
-                size={13}
-                style={{
-                  color: '#94a3b8',
-                  transform: portalOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                  transition: 'transform 0.15s ease',
-                  flexShrink: 0,
-                  marginLeft: '2px',
-                }}
-              />
-            </button>
-
-            {/* Switch Portal Dropdown Menu */}
-            {portalOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 6px)',
-                  right: 0,
-                  width: 'min(calc(100vw - 24px), 230px)',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '12px',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                  zIndex: 120,
-                  padding: '5px',
-                  overflow: 'hidden',
-                }}
-              >
-                <p style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '6px 8px 4px 8px' }}>
-                  Switch Portal
-                </p>
-                {ROLES.map(role => {
-                  const isRoleActive = role.value === 'ADMIN' ? isManager : activePortal === 'STUDENT';
-                  return (
-                    <button
-                      key={role.value}
-                      type="button"
-                      onClick={() => handleRoleSwitch(role.value)}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '1px',
-                        padding: '7px 8px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: isRoleActive ? '#f0fdf4' : 'transparent',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'background-color 0.1s',
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isRoleActive) e.currentTarget.style.backgroundColor = '#f8fafc';
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isRoleActive) e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 600, color: isRoleActive ? '#166534' : '#0f172a' }}>
-                          {role.label}
-                        </span>
-                        {isRoleActive && <Check size={13} style={{ color: '#166534' }} />}
-                      </div>
-                      <span style={{ fontSize: '10px', color: '#94a3b8' }}>{role.desc}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+              <Building size={14} />
+            </div>
+            <div style={{ textAlign: 'left', minWidth: 0 }}>
+              <p className="truncate" style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#f4f4f5' : '#0f172a', lineHeight: 1.15 }}>
+                <span className="hidden sm:inline">{currentRole.label}</span>
+                <span className="sm:hidden">{currentRole.value === 'ADMIN' ? 'Admin' : 'Student'}</span>
+              </p>
+              <p className="truncate hidden md:block" style={{ fontSize: '9.5px', color: isDark ? '#a1a1aa' : '#64748b', marginTop: '1px', lineHeight: 1 }}>
+                {currentRole.desc}
+              </p>
+            </div>
           </div>
 
           {/* Dark / Light Mode Toggle */}
@@ -486,7 +383,6 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
             <button
               onClick={() => {
                 setNotifOpen(!notifOpen);
-                setPortalOpen(false);
                 setNavMenuOpen(false);
               }}
               title="Campus Announcements"

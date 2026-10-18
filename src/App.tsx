@@ -4,9 +4,10 @@ import { StudentPortalLayout } from './components/student/StudentPortalLayout';
 import { AdminPortalLayout } from './components/admin/AdminPortalLayout';
 import { LandingPage } from './components/landing/LandingPage';
 import { SidebarDemo } from './components/ui/demo';
+import Auth8 from './components/ui/auth-8';
 
 interface ParsedRoute {
-  portal: 'LANDING' | 'STUDENT' | 'ADMIN' | 'SIDEBAR_DEMO';
+  portal: 'LANDING' | 'STUDENT' | 'ADMIN' | 'SIDEBAR_DEMO' | 'LOGIN';
   view: string;
   path: string;
 }
@@ -14,6 +15,23 @@ interface ParsedRoute {
 const parseRoute = (pathname: string, hash: string): ParsedRoute => {
   const normalizedPath = pathname.toLowerCase();
   const normalizedHash = hash.replace(/^#/, '').toLowerCase();
+
+  // 0. Dedicated Login routing: /login, /login/student, /login/admin
+  if (normalizedPath === '/login/student' || normalizedPath === '/login/student/') {
+    return { portal: 'LOGIN', view: 'STUDENT', path: '/login/student' };
+  }
+  if (normalizedPath === '/login/admin' || normalizedPath === '/login/admin/') {
+    return { portal: 'LOGIN', view: 'ADMIN', path: '/login/admin' };
+  }
+  if (normalizedPath === '/login' || normalizedPath === '/login/' || normalizedPath === '/auth' || normalizedPath === '/auth/') {
+    return { portal: 'LOGIN', view: 'STUDENT', path: '/login' };
+  }
+  if (normalizedHash === 'login-student') {
+    return { portal: 'LOGIN', view: 'STUDENT', path: '/login/student' };
+  }
+  if (normalizedHash === 'login-admin') {
+    return { portal: 'LOGIN', view: 'ADMIN', path: '/login/admin' };
+  }
 
   // 0. Sidebar Demo routing: /sidebar or /demo
   if (
@@ -149,6 +167,12 @@ export const App: React.FC = () => {
         targetPath = '/students/applications';
       } else if (view === 'DISCOVER') {
         targetPath = route.portal === 'ADMIN' ? '/admin/events' : '/students';
+      } else if (view === 'LOGIN_STUDENT') {
+        targetPath = '/login/student';
+      } else if (view === 'LOGIN_ADMIN') {
+        targetPath = '/login/admin';
+      } else if (view === 'LOGIN') {
+        targetPath = '/login';
       } else if (view === 'SIDEBAR_DEMO') {
         targetPath = '/sidebar';
       } else {
@@ -167,7 +191,24 @@ export const App: React.FC = () => {
     setRoute(nextRoute);
   }, [route.portal]);
 
-  // 0. Dedicated Sidebar Demo Showcase
+  // 0. Dedicated Login Page (Auth8 Component for Student and Admin)
+  if (route.portal === 'LOGIN') {
+    return (
+      <Auth8
+        initialRole={route.view === 'ADMIN' ? 'ADMIN' : 'STUDENT'}
+        onLoginSuccess={(role) => {
+          if (role === 'ADMIN') {
+            handleNavigate('ADMIN', '/admin');
+          } else {
+            handleNavigate('DISCOVER', '/students');
+          }
+        }}
+        onBack={() => handleNavigate('LANDING', '/')}
+      />
+    );
+  }
+
+  // 1. Dedicated Sidebar Demo Showcase
   if (route.portal === 'SIDEBAR_DEMO') {
     return (
       <div className="min-h-screen bg-neutral-950 text-neutral-100 p-4 md:p-8 flex flex-col gap-6">
@@ -196,7 +237,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // 1. Admin Portal Layout: Dedicated /admin Route
+  // 2. Admin Portal Layout: Dedicated /admin Route
   if (route.portal === 'ADMIN') {
     return (
       <AdminPortalLayout
@@ -206,7 +247,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // 2. Student Portal Layout: Dedicated /students Route
+  // 3. Student Portal Layout: Dedicated /students Route
   if (route.portal === 'STUDENT') {
     return (
       <StudentPortalLayout
@@ -216,10 +257,10 @@ export const App: React.FC = () => {
     );
   }
 
-  // 3. Welcome Landing Page: Root (/) Route
+  // 4. Welcome Landing Page: Root (/) Route
   return (
     <LandingPage
-      onExploreEvents={() => handleNavigate('DISCOVER', '/students')}
+      onExploreEvents={() => handleNavigate('LOGIN_STUDENT', '/login/student')}
       onNavigate={handleNavigate}
     />
   );

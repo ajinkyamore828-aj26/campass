@@ -13,6 +13,7 @@ import {
   ShieldAlert,
   Bell,
   Home,
+  LogOut,
   User,
   CheckCircle2,
   Activity,
@@ -23,6 +24,7 @@ import { MenuIcon } from '@/components/ui/icons-menu';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { cn } from '@/lib/utils';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar';
+import { CampusPassLogo } from '@/assets/logo-icon';
 
 interface AdminPortalLayoutProps {
   currentView: string;
@@ -126,11 +128,7 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
             {/* Header: Brand & Security Badge */}
             {(isSidebarOpen || mobileMenuOpen) ? (
               <div className="flex items-center gap-3 py-1.5 px-1 min-w-0">
-                <div
-                  className="size-9 rounded-lg flex items-center justify-center flex-shrink-0 text-sky-400 bg-zinc-900 border border-zinc-800 shadow-xs"
-                >
-                  <ShieldCheck className="size-5" />
-                </div>
+                <CampusPassLogo className="size-9 rounded-lg flex-shrink-0 object-contain shadow-xs bg-zinc-900 border border-zinc-800" />
                 <div className="flex flex-col min-w-0 overflow-hidden">
                   <span className="text-[13px] font-extrabold text-slate-900 dark:text-zinc-100 truncate leading-tight">
                     {institutionProfile.collegeName}
@@ -142,12 +140,10 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
               </div>
             ) : (
               <div className="flex items-center justify-center py-1.5">
-                <div
-                  className="size-9 rounded-lg flex items-center justify-center text-sky-400 bg-zinc-900 border border-zinc-800 shadow-xs"
+                <CampusPassLogo
+                  className="size-9 rounded-lg flex items-center justify-center object-contain shadow-xs bg-zinc-900 border border-zinc-800"
                   title={`${institutionProfile.collegeName} - Admin Portal`}
-                >
-                  <ShieldCheck className="size-5" />
-                </div>
+                />
               </div>
             )}
 
@@ -236,13 +232,13 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
                   type="button"
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    onNavigate('DISCOVER', '/students');
+                    onNavigate('LANDING', '/');
                   }}
-                  className="flex items-center justify-center gap-1 py-1.5 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 text-[11px] font-semibold border border-slate-200 dark:border-zinc-700 transition cursor-pointer shadow-2xs"
-                  title="Switch to Student Portal (/students)"
+                  className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-[11px] font-semibold border border-slate-200 dark:border-zinc-700 transition cursor-pointer shadow-2xs"
+                  title="Sign Out of Admin Portal"
                 >
-                  <Compass className="size-3 text-emerald-600" />
-                  <span>Students</span>
+                  <LogOut className="size-3" />
+                  <span>Sign Out</span>
                 </button>
               </div>
             ) : (
@@ -262,12 +258,12 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
                   type="button"
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    onNavigate('DISCOVER', '/students');
+                    onNavigate('LANDING', '/');
                   }}
-                  className="size-8 flex items-center justify-center rounded-md bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-emerald-500 border border-slate-200 dark:border-zinc-700 transition cursor-pointer"
-                  title="Switch to Student Portal (/students)"
+                  className="size-8 flex items-center justify-center rounded-md bg-white dark:bg-zinc-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-500 border border-slate-200 dark:border-zinc-700 transition cursor-pointer"
+                  title="Sign Out of Admin Portal"
                 >
-                  <Compass className="size-3.5" />
+                  <LogOut className="size-3.5" />
                 </button>
               </div>
             )}

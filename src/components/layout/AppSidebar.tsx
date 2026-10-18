@@ -17,6 +17,7 @@ import {
   ArrowRightLeft
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
+import { CampusPassLogo } from '../../assets/logo-icon';
 
 interface AppSidebarProps {
   currentView: string;
@@ -63,14 +64,14 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             width: '42px',
             height: '42px',
             borderRadius: '12px',
-            background: 'linear-gradient(135deg, #166534 0%, #14532d 100%)',
-            color: '#ffffff',
+            background: '#18181b',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: 'var(--shadow-sm)'
+            boxShadow: 'var(--shadow-sm)',
+            overflow: 'hidden'
           }}>
-            <GraduationCap size={24} />
+            <CampusPassLogo className="size-full object-contain" />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -95,40 +96,22 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           </div>
         </div>
 
-        {/* Persona Switcher Selector */}
+        {/* Persona Indicator (Static) */}
         <div style={{
           backgroundColor: 'var(--bg-subtle)',
-          padding: '6px',
+          padding: '6px 10px',
           borderRadius: '10px',
           border: '1px solid var(--border)',
           display: 'flex',
           flexDirection: 'column',
-          gap: '4px'
+          gap: '2px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
-              Active Persona
-            </span>
-            <span style={{ fontSize: '10px', color: 'var(--accent-cyan)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '3px' }}>
-              <ArrowRightLeft size={10} />
-              Switch
-            </span>
-          </div>
-          <select
-            value={activePortal}
-            onChange={(e) => handleRoleChange(e.target.value as any)}
-            className="wm-select"
-            style={{
-              padding: '6px 28px 6px 8px',
-              fontSize: '12px',
-              fontWeight: 700,
-              backgroundColor: '#ffffff'
-            }}
-          >
-            <option value="STUDENT">Student: Rohan Verma</option>
-            <option value="ORGANIZER">Event Organizer: Dr. Sharma</option>
-            <option value="ADMIN">Administrator: System Dean</option>
-          </select>
+          <span style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
+            Current Portal
+          </span>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
+            {activePortal === 'ADMIN' ? 'Administrator' : activePortal === 'ORGANIZER' ? 'Event Organizer' : 'Student'}
+          </span>
         </div>
       </div>
 

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 84" fill="none">
+  <!-- Solid Dark Background Container -->
+  <rect width="84" height="84" rx="18" fill="#111113"/>
+  <!-- Credential Badge Silhouette -->
+  <rect x="14" y="10" width="56" height="64" rx="14" fill="#18181B" stroke="#27272A" stroke-width="2"/>
+  <!-- Lanyard Slot Cutout -->
+  <rect x="32" y="16" width="20" height="5" rx="2.5" fill="#3F3F46"/>
+  <!-- Collegiate Archway Portal -->
+  <path d="M25 60V38C25 28.6112 32.6112 21 42 21C51.3888 21 59 28.6112 59 38V60H51V39C51 34.0294 46.9706 30 42 30C37.0294 30 33 34.0294 33 39V60H25Z" fill="#FFFFFF"/>
+  <!-- Verification Access Dot -->
+  <circle cx="54" cy="27" r="3.2" fill="#38BDF8"/>
+</svg>
