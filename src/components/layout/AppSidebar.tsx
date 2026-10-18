@@ -279,9 +279,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             <strong style={{ display: 'block', fontSize: '12px', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {currentUser.fullName}
             </strong>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {currentUser.role} • {currentUser.studentId || currentUser.department.split(' ')[0]}
-            </span>
           </div>
         </div>
       </div>

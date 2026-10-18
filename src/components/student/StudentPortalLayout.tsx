@@ -164,9 +164,6 @@ export const StudentPortalLayout: React.FC<StudentPortalLayoutProps> = ({
                   <p className="text-xs font-bold text-slate-800 dark:text-zinc-200 truncate leading-tight">
                     {currentUser.fullName}
                   </p>
-                  <p className="text-[10px] text-slate-500 dark:text-zinc-400 truncate mt-0.5">
-                    {currentUser.studentId || 'Student ID'} • {currentUser.academicYear || 'UG'}
-                  </p>
                 </div>
               )}
             </div>

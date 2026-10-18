@@ -234,9 +234,6 @@ export const CampusPassNavbar: React.FC = () => {
               <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f8fafc', lineHeight: 1.1 }}>
                 {currentUser.fullName}
               </div>
-              <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>
-                {currentUser.role} • {currentUser.studentId || currentUser.department.split('&')[0]}
-              </div>
             </div>
           </div>
         </div>

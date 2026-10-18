@@ -549,7 +549,7 @@ export const DemostackTopbar: React.FC<DemostackTopbarProps> = ({
             >
               {(currentUser.fullName || 'User').charAt(0)}
             </div>
-            <span className="hidden md:inline" style={{ fontSize: '12px', fontWeight: 600, color: isDark ? '#f4f4f5' : '#09090b' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: isDark ? '#f4f4f5' : '#09090b', whiteSpace: 'nowrap' }}>
               {currentUser.fullName || 'Ajinkya More'}
             </span>
           </div>

@@ -19,7 +19,8 @@ interface CampusPassContextType {
   activePortal: ActivePortal;
   setActivePortal: (portal: ActivePortal) => void;
   currentUser: CampusUser;
-  switchUserRole: (role: UserRole) => void;
+  switchUserRole: (role: UserRole, customName?: string) => void;
+  updateCurrentUser: (updates: Partial<CampusUser>) => void;
   
   // Data
   events: CampusEvent[];
@@ -148,19 +149,45 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const [users, setUsers] = useState<CampusUser[]>([]);
-  const [currentUser, setCurrentUser] = useState<CampusUser>({
-    id: 'USR-STU-01',
-    fullName: 'Ajinkya More',
-    email: 'ajinkya.more@axiogen.in',
-    studentId: 'STU-2023-CS-041',
-    department: 'Computer Science & Engineering',
-    academicYear: '3rd Year',
-    phone: '+91 98234 11001',
-    role: 'STUDENT',
-    status: 'ACTIVE',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-    createdAt: '2026-08-01T10:00:00Z'
+  const [currentUser, setCurrentUserState] = useState<CampusUser>(() => {
+    try {
+      const saved = localStorage.getItem('campuspass_current_user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.fullName) return parsed;
+      }
+    } catch {}
+    return {
+      id: 'USR-STU-01',
+      fullName: 'Ajinkya More',
+      email: 'ajinkya.more@axiogen.in',
+      studentId: 'STU-2023-CS-041',
+      department: 'Computer Science & Engineering',
+      academicYear: '3rd Year',
+      phone: '+91 98234 11001',
+      role: 'STUDENT',
+      status: 'ACTIVE',
+      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      createdAt: '2026-08-01T10:00:00Z'
+    };
   });
+
+  const setCurrentUser = (userOrUpdater: CampusUser | ((prev: CampusUser) => CampusUser)) => {
+    setCurrentUserState(prev => {
+      const next = typeof userOrUpdater === 'function' ? userOrUpdater(prev) : userOrUpdater;
+      try {
+        localStorage.setItem('campuspass_current_user', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const updateCurrentUser = (updates: Partial<CampusUser>) => {
+    setCurrentUser(prev => ({
+      ...prev,
+      ...updates,
+    }));
+  };
 
   const [events, setEvents] = useState<CampusEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<CampusEvent | null>(null);
@@ -469,17 +496,17 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     refreshData();
   }, []);
 
-  const switchUserRole = (newRole: UserRole) => {
+  const switchUserRole = (newRole: UserRole, customName?: string) => {
     const match = users.find(u => u.role === newRole);
     if (match) {
-      setCurrentUser(match);
+      setCurrentUser(customName ? { ...match, fullName: customName } : match);
     } else {
-      setCurrentUser({
-        ...currentUser,
+      setCurrentUser(prev => ({
+        ...prev,
         role: newRole,
-        fullName: newRole === 'ADMIN' ? 'Dr. Rajesh Sharma' : newRole === 'ORGANIZER' ? 'Prof. Ananya Sen' : newRole === 'VOLUNTEER' ? 'Rohan Mehra' : 'Ajinkya More',
-        studentId: newRole === 'STUDENT' ? 'STU-2023-CS-041' : undefined
-      });
+        fullName: customName || (newRole === 'ADMIN' ? 'Dr. Rajesh Sharma' : newRole === 'ORGANIZER' ? 'Prof. Ananya Sen' : newRole === 'VOLUNTEER' ? 'Rohan Mehra' : prev.fullName || 'Ajinkya More'),
+        studentId: newRole === 'STUDENT' ? (prev.studentId || 'STU-2023-CS-041') : undefined
+      }));
     }
     setActivePortal(newRole);
   };
@@ -720,6 +747,7 @@ export const CampusPassProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setActivePortal,
         currentUser,
         switchUserRole,
+        updateCurrentUser,
         events,
         selectedEvent,
         setSelectedEvent,

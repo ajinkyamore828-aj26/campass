@@ -331,9 +331,6 @@ export const DemostackSidebar: React.FC<DemostackSidebarProps> = ({ currentView,
                 <p className="truncate" style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a' }}>
                   {currentUser.fullName}
                 </p>
-                <p className="truncate" style={{ fontSize: '11px', color: '#64748b' }}>
-                  {currentUser.email || `${currentUser.studentId}@campus.edu`}
-                </p>
               </div>
               <ChevronDown size={13} style={{ color: '#94a3b8', flexShrink: 0, transform: userOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.15s' }} />
             </button>

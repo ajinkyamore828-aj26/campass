@@ -199,15 +199,12 @@ export const AdminPortalLayout: React.FC<AdminPortalLayoutProps> = ({
               )}
             >
               <div className="size-7 rounded-full bg-zinc-900 border border-zinc-800 text-sky-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                A
+                {(currentUser.fullName || 'A').charAt(0)}
               </div>
               {(isSidebarOpen || mobileMenuOpen) && (
                 <div className="flex-1 min-w-0 overflow-hidden">
                   <p className="text-xs font-bold text-slate-800 dark:text-zinc-200 truncate leading-tight">
-                    System Administrator
-                  </p>
-                  <p className="text-[10px] text-slate-500 dark:text-zinc-400 truncate mt-0.5">
-                    Faculty &bull; Clearance L4
+                    {currentUser.fullName || "System Administrator"}
                   </p>
                 </div>
               )}

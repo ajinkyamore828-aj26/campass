@@ -76,7 +76,7 @@ export default function Auth8({
   const [magicLinkMessage, setMagicLinkMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { switchUserRole, setActivePortal, createUser } = useCampusPass();
+  const { switchUserRole, setActivePortal, createUser, updateCurrentUser } = useCampusPass();
 
   const handleRoleSwitch = (newRole: 'STUDENT' | 'ADMIN') => {
     setRole(newRole);
@@ -94,11 +94,33 @@ export default function Auth8({
     }
   };
 
-  const executeLogin = (selectedRole: 'STUDENT' | 'ADMIN') => {
+  const executeLogin = (selectedRole: 'STUDENT' | 'ADMIN', customName?: string) => {
     setIsSubmitting(true);
     setTimeout(() => {
+      let displayName = customName;
+      if (!displayName && isSignUp && fullName.trim()) {
+        displayName = fullName.trim();
+      } else if (!displayName && username.trim()) {
+        const u = username.trim();
+        if (u.includes('_') || u.includes('.')) {
+          displayName = u.split(/[_.]/).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+        } else {
+          displayName = u.charAt(0).toUpperCase() + u.slice(1);
+        }
+      } else if (!displayName && selectedRole === 'ADMIN') {
+        displayName = 'Prof. S.K. Joshi';
+      }
+
+      if (displayName) {
+        updateCurrentUser({
+          fullName: displayName,
+          email: email.trim() || undefined,
+          role: selectedRole,
+        });
+      }
+
       // Sync global application context
-      switchUserRole(selectedRole);
+      switchUserRole(selectedRole, displayName);
       setActivePortal(selectedRole);
 
       if (onLoginSuccess) {
@@ -158,7 +180,7 @@ export default function Auth8({
       } catch {
         // Continue to sign in even if offline
       }
-      executeLogin('STUDENT');
+      executeLogin('STUDENT', fullName.trim());
       return;
     }
 
